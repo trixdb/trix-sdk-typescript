@@ -1,0 +1,1426 @@
+/**
+ * Core type definitions for the TrixDB SDK
+ */
+
+import type { RequestInterceptor, ResponseInterceptor, ErrorInterceptor } from './client.js';
+
+/**
+ * Configuration options for the TrixDB client
+ */
+export interface TrixDBConfig {
+  /**
+   * API key or JWT token for authentication
+   */
+  apiKey: string;
+
+  /**
+   * Base URL for the TrixDB API
+   * @default 'https://api.trixdb.com'
+   */
+  baseUrl?: string;
+
+  /**
+   * Maximum number of retry attempts for failed requests
+   * @default 3
+   */
+  maxRetries?: number;
+
+  /**
+   * Timeout for requests in milliseconds
+   * @default 30000
+   */
+  timeout?: number;
+
+  /**
+   * Custom fetch implementation (useful for testing or specific environments)
+   */
+  fetch?: typeof fetch;
+
+  /**
+   * Allow insecure connections (HTTP, localhost).
+   * Only use for local development - never in production.
+   * @default false
+   */
+  allowInsecure?: boolean;
+
+  /**
+   * Request interceptors to run before each request.
+   * Interceptors run in order and can modify the request.
+   */
+  requestInterceptors?: RequestInterceptor[];
+
+  /**
+   * Response interceptors to run after each successful response.
+   * Interceptors run in order and can modify or observe the response.
+   */
+  responseInterceptors?: ResponseInterceptor[];
+
+  /**
+   * Error interceptors to run when an error occurs.
+   * Interceptors run in order and can transform or log errors.
+   */
+  errorInterceptors?: ErrorInterceptor[];
+}
+
+/**
+ * Paginated response wrapper
+ */
+export interface PaginatedResponse<T> {
+  data: T[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    hasMore: boolean;
+  };
+}
+
+/**
+ * Memory types supported by TrixDB
+ */
+export type MemoryType = 'text' | 'markdown' | 'url' | 'audio';
+
+/**
+ * Memory object
+ */
+export interface Memory {
+  id: string;
+  spaceId: string;
+  type: MemoryType;
+  content: string;
+  embedding?: number[];
+  tags?: string[];
+  metadata?: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+  transcriptStatus?: 'pending' | 'processing' | 'completed' | 'failed';
+}
+
+/**
+ * Parameters for creating a memory
+ */
+export interface CreateMemoryParams {
+  content: string;
+  type?: MemoryType;
+  tags?: string[];
+  metadata?: Record<string, unknown>;
+  spaceId?: string;
+  embedding?: number[];
+  audioFile?: Blob | Buffer;
+}
+
+/**
+ * Parameters for updating a memory
+ */
+export interface UpdateMemoryParams {
+  id?: string;
+  content?: string;
+  tags?: string[];
+  metadata?: Record<string, unknown>;
+  embedding?: number[];
+}
+
+/**
+ * Parameters for listing memories
+ */
+export interface ListMemoriesParams {
+  q?: string;
+  mode?: 'semantic' | 'keyword' | 'hybrid';
+  limit?: number;
+  page?: number;
+  offset?: number;
+  tags?: string[];
+  type?: MemoryType;
+  spaceId?: string;
+  sortBy?: 'createdAt' | 'updatedAt' | 'relevance';
+  sortOrder?: 'asc' | 'desc';
+}
+
+/**
+ * Bulk operation result
+ */
+export interface BulkResult {
+  success: number;
+  failed: number;
+  errors?: Array<{
+    index: number;
+    message: string;
+  }>;
+}
+
+/**
+ * Memory configuration
+ */
+export interface MemoryConfig {
+  maxContentLength: number;
+  supportedTypes: MemoryType[];
+  maxTagsPerMemory: number;
+  maxAudioDuration: number;
+}
+
+/**
+ * Transcript object
+ */
+export interface Transcript {
+  memoryId: string;
+  text: string;
+  language?: string;
+  confidence?: number;
+  segments?: Array<{
+    start: number;
+    end: number;
+    text: string;
+  }>;
+  createdAt: string;
+}
+
+/**
+ * Parameters for transcription
+ */
+export interface TranscribeParams {
+  language?: string;
+  model?: string;
+  priority?: 'low' | 'normal' | 'high';
+}
+
+/**
+ * Relationship object
+ */
+export interface Relationship {
+  id: string;
+  sourceId: string;
+  targetId: string;
+  relationshipType: string;
+  strength: number;
+  metadata?: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Parameters for creating a relationship
+ */
+export interface CreateRelationshipParams {
+  relationshipType: string;
+  strength?: number;
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Parameters for updating a relationship
+ */
+export interface UpdateRelationshipParams {
+  relationshipType?: string;
+  strength?: number;
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Parameters for reinforcing a relationship
+ */
+export interface ReinforceParams {
+  amount?: number;
+}
+
+/**
+ * Cluster object
+ */
+export interface Cluster {
+  id: string;
+  spaceId: string;
+  name: string;
+  description?: string;
+  memoryIds: string[];
+  centroid?: number[];
+  metadata?: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Parameters for creating a cluster
+ */
+export interface CreateClusterParams {
+  name: string;
+  description?: string;
+  memoryIds?: string[];
+  spaceId?: string;
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Parameters for updating a cluster
+ */
+export interface UpdateClusterParams {
+  name?: string;
+  description?: string;
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Parameters for listing clusters
+ */
+export interface ListClustersParams {
+  limit?: number;
+  page?: number;
+  offset?: number;
+  spaceId?: string;
+  sortBy?: 'createdAt' | 'updatedAt' | 'name';
+  sortOrder?: 'asc' | 'desc';
+}
+
+/**
+ * Parameters for expanding a cluster
+ */
+export interface ExpandParams {
+  limit?: number;
+  threshold?: number;
+}
+
+/**
+ * Expand result
+ */
+export interface ExpandResult {
+  clusterId: string;
+  newMemories: Array<{
+    memoryId: string;
+    confidence: number;
+  }>;
+}
+
+/**
+ * Space object
+ */
+export interface Space {
+  id: string;
+  name: string;
+  description?: string;
+  metadata?: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Parameters for creating a space
+ */
+export interface CreateSpaceParams {
+  name: string;
+  description?: string;
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Parameters for updating a space
+ */
+export interface UpdateSpaceParams {
+  name?: string;
+  description?: string;
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Parameters for graph traversal
+ */
+export interface TraverseParams {
+  startNodeId: string;
+  maxDepth?: number;
+  relationshipTypes?: string[];
+  direction?: 'outgoing' | 'incoming' | 'both';
+  limit?: number;
+}
+
+/**
+ * Graph result
+ */
+export interface GraphResult {
+  nodes: Array<{
+    id: string;
+    type: string;
+    data: Memory | Cluster;
+    depth: number;
+  }>;
+  edges: Array<{
+    source: string;
+    target: string;
+    relationship: Relationship;
+  }>;
+}
+
+/**
+ * Parameters for getting context
+ */
+export interface ContextParams {
+  memoryId: string;
+  depth?: number;
+  relationshipTypes?: string[];
+  includeMetadata?: boolean;
+}
+
+/**
+ * Context result
+ */
+export interface ContextResult {
+  central: Memory;
+  related: Memory[];
+  relationships: Relationship[];
+  clusters?: Cluster[];
+}
+
+/**
+ * Parameters for shortest path
+ */
+export interface PathParams {
+  relationshipTypes?: string[];
+  maxDepth?: number;
+}
+
+/**
+ * Path result
+ */
+export interface PathResult {
+  path: Array<{
+    node: Memory;
+    relationship?: Relationship;
+  }>;
+  distance: number;
+  found: boolean;
+}
+
+/**
+ * Parameters for similar search
+ */
+export interface SimilarParams {
+  limit?: number;
+  threshold?: number;
+  includeEmbedding?: boolean;
+  spaceId?: string;
+}
+
+/**
+ * Similar result
+ */
+export interface SimilarResult {
+  results: Array<{
+    memory: Memory;
+    similarity: number;
+  }>;
+}
+
+/**
+ * Embed result
+ */
+export interface EmbedResult {
+  embeddings: Array<{
+    memoryId: string;
+    embedding: number[];
+  }>;
+}
+
+/**
+ * Embed all result
+ */
+export interface EmbedAllResult {
+  total: number;
+  processed: number;
+  jobId?: string;
+}
+
+/**
+ * Search configuration
+ */
+export interface SearchConfig {
+  embeddingModel: string;
+  embeddingDimensions: number;
+  maxBatchSize: number;
+}
+
+/**
+ * Webhook object
+ */
+export interface Webhook {
+  id: string;
+  url: string;
+  events: string[];
+  secret?: string;
+  active: boolean;
+  metadata?: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Parameters for creating a webhook
+ */
+export interface CreateWebhookParams {
+  url: string;
+  events: string[];
+  secret?: string;
+  active?: boolean;
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Parameters for updating a webhook
+ */
+export interface UpdateWebhookParams {
+  url?: string;
+  events?: string[];
+  secret?: string;
+  active?: boolean;
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Parameters for listing webhooks
+ */
+export interface ListWebhooksParams {
+  limit?: number;
+  page?: number;
+  active?: boolean;
+}
+
+/**
+ * Test result
+ */
+export interface TestResult {
+  success: boolean;
+  statusCode?: number;
+  response?: string;
+  error?: string;
+}
+
+/**
+ * Webhook delivery
+ */
+export interface Delivery {
+  id: string;
+  webhookId: string;
+  event: string;
+  status: 'pending' | 'success' | 'failed';
+  statusCode?: number;
+  attempts: number;
+  nextRetry?: string;
+  createdAt: string;
+}
+
+/**
+ * Parameters for listing deliveries
+ */
+export interface DeliveriesParams {
+  limit?: number;
+  page?: number;
+  status?: 'pending' | 'success' | 'failed';
+}
+
+/**
+ * Parameters for consolidation
+ */
+export interface ConsolidateParams {
+  spaceId?: string;
+  threshold?: number;
+  maxClusters?: number;
+  priority?: 'low' | 'normal' | 'high';
+}
+
+/**
+ * Consolidate result
+ */
+export interface ConsolidateResult {
+  jobId: string;
+  status: 'queued' | 'processing' | 'completed' | 'failed';
+}
+
+/**
+ * Session object
+ */
+export interface Session {
+  id: string;
+  spaceId?: string;
+  name?: string;
+  metadata?: Record<string, unknown>;
+  startedAt: string;
+  endedAt?: string;
+  memoryCount: number;
+}
+
+/**
+ * Parameters for creating a session
+ */
+export interface CreateSessionParams {
+  name?: string;
+  spaceId?: string;
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Session memory
+ */
+export interface SessionMemory {
+  id: string;
+  sessionId: string;
+  memoryId: string;
+  sequenceNumber: number;
+  createdAt: string;
+}
+
+/**
+ * Parameters for adding memory to session
+ */
+export interface AddMemoryParams {
+  memoryId?: string;
+  content?: string;
+  type?: MemoryType;
+  tags?: string[];
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Parameters for getting session
+ */
+export interface GetSessionParams {
+  includeMemories?: boolean;
+  limit?: number;
+}
+
+/**
+ * Session history
+ */
+export interface SessionHistory {
+  session: Session;
+  memories?: Memory[];
+}
+
+/**
+ * Parameters for listing sessions
+ */
+export interface ListSessionsParams {
+  limit?: number;
+  page?: number;
+  spaceId?: string;
+  active?: boolean;
+}
+
+/**
+ * Parameters for getting agent context
+ */
+export interface GetContextParams {
+  sessionId?: string;
+  query?: string;
+  limit?: number;
+  includeRelated?: boolean;
+}
+
+/**
+ * Parameters for ending session
+ */
+export interface EndSessionParams {
+  consolidate?: boolean;
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Ended session
+ */
+export interface EndedSession {
+  session: Session;
+  consolidationJobId?: string;
+}
+
+/**
+ * Parameters for submitting feedback
+ */
+export interface SubmitFeedbackParams {
+  memoryId: string;
+  type: 'positive' | 'negative' | 'neutral';
+  comment?: string;
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Feedback result
+ */
+export interface FeedbackResult {
+  id: string;
+  memoryId: string;
+  type: string;
+  createdAt: string;
+}
+
+/**
+ * Parameters for quick feedback
+ */
+export interface QuickFeedbackParams {
+  memoryId: string;
+  type: 'thumbs_up' | 'thumbs_down';
+}
+
+/**
+ * Quick feedback result
+ */
+export interface QuickFeedbackResult {
+  success: boolean;
+  memoryId: string;
+}
+
+/**
+ * Parameters for batch feedback
+ */
+export interface BatchFeedbackParams {
+  feedback: Array<{
+    memoryId: string;
+    type: 'positive' | 'negative' | 'neutral';
+    comment?: string;
+  }>;
+}
+
+/**
+ * Batch feedback result
+ */
+export interface BatchFeedbackResult {
+  success: number;
+  failed: number;
+  errors?: Array<{
+    index: number;
+    message: string;
+  }>;
+}
+
+/**
+ * Highlight object
+ */
+export interface Highlight {
+  id: string;
+  memoryId: string;
+  text: string;
+  startOffset: number;
+  endOffset: number;
+  color?: string;
+  note?: string;
+  metadata?: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Parameters for creating a highlight
+ */
+export interface CreateHighlightParams {
+  text: string;
+  startOffset: number;
+  endOffset: number;
+  color?: string;
+  note?: string;
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Parameters for updating a highlight
+ */
+export interface UpdateHighlightParams {
+  color?: string;
+  note?: string;
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Parameters for listing highlights
+ */
+export interface ListHighlightsParams {
+  limit?: number;
+  page?: number;
+}
+
+/**
+ * Parameters for extracting highlights
+ */
+export interface ExtractParams {
+  method?: 'ai' | 'keyword' | 'tfidf';
+  limit?: number;
+  minLength?: number;
+}
+
+/**
+ * Extract result
+ */
+export interface ExtractResult {
+  highlights: Array<{
+    text: string;
+    startOffset: number;
+    endOffset: number;
+    score: number;
+  }>;
+}
+
+/**
+ * Job object
+ */
+export interface Job {
+  id: string;
+  queue: string;
+  name: string;
+  data: Record<string, unknown>;
+  status: 'waiting' | 'active' | 'completed' | 'failed' | 'delayed';
+  progress?: number;
+  returnValue?: unknown;
+  failedReason?: string;
+  attempts: number;
+  createdAt: string;
+  processedAt?: string;
+  finishedAt?: string;
+}
+
+/**
+ * Job statistics
+ */
+export interface JobStats {
+  queues: Array<{
+    name: string;
+    waiting: number;
+    active: number;
+    completed: number;
+    failed: number;
+    delayed: number;
+  }>;
+}
+
+/**
+ * Parameters for listing jobs
+ */
+export interface ListJobsParams {
+  queue?: string;
+  status?: 'waiting' | 'active' | 'completed' | 'failed' | 'delayed';
+  limit?: number;
+  page?: number;
+}
+
+/**
+ * Parameters for cleaning jobs
+ */
+export interface CleanParams {
+  grace?: number;
+  limit?: number;
+  status?: 'completed' | 'failed';
+}
+
+/**
+ * Clean result
+ */
+export interface CleanResult {
+  removed: number;
+}
+
+// ============================================================================
+// Fact Types - Knowledge Graph Triples
+// ============================================================================
+
+/**
+ * Type of subject/object in a fact
+ */
+export type FactNodeType = 'entity' | 'text' | 'memory';
+
+/**
+ * Source of a fact (how it was created)
+ */
+export interface FactSource {
+  memoryId?: string;
+  sessionId?: string;
+  method?: 'manual' | 'extracted' | 'inferred';
+}
+
+/**
+ * Fact object - represents a knowledge graph triple (Subject-Predicate-Object)
+ */
+export interface Fact {
+  id: string;
+  subject: string;
+  predicate: string;
+  object: string;
+  subjectType?: FactNodeType;
+  objectType?: FactNodeType;
+  confidence: number;
+  source?: FactSource;
+  validFrom?: string;
+  validTo?: string;
+  metadata?: Record<string, unknown>;
+  spaceId?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Parameters for creating a fact
+ */
+export interface CreateFactParams {
+  subject: string;
+  predicate: string;
+  object: string;
+  subjectType?: FactNodeType;
+  objectType?: FactNodeType;
+  confidence?: number;
+  source?: FactSource;
+  validFrom?: string;
+  validTo?: string;
+  metadata?: Record<string, unknown>;
+  spaceId?: string;
+}
+
+/**
+ * Parameters for updating a fact
+ */
+export interface UpdateFactParams {
+  subject?: string;
+  predicate?: string;
+  object?: string;
+  subjectType?: FactNodeType;
+  objectType?: FactNodeType;
+  confidence?: number;
+  validFrom?: string;
+  validTo?: string;
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Parameters for listing facts
+ */
+export interface ListFactsParams {
+  subject?: string;
+  predicate?: string;
+  object?: string;
+  minConfidence?: number;
+  spaceId?: string;
+  limit?: number;
+  page?: number;
+  offset?: number;
+}
+
+/**
+ * Parameters for querying facts
+ */
+export interface QueryFactsParams {
+  limit?: number;
+  minConfidence?: number;
+  spaceId?: string;
+}
+
+/**
+ * Fact with relevance score
+ */
+export interface ScoredFact extends Fact {
+  score: number;
+}
+
+/**
+ * Result of fact extraction
+ */
+export interface FactExtractionResult {
+  memoryId: string;
+  facts: Array<{
+    subject: string;
+    predicate: string;
+    object: string;
+    confidence: number;
+  }>;
+  saved?: boolean;
+}
+
+/**
+ * Result of fact verification
+ */
+export interface FactVerificationResult {
+  factId: string;
+  verified: boolean;
+  confidence: number;
+  supportingMemories: string[];
+  contradictingMemories?: string[];
+}
+
+// ============================================================================
+// Entity Types - Named Entity Management
+// ============================================================================
+
+/**
+ * Entity object - represents a named entity
+ */
+export interface Entity {
+  id: string;
+  name: string;
+  type: string;
+  aliases?: string[];
+  description?: string;
+  properties?: Record<string, unknown>;
+  memoryIds?: string[];
+  metadata?: Record<string, unknown>;
+  spaceId?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Parameters for creating an entity
+ */
+export interface CreateEntityParams {
+  name: string;
+  type: string;
+  aliases?: string[];
+  description?: string;
+  properties?: Record<string, unknown>;
+  memoryIds?: string[];
+  metadata?: Record<string, unknown>;
+  spaceId?: string;
+}
+
+/**
+ * Parameters for updating an entity
+ */
+export interface UpdateEntityParams {
+  name?: string;
+  type?: string;
+  aliases?: string[];
+  description?: string;
+  properties?: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Parameters for listing entities
+ */
+export interface ListEntitiesParams {
+  type?: string;
+  spaceId?: string;
+  limit?: number;
+  page?: number;
+  offset?: number;
+}
+
+/**
+ * Parameters for searching entities
+ */
+export interface SearchEntitiesParams {
+  type?: string;
+  spaceId?: string;
+  limit?: number;
+}
+
+/**
+ * Parameters for resolving text to entity
+ */
+export interface ResolveEntityParams {
+  context?: string;
+  spaceId?: string;
+}
+
+/**
+ * Entity with relevance score
+ */
+export interface ScoredEntity extends Entity {
+  score: number;
+}
+
+/**
+ * Result of entity resolution
+ */
+export interface EntityResolutionResult {
+  text: string;
+  entity?: Entity;
+  confidence: number;
+  alternatives?: Array<{
+    entity: Entity;
+    confidence: number;
+  }>;
+}
+
+/**
+ * Result of entity merge
+ */
+export interface EntityMergeResult {
+  mergedEntity: Entity;
+  deletedId: string;
+}
+
+/**
+ * Result of entity-memory link
+ */
+export interface EntityMemoryLinkResult {
+  entityId: string;
+  memoryId: string;
+  linked: boolean;
+}
+
+/**
+ * Result of entity extraction
+ */
+export interface EntityExtractionResult {
+  memoryId: string;
+  entities: Array<{
+    name: string;
+    type: string;
+    confidence: number;
+    span?: {
+      start: number;
+      end: number;
+    };
+  }>;
+  saved?: boolean;
+  linked?: boolean;
+}
+
+/**
+ * Entity type with count
+ */
+export interface EntityTypeInfo {
+  name: string;
+  count: number;
+}
+
+/**
+ * Result of getting entity types
+ */
+export interface EntityTypesResult {
+  types: EntityTypeInfo[];
+}
+
+/**
+ * Result of getting entity facts
+ */
+export interface EntityFactsResult {
+  entityId: string;
+  facts: Fact[];
+}
+
+// ============================================================================
+// Enrichment Types - Memory Enrichments
+// ============================================================================
+
+/**
+ * Enrichment status
+ */
+export type EnrichmentStatus = 'pending' | 'processing' | 'completed' | 'failed';
+
+/**
+ * Enrichment type
+ */
+export type EnrichmentType = 'entities' | 'summary' | 'sentiment' | 'topics' | 'keywords' | 'custom';
+
+/**
+ * Enrichment object
+ */
+export interface Enrichment {
+  type: EnrichmentType | string;
+  status: EnrichmentStatus;
+  data?: Record<string, unknown>;
+  error?: string;
+  processedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Parameters for listing enrichments
+ */
+export interface ListEnrichmentsParams {
+  status?: EnrichmentStatus;
+}
+
+/**
+ * Parameters for triggering enrichments
+ */
+export interface TriggerEnrichmentParams {
+  types?: string[];
+  priority?: 'low' | 'normal' | 'high';
+  force?: boolean;
+}
+
+/**
+ * Enrichment result
+ */
+export interface EnrichmentResult {
+  memoryId: string;
+  triggered: string[];
+  jobIds?: string[];
+  status: 'queued' | 'processing';
+}
+
+// ============================================================================
+// Memory Stats Types
+// ============================================================================
+
+/**
+ * Parameters for getting memory stats
+ */
+export interface MemoryStatsParams {
+  spaceId?: string;
+  createdAfter?: string;
+  createdBefore?: string;
+  includeTypeDistribution?: boolean;
+  includeTagDistribution?: boolean;
+  includeTimeline?: boolean;
+  timelineGranularity?: 'hour' | 'day' | 'week' | 'month';
+}
+
+/**
+ * Memory statistics
+ */
+export interface MemoryStats {
+  total: number;
+  byType?: Record<string, number>;
+  byTag?: Record<string, number>;
+  timeline?: Array<{
+    period: string;
+    count: number;
+  }>;
+  avgContentLength?: number;
+  totalSize?: number;
+}
+
+// ============================================================================
+// Cluster Extended Types
+// ============================================================================
+
+/**
+ * Cluster statistics
+ */
+export interface ClusterStats {
+  total: number;
+  avgSize: number;
+  avgQuality: number;
+  bySpace?: Record<string, number>;
+}
+
+/**
+ * Cluster quality metrics
+ */
+export interface ClusterQuality {
+  clusterId: string;
+  coherence: number;
+  separation: number;
+  silhouetteScore: number;
+  outlierCount: number;
+}
+
+/**
+ * Cluster topics
+ */
+export interface ClusterTopics {
+  clusterId: string;
+  topics: Array<{
+    label: string;
+    score: number;
+    keywords: string[];
+  }>;
+}
+
+/**
+ * Parameters for incremental clustering
+ */
+export interface IncrementalClusterParams {
+  spaceId?: string;
+  threshold?: number;
+  maxNewClusters?: number;
+}
+
+/**
+ * Incremental clustering result
+ */
+export interface IncrementalClusterResult {
+  jobId: string;
+  status: 'queued' | 'processing';
+  estimatedMemories: number;
+}
+
+// ============================================================================
+// Relationship Extended Types
+// ============================================================================
+
+/**
+ * Relationship type info
+ */
+export interface RelationshipType {
+  name: string;
+  count: number;
+  description?: string;
+}
+
+/**
+ * Parameters for weakening a relationship
+ */
+export interface WeakenParams {
+  amount?: number;
+}
+
+/**
+ * Related memories result
+ */
+export interface RelatedMemoriesResult {
+  memoryId: string;
+  related: Array<{
+    memory: Memory;
+    relationship: Relationship;
+    score: number;
+  }>;
+}
+
+/**
+ * Parameters for reinforcing a group of relationships
+ */
+export interface ReinforceGroupParams {
+  relationshipIds: string[];
+  amount?: number;
+}
+
+/**
+ * Reinforce group result
+ */
+export interface ReinforceGroupResult {
+  reinforced: number;
+  failed: number;
+}
+
+// ============================================================================
+// Graph Extended Types
+// ============================================================================
+
+/**
+ * Graph neighbors
+ */
+export interface GraphNeighbors {
+  nodeId: string;
+  neighbors: Array<{
+    id: string;
+    type: string;
+    relationship: Relationship;
+  }>;
+}
+
+/**
+ * Graph statistics
+ */
+export interface GraphStats {
+  nodeCount: number;
+  edgeCount: number;
+  avgDegree: number;
+  density: number;
+  components: number;
+}
+
+// ============================================================================
+// Agent Core Memory Types
+// ============================================================================
+
+/**
+ * Core memory block
+ */
+export interface CoreMemoryBlock {
+  type: string;
+  content: string;
+  metadata?: Record<string, unknown>;
+  updatedAt: string;
+}
+
+/**
+ * Core memory
+ */
+export interface CoreMemory {
+  blocks: CoreMemoryBlock[];
+  updatedAt: string;
+}
+
+/**
+ * Formatted core memory context
+ */
+export interface CoreMemoryContext {
+  formatted: string;
+  blocks: CoreMemoryBlock[];
+}
+
+// ============================================================================
+// Webhook Extended Types
+// ============================================================================
+
+/**
+ * Webhook event
+ */
+export interface WebhookEvent {
+  id: string;
+  type: string;
+  data: Record<string, unknown>;
+  createdAt: string;
+}
+
+/**
+ * Webhook event type info
+ */
+export interface WebhookEventType {
+  name: string;
+  description: string;
+  schema?: Record<string, unknown>;
+}
+
+/**
+ * Webhook statistics
+ */
+export interface WebhookStats {
+  totalDeliveries: number;
+  successRate: number;
+  avgLatency: number;
+  byEvent: Record<string, {
+    count: number;
+    successRate: number;
+  }>;
+}
+
+/**
+ * Parameters for listing webhook events
+ */
+export interface ListWebhookEventsParams {
+  limit?: number;
+  page?: number;
+  type?: string;
+}
+
+// ============================================================================
+// Highlight Extended Types
+// ============================================================================
+
+/**
+ * Parameters for searching highlights
+ */
+export interface SearchHighlightsParams {
+  limit?: number;
+  threshold?: number;
+  spaceId?: string;
+}
+
+/**
+ * Highlight search result
+ */
+export interface HighlightSearchResult {
+  highlights: Array<{
+    highlight: Highlight;
+    score: number;
+  }>;
+}
+
+/**
+ * Highlight type info
+ */
+export interface HighlightType {
+  name: string;
+  count: number;
+  color?: string;
+}
+
+/**
+ * Parameters for linking highlight to memory
+ */
+export interface LinkHighlightParams {
+  memoryId: string;
+}
+
+/**
+ * Highlight link result
+ */
+export interface HighlightLinkResult {
+  highlightId: string;
+  memoryId: string;
+  linked: boolean;
+}

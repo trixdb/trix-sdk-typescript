@@ -1,0 +1,24 @@
+# Source files
+src/
+tests/
+
+# Configuration
+tsconfig.json
+tsup.config.ts
+.eslintrc.json
+
+# Development
+.git/
+.gitignore
+*.log
+.DS_Store
+
+# CI/CD
+.github/
+
+# Documentation (keep README.md)
+docs/
+
+# Test coverage
+coverage/
+.nyc_output/
