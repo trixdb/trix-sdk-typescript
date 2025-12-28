@@ -97,6 +97,8 @@ import { Jobs } from './resources/jobs.js';
 import { Facts } from './resources/facts.js';
 import { Entities } from './resources/entities.js';
 import { Enrichments } from './resources/enrichments.js';
+import { Billing } from './resources/billing.js';
+import { Invites } from './resources/invites.js';
 
 /**
  * HTTP request options
@@ -217,6 +219,8 @@ export class Trix {
   public readonly facts: Facts;
   public readonly entities: Entities;
   public readonly enrichments: Enrichments;
+  public readonly billing: Billing;
+  public readonly invites: Invites;
 
   /**
    * Create a Trix client from environment variables.
@@ -296,6 +300,8 @@ export class Trix {
     this.facts = new Facts(this);
     this.entities = new Entities(this);
     this.enrichments = new Enrichments(this);
+    this.billing = new Billing(this);
+    this.invites = new Invites(this);
   }
 
   /**
@@ -748,5 +754,3 @@ export class Trix {
     }
   }
 }
-
-/**

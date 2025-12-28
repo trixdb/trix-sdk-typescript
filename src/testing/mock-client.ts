@@ -473,5 +473,3 @@ function createSimpleMockResource<T>() {
     },
   };
 }
-
-/**
