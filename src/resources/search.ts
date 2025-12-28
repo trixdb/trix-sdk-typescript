@@ -2,7 +2,7 @@
  * Search resource
  */
 
-import type { TrixDB } from '../client.js';
+import type { Trix } from '../client.js';
 import type {
   SimilarParams,
   SimilarResult,
@@ -24,7 +24,7 @@ import { validateId } from '../utils/security.js';
  * ```
  */
 export class Search {
-  constructor(private readonly client: TrixDB) {}
+  constructor(private readonly client: Trix) {}
 
   /**
    * Find similar memories to a given memory

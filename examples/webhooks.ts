@@ -1,21 +1,21 @@
 /**
- * Webhooks example for TrixDB SDK
+ * Webhooks example for Trix SDK
  *
  * Demonstrates how to set up and manage webhooks for event notifications.
  */
 
-import { TrixDB } from '../src/index.js';
+import { Trix } from '../src/index.js';
 
 async function setupWebhooks() {
-  const client = new TrixDB({
-    apiKey: process.env.TRIXDB_API_KEY || 'your_api_key',
+  const client = new Trix({
+    apiKey: process.env.TRIX_API_KEY || 'your_api_key',
   });
 
   try {
     // Create a webhook
     console.log('Creating webhook...');
     const webhook = await client.webhooks.create({
-      url: 'https://api.example.com/trixdb-webhook',
+      url: 'https://api.example.com/trix-webhook',
       events: [
         'memory.created',
         'memory.updated',

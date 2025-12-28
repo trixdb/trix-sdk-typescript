@@ -1,6 +1,6 @@
 # Development Guide
 
-This guide will help you set up your development environment and start working on the TrixDB TypeScript SDK.
+This guide will help you set up your development environment and start working on the Trix TypeScript SDK.
 
 ## Prerequisites
 
@@ -12,7 +12,7 @@ This guide will help you set up your development environment and start working o
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/trixdb/trix-typescript-sdk.git
+   git clone https://github.com/trix/trix-typescript-sdk.git
    cd trix-typescript-sdk
    ```
 
@@ -76,7 +76,7 @@ Note: You'll need to configure your test framework (Jest, Vitest, etc.) and impl
 trix-typescript-sdk/
 ├── src/
 │   ├── index.ts              # Main entry point, exports
-│   ├── client.ts             # TrixDB client class
+│   ├── client.ts             # Trix client class
 │   ├── types.ts              # All TypeScript type definitions
 │   ├── errors.ts             # Custom error classes
 │   ├── resources/            # API resource implementations
@@ -120,7 +120,7 @@ trix-typescript-sdk/
 
 ### src/client.ts
 
-The main `TrixDB` class that:
+The main `Trix` class that:
 - Handles HTTP requests
 - Manages authentication
 - Implements retry logic
@@ -136,7 +136,7 @@ All TypeScript type definitions including:
 ### src/errors.ts
 
 Custom error classes:
-- `TrixDBError` - Base error
+- `TrixError` - Base error
 - `AuthenticationError` - 401 errors
 - `NotFoundError` - 404 errors
 - `ValidationError` - 422 errors
@@ -167,10 +167,10 @@ Utility functions:
 
 2. **Define the resource class**
    ```typescript
-   import type { TrixDB } from '../client.js';
+   import type { Trix } from '../client.js';
 
    export class MyResource {
-     constructor(private readonly client: TrixDB) {}
+     constructor(private readonly client: Trix) {}
 
      async myMethod(params: MyParams): Promise<MyResult> {
        return this.client.request<MyResult>({
@@ -202,10 +202,10 @@ Utility functions:
    ```typescript
    import { MyResource } from './resources/my-resource.js';
 
-   export class TrixDB {
+   export class Trix {
      public readonly myResource: MyResource;
 
-     constructor(config: TrixDBConfig) {
+     constructor(config: TrixConfig) {
        // ...
        this.myResource = new MyResource(this);
      }
@@ -221,7 +221,7 @@ Utility functions:
 
 ```bash
 # Set your API key
-export TRIXDB_API_KEY=your_api_key
+export TRIX_API_KEY=your_api_key
 
 # Run an example
 npx tsx examples/basic-usage.ts
@@ -246,13 +246,13 @@ To test the SDK locally in another project:
 
 3. **In your test project**
    ```bash
-   npm link trixdb
+   npm link @trix/client
    ```
 
 4. **Use it**
    ```typescript
-   import { TrixDB } from 'trixdb';
-   const client = new TrixDB({ apiKey: 'test' });
+   import { Trix } from '@trix/client';
+   const client = new Trix({ apiKey: 'test' });
    ```
 
 ## Publishing
@@ -285,7 +285,7 @@ npm publish
 
 ### Naming Conventions
 
-- Classes: PascalCase (e.g., `TrixDB`, `Memories`)
+- Classes: PascalCase (e.g., `Trix`, `Memories`)
 - Interfaces/Types: PascalCase (e.g., `Memory`, `CreateMemoryParams`)
 - Functions/Methods: camelCase (e.g., `create`, `listAll`)
 - Constants: UPPER_SNAKE_CASE (e.g., `MAX_RETRIES`)
@@ -391,7 +391,7 @@ import { retry } from './utils/retry';
 - [TypeScript Documentation](https://www.typescriptlang.org/docs/)
 - [tsup Documentation](https://tsup.egoist.dev/)
 - [ESLint Documentation](https://eslint.org/docs/)
-- [TrixDB API Documentation](https://docs.trixdb.com)
+- [Trix API Documentation](https://docs.trixdb.com)
 
 ## Getting Help
 

@@ -1,5 +1,5 @@
 /**
- * Metrics and observability utilities for TrixDB SDK.
+ * Metrics and observability utilities for Trix SDK.
  */
 
 /**
@@ -60,11 +60,11 @@ export function createRequestMetrics(
  * class DatadogCollector implements MetricsCollector {
  *   onRequestComplete(metrics: RequestMetrics): void {
  *     // Send to Datadog
- *     statsd.increment('trixdb.requests.total', {
+ *     statsd.increment('trix.requests.total', {
  *       method: metrics.method,
  *       status: String(metrics.statusCode),
  *     });
- *     statsd.histogram('trixdb.requests.duration', metrics.durationMs);
+ *     statsd.histogram('trix.requests.duration', metrics.durationMs);
  *   }
  * }
  * ```
@@ -401,7 +401,7 @@ export function getMetricsCollector(): MetricsCollector {
  *
  * @example
  * ```typescript
- * import { setMetricsCollector, InMemoryCollector } from 'trixdb';
+ * import { setMetricsCollector, InMemoryCollector } from 'trix';
  * const collector = new InMemoryCollector();
  * setMetricsCollector(collector);
  * ```

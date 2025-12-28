@@ -1,14 +1,14 @@
 /**
- * Mock TrixDB client for testing
+ * Mock Trix client for testing
  *
  * Provides a fully-typed mock client that can be used in unit tests
  * without making real API calls.
  *
  * @example
  * ```typescript
- * import { MockTrixDB, createMockMemory } from 'trixdb/testing';
+ * import { MockTrix, createMockMemory } from '@trix/client/testing';
  *
- * const mockClient = new MockTrixDB();
+ * const mockClient = new MockTrix();
  *
  * // Configure mock responses
  * mockClient.memories.mockCreate(createMockMemory({ content: 'Test' }));
@@ -330,17 +330,17 @@ export class MockFactsResource extends MockResource<
 // ============================================================================
 
 /**
- * Mock TrixDB client for testing
+ * Mock Trix client for testing
  *
  * @example
  * ```typescript
- * import { MockTrixDB, createMockMemory } from 'trixdb/testing';
+ * import { MockTrix, createMockMemory } from '@trix/client/testing';
  *
  * describe('MyService', () => {
- *   let mockClient: MockTrixDB;
+ *   let mockClient: MockTrix;
  *
  *   beforeEach(() => {
- *     mockClient = new MockTrixDB();
+ *     mockClient = new MockTrix();
  *   });
  *
  *   it('should create a memory', async () => {
@@ -356,7 +356,7 @@ export class MockFactsResource extends MockResource<
  * });
  * ```
  */
-export class MockTrixDB {
+export class MockTrix {
   readonly memories = new MockMemoriesResource();
   readonly clusters = new MockClustersResource();
   readonly entities = new MockEntitiesResource();
@@ -473,3 +473,5 @@ function createSimpleMockResource<T>() {
     },
   };
 }
+
+/**

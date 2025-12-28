@@ -1,13 +1,13 @@
 /**
- * Basic usage example for TrixDB SDK
+ * Basic usage example for Trix SDK
  */
 
-import { TrixDB } from '../src/index.js';
+import { Trix } from '../src/index.js';
 
 async function main() {
   // Initialize the client
-  const client = new TrixDB({
-    apiKey: process.env.TRIXDB_API_KEY || 'your_api_key',
+  const client = new Trix({
+    apiKey: process.env.TRIX_API_KEY || 'your_api_key',
     baseUrl: 'https://api.trixdb.com',
   });
 
@@ -15,7 +15,7 @@ async function main() {
     // Create a memory
     console.log('Creating a memory...');
     const memory = await client.memories.create({
-      content: 'TrixDB is a powerful memory and knowledge management system',
+      content: 'Trix is a powerful memory and knowledge management system',
       tags: ['introduction', 'knowledge-base'],
       metadata: {
         source: 'example',

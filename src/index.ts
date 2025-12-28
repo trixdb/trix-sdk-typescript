@@ -1,13 +1,13 @@
 /**
- * TrixDB TypeScript SDK
+ * Trix TypeScript SDK
  *
- * Official TypeScript SDK for TrixDB - A memory and knowledge management API
+ * Official TypeScript SDK for Trix - A memory and knowledge management API
  *
  * @example
  * ```typescript
- * import { TrixDB } from 'trixdb';
+ * import { Trix } from '@trix/client';
  *
- * const client = new TrixDB({
+ * const client = new Trix({
  *   apiKey: 'your_api_key',
  *   baseUrl: 'https://api.trixdb.com'
  * });
@@ -35,7 +35,8 @@
  */
 
 export {
-  TrixDB,
+  Trix,
+
   SDK_VERSION,
   API_VERSION,
   MIN_API_VERSION,
@@ -131,9 +132,10 @@ export type {
 } from './resources/index.js';
 
 // Re-export testing utilities for convenience
-// Users can also import directly from 'trixdb/testing'
+// Users can also import directly from '@trix/client/testing'
 export {
-  MockTrixDB,
+  MockTrix,
+
   MockMemoriesResource,
   MockClustersResource,
   MockEntitiesResource,

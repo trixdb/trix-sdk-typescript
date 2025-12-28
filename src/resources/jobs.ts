@@ -2,7 +2,7 @@
  * Jobs resource
  */
 
-import type { TrixDB } from '../client.js';
+import type { Trix } from '../client.js';
 import type {
   Job,
   JobStats,
@@ -24,7 +24,7 @@ import { validateId } from '../utils/security.js';
  * ```
  */
 export class Jobs {
-  constructor(private readonly client: TrixDB) {}
+  constructor(private readonly client: Trix) {}
 
   /**
    * Get statistics for all job queues

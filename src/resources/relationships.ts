@@ -2,7 +2,7 @@
  * Relationships resource
  */
 
-import type { TrixDB } from '../client.js';
+import type { Trix } from '../client.js';
 import type {
   Relationship,
   CreateRelationshipParams,
@@ -28,7 +28,7 @@ import { validateId } from '../utils/security.js';
  * ```
  */
 export class Relationships {
-  constructor(private readonly client: TrixDB) {}
+  constructor(private readonly client: Trix) {}
 
   /**
    * Create a relationship between two memories

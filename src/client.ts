@@ -1,8 +1,8 @@
 /**
- * Main TrixDB client class
+ * Main Trix client class
  */
 
-import type { TrixDBConfig } from './types.js';
+import type { TrixConfig } from './types.js';
 import {
   APIError,
   APIVersionMismatchError,
@@ -52,9 +52,9 @@ function debug(message: string, data?: unknown): void {
   if (debugLogger) {
     if (data !== undefined) {
       const safeData = redactSensitiveData(data);
-      debugLogger(`[TrixDB] ${message} ${JSON.stringify(safeData)}`);
+      debugLogger(`[Trix] ${message} ${JSON.stringify(safeData)}`);
     } else {
-      debugLogger(`[TrixDB] ${message}`);
+      debugLogger(`[Trix] ${message}`);
     }
   }
 }
@@ -178,11 +178,11 @@ interface MultipartRequestOptions {
 export type EmptyResponse = void;
 
 /**
- * Main TrixDB client
+ * Main Trix client
  *
  * @example
  * ```typescript
- * const client = new TrixDB({
+ * const client = new Trix({
  *   apiKey: 'your_api_key',
  *   baseUrl: 'https://api.trixdb.com'
  * });
@@ -193,7 +193,7 @@ export type EmptyResponse = void;
  * });
  * ```
  */
-export class TrixDB {
+export class Trix {
   private readonly apiKey: string;
   private readonly baseUrl: string;
   private readonly maxRetries: number;
@@ -219,26 +219,26 @@ export class TrixDB {
   public readonly enrichments: Enrichments;
 
   /**
-   * Create a TrixDB client from environment variables.
+   * Create a Trix client from environment variables.
    *
    * @param options - Optional configuration overrides
-   * @returns TrixDB client instance
-   * @throws Error if TRIXDB_API_KEY environment variable is not set
+   * @returns Trix client instance
+   * @throws Error if TRIX_API_KEY environment variable is not set
    *
    * @example
    * ```typescript
-   * // Uses TRIXDB_API_KEY and optionally TRIXDB_BASE_URL
-   * const client = TrixDB.fromEnv();
+   * // Uses TRIX_API_KEY and optionally TRIX_BASE_URL
+   * const client = Trix.fromEnv();
    *
    * // With overrides
-   * const client = TrixDB.fromEnv({ timeout: 60000 });
+   * const client = Trix.fromEnv({ timeout: 60000 });
    * ```
    */
-  static fromEnv(options?: Partial<Omit<TrixDBConfig, 'apiKey'>>): TrixDB {
-    const apiKey = getEnvCredential('TRIXDB_API_KEY', true);
+  static fromEnv(options?: Partial<Omit<TrixConfig, 'apiKey'>>): Trix {
+    const apiKey = getEnvCredential('TRIX_API_KEY', true);
     if (!apiKey) {
       throw new Error(
-        'TRIXDB_API_KEY environment variable is not set. ' +
+        'TRIX_API_KEY environment variable is not set. ' +
         'Set the environment variable or pass apiKey explicitly.'
       );
     }
@@ -246,10 +246,10 @@ export class TrixDB {
     // Check for base URL in environment
     let baseUrl = options?.baseUrl;
     if (!baseUrl && typeof process !== 'undefined' && process.env) {
-      baseUrl = process.env.TRIXDB_BASE_URL;
+      baseUrl = process.env.TRIX_BASE_URL;
     }
 
-    return new TrixDB({
+    return new Trix({
       apiKey,
       baseUrl,
       ...options,
@@ -257,11 +257,11 @@ export class TrixDB {
   }
 
   /**
-   * Create a new TrixDB client
+   * Create a new Trix client
    *
    * @param config - Client configuration
    */
-  constructor(config: TrixDBConfig) {
+  constructor(config: TrixConfig) {
     if (!config.apiKey) {
       throw new ValidationError('API key is required');
     }
@@ -417,7 +417,7 @@ export class TrixDB {
   }
 
   /**
-   * Make an HTTP request to the TrixDB API
+   * Make an HTTP request to the Trix API
    *
    * @param options - Request options
    * @returns Response data
@@ -599,7 +599,7 @@ export class TrixDB {
     // Don't set Content-Type - let the browser set it with the boundary
     const headers: Record<string, string> = {
       'Authorization': `Bearer ${this.apiKey}`,
-      'User-Agent': `trixdb-typescript-sdk/${SDK_VERSION}`,
+      'User-Agent': `trix-typescript-sdk/${SDK_VERSION}`,
       'X-SDK-Version': SDK_VERSION,
       'X-API-Version': API_VERSION,
       ...options.headers,
@@ -670,7 +670,7 @@ export class TrixDB {
     return {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${this.apiKey}`,
-      'User-Agent': `trixdb-typescript-sdk/${SDK_VERSION}`,
+      'User-Agent': `trix-typescript-sdk/${SDK_VERSION}`,
       'X-SDK-Version': SDK_VERSION,
       'X-API-Version': API_VERSION,
       ...customHeaders,
@@ -748,3 +748,5 @@ export class TrixDB {
     }
   }
 }
+
+/**

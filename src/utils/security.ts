@@ -1,5 +1,5 @@
 /**
- * Security utilities for TrixDB SDK
+ * Security utilities for Trix SDK
  */
 
 /** Pattern for valid resource IDs - alphanumeric, underscores, hyphens */
@@ -323,7 +323,7 @@ export function redactSensitiveData(data: unknown, maxDepth = 10): unknown {
  * @throws Error if required and not found
  */
 export function getEnvCredential(
-  envVar = 'TRIXDB_API_KEY',
+  envVar = 'TRIX_API_KEY',
   required = true
 ): string | undefined {
   // Check if we're in a Node.js environment

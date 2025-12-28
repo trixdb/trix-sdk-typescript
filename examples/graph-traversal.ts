@@ -1,14 +1,14 @@
 /**
- * Graph traversal example for TrixDB SDK
+ * Graph traversal example for Trix SDK
  *
  * Demonstrates how to traverse and analyze the knowledge graph.
  */
 
-import { TrixDB } from '../src/index.js';
+import { Trix } from '../src/index.js';
 
 async function exploreGraph() {
-  const client = new TrixDB({
-    apiKey: process.env.TRIXDB_API_KEY || 'your_api_key',
+  const client = new Trix({
+    apiKey: process.env.TRIX_API_KEY || 'your_api_key',
   });
 
   try {

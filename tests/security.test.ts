@@ -414,27 +414,27 @@ describe('getEnvCredential', () => {
   });
 
   it('should get credential from environment', () => {
-    process.env.TRIXDB_API_KEY = 'test_key';
-    expect(getEnvCredential('TRIXDB_API_KEY')).toBe('test_key');
+    process.env.TRIX_API_KEY = 'test_key';
+    expect(getEnvCredential('TRIX_API_KEY')).toBe('test_key');
   });
 
   it('should trim whitespace', () => {
-    process.env.TRIXDB_API_KEY = '  test_key  ';
-    expect(getEnvCredential('TRIXDB_API_KEY')).toBe('test_key');
+    process.env.TRIX_API_KEY = '  test_key  ';
+    expect(getEnvCredential('TRIX_API_KEY')).toBe('test_key');
   });
 
   it('should throw when required and not set', () => {
-    delete process.env.TRIXDB_API_KEY;
-    expect(() => getEnvCredential('TRIXDB_API_KEY', true)).toThrow(/not set/);
+    delete process.env.TRIX_API_KEY;
+    expect(() => getEnvCredential('TRIX_API_KEY', true)).toThrow(/not set/);
   });
 
   it('should return undefined when not required and not set', () => {
-    delete process.env.TRIXDB_API_KEY;
-    expect(getEnvCredential('TRIXDB_API_KEY', false)).toBeUndefined();
+    delete process.env.TRIX_API_KEY;
+    expect(getEnvCredential('TRIX_API_KEY', false)).toBeUndefined();
   });
 
   it('should throw when required and empty', () => {
-    process.env.TRIXDB_API_KEY = '   ';
-    expect(() => getEnvCredential('TRIXDB_API_KEY', true)).toThrow();
+    process.env.TRIX_API_KEY = '   ';
+    expect(() => getEnvCredential('TRIX_API_KEY', true)).toThrow();
   });
 });

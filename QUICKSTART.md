@@ -1,29 +1,29 @@
 # Quick Start Guide
 
-Get up and running with the TrixDB TypeScript SDK in 5 minutes.
+Get up and running with the Trix TypeScript SDK in 5 minutes.
 
 ## Installation
 
 ```bash
-npm install trixdb
+npm install @trix/client
 ```
 
 Or with yarn:
 ```bash
-yarn add trixdb
+yarn add @trix/client
 ```
 
 Or with pnpm:
 ```bash
-pnpm add trixdb
+pnpm add @trix/client
 ```
 
 ## Basic Setup
 
 ```typescript
-import { TrixDB } from 'trixdb';
+import { Trix } from '@trix/client';
 
-const client = new TrixDB({
+const client = new Trix({
   apiKey: 'your_api_key'  // Get your API key from https://trixdb.com/dashboard
 });
 ```
@@ -33,7 +33,7 @@ const client = new TrixDB({
 ```typescript
 // Create a memory
 const memory = await client.memories.create({
-  content: 'TrixDB is a powerful knowledge management system',
+  content: 'Trix is a powerful knowledge management system',
   tags: ['introduction', 'knowledge-base']
 });
 
@@ -119,7 +119,7 @@ similar.results.forEach(({ memory, similarity }) => {
 ## Error Handling
 
 ```typescript
-import { NotFoundError, ValidationError } from 'trixdb';
+import { NotFoundError, ValidationError } from '@trix/client';
 
 try {
   const memory = await client.memories.get('invalid_id');
@@ -145,11 +145,11 @@ for await (const memory of client.memories.listAll({ limit: 100 })) {
 ## Complete Example
 
 ```typescript
-import { TrixDB } from 'trixdb';
+import { Trix } from '@trix/client';
 
 async function main() {
-  const client = new TrixDB({
-    apiKey: process.env.TRIXDB_API_KEY
+  const client = new Trix({
+    apiKey: process.env.TRIX_API_KEY
   });
 
   // Create memories
@@ -187,7 +187,7 @@ main().catch(console.error);
 - Read the [full documentation](./README.md)
 - Explore [examples](./examples/)
 - Check the [API reference](https://docs.trixdb.com)
-- Join our [Discord community](https://discord.gg/trixdb)
+- Join our [Discord community](https://discord.gg/trix)
 
 ## Common Patterns
 
@@ -244,12 +244,12 @@ console.log(`Created ${result.success} memories`);
 2. **Tag your memories** for easier organization and filtering
 3. **Set relationship strength** based on how strongly connected concepts are
 4. **Use clusters** to group related memories automatically
-5. **Enable webhooks** to keep your app in sync with TrixDB
+5. **Enable webhooks** to keep your app in sync with Trix
 
 ## Configuration Options
 
 ```typescript
-const client = new TrixDB({
+const client = new Trix({
   apiKey: 'your_api_key',
   baseUrl: 'https://api.trixdb.com',  // Optional: custom API endpoint
   maxRetries: 3,                      // Optional: max retry attempts
@@ -262,7 +262,7 @@ const client = new TrixDB({
 The SDK is fully typed. Your IDE will provide autocomplete and type checking:
 
 ```typescript
-import type { Memory, CreateMemoryParams } from 'trixdb';
+import type { Memory, CreateMemoryParams } from '@trix/client';
 
 const params: CreateMemoryParams = {
   content: 'Typed content',
@@ -279,9 +279,9 @@ The SDK works in browsers too:
 
 ```html
 <script type="module">
-  import { TrixDB } from 'https://cdn.skypack.dev/trixdb';
+  import { Trix } from 'https://cdn.skypack.dev/@trix/client';
 
-  const client = new TrixDB({
+  const client = new Trix({
     apiKey: 'your_api_key'
   });
 
@@ -294,7 +294,7 @@ The SDK works in browsers too:
 ## Need Help?
 
 - Documentation: [README.md](./README.md)
-- Issues: [GitHub Issues](https://github.com/trixdb/trix-typescript-sdk/issues)
+- Issues: [GitHub Issues](https://github.com/trix/trix-typescript-sdk/issues)
 - Email: support@trixdb.com
 
-Happy building with TrixDB!
+Happy building with Trix!

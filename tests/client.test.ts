@@ -1,9 +1,9 @@
 /**
- * Comprehensive tests for TrixDB TypeScript SDK
+ * Comprehensive tests for Trix TypeScript SDK
  */
 
 import {
-  TrixDB,
+  Trix,
   SDK_VERSION,
   API_VERSION,
   MIN_API_VERSION,
@@ -12,7 +12,7 @@ import {
   disableDebugLogging,
 } from '../src/client';
 import {
-  TrixDBError,
+  TrixError,
   APIError,
   APIVersionMismatchError,
   AuthenticationError,
@@ -47,21 +47,21 @@ function createMockFetch(response: {
   });
 }
 
-describe('TrixDB Client', () => {
+describe('Trix Client', () => {
   describe('Initialization', () => {
     it('should initialize with API key', () => {
-      const client = new TrixDB({ apiKey: 'test_key' });
-      expect(client).toBeInstanceOf(TrixDB);
+      const client = new Trix({ apiKey: 'test_key' });
+      expect(client).toBeInstanceOf(Trix);
     });
 
     it('should use default base URL', () => {
       const mockFetch = createMockFetch({ status: 200, body: {} });
-      const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
       expect(client).toBeDefined();
     });
 
     it('should accept custom base URL', () => {
-      const client = new TrixDB({
+      const client = new Trix({
         apiKey: 'test_key',
         baseUrl: 'https://custom.api.com',
       });
@@ -69,7 +69,7 @@ describe('TrixDB Client', () => {
     });
 
     it('should accept custom timeout', () => {
-      const client = new TrixDB({
+      const client = new Trix({
         apiKey: 'test_key',
         timeout: 60000,
       });
@@ -77,7 +77,7 @@ describe('TrixDB Client', () => {
     });
 
     it('should accept custom max retries', () => {
-      const client = new TrixDB({
+      const client = new Trix({
         apiKey: 'test_key',
         maxRetries: 5,
       });
@@ -85,7 +85,7 @@ describe('TrixDB Client', () => {
     });
 
     it('should have all resource properties', () => {
-      const client = new TrixDB({ apiKey: 'test_key' });
+      const client = new Trix({ apiKey: 'test_key' });
       expect(client.memories).toBeDefined();
       expect(client.relationships).toBeDefined();
       expect(client.clusters).toBeDefined();
@@ -141,7 +141,7 @@ describe('TrixDB Client', () => {
   describe('Request Headers', () => {
     it('should include Authorization header', async () => {
       const mockFetch = createMockFetch({ status: 200, body: { data: [] } });
-      const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
       await client.memories.list();
 
@@ -152,7 +152,7 @@ describe('TrixDB Client', () => {
 
     it('should include SDK version headers', async () => {
       const mockFetch = createMockFetch({ status: 200, body: { data: [] } });
-      const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
       await client.memories.list();
 
@@ -163,18 +163,18 @@ describe('TrixDB Client', () => {
 
     it('should include User-Agent header', async () => {
       const mockFetch = createMockFetch({ status: 200, body: { data: [] } });
-      const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
       await client.memories.list();
 
       const [, options] = mockFetch.mock.calls[0];
-      expect(options.headers['User-Agent']).toContain('trixdb-typescript-sdk');
+      expect(options.headers['User-Agent']).toContain('trix-typescript-sdk');
       expect(options.headers['User-Agent']).toContain(SDK_VERSION);
     });
 
     it('should include Content-Type header', async () => {
       const mockFetch = createMockFetch({ status: 200, body: { id: 'mem_123' } });
-      const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
       await client.memories.create({ content: 'test' });
 
@@ -186,7 +186,7 @@ describe('TrixDB Client', () => {
 
 describe('Error Handling', () => {
   describe('Exception Hierarchy', () => {
-    it('all exceptions should inherit from TrixDBError', () => {
+    it('all exceptions should inherit from TrixError', () => {
       const exceptions = [
         new APIError('test'),
         new APIVersionMismatchError('test', '1.0', 'v2', 'v1', 'v1'),
@@ -201,7 +201,7 @@ describe('Error Handling', () => {
       ];
 
       exceptions.forEach((exc) => {
-        expect(exc).toBeInstanceOf(TrixDBError);
+        expect(exc).toBeInstanceOf(TrixError);
         expect(exc).toBeInstanceOf(Error);
       });
     });
@@ -249,7 +249,7 @@ describe('Error Handling', () => {
         ok: false,
         body: { message: 'Invalid credentials' },
       });
-      const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
       await expect(client.memories.list()).rejects.toThrow(AuthenticationError);
     });
@@ -260,7 +260,7 @@ describe('Error Handling', () => {
         ok: false,
         body: { message: 'Access denied' },
       });
-      const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
       await expect(client.memories.list()).rejects.toThrow(PermissionError);
     });
@@ -271,7 +271,7 @@ describe('Error Handling', () => {
         ok: false,
         body: { message: 'Not found' },
       });
-      const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
       await expect(client.memories.get('invalid_id')).rejects.toThrow(NotFoundError);
     });
@@ -282,7 +282,7 @@ describe('Error Handling', () => {
         ok: false,
         body: { message: 'Validation failed', errors: [{ field: 'content' }] },
       });
-      const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
       await expect(client.memories.create({ content: '' })).rejects.toThrow(ValidationError);
     });
@@ -294,7 +294,7 @@ describe('Error Handling', () => {
         headers: { 'retry-after': '60' },
         body: { message: 'Rate limited' },
       });
-      const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch, maxRetries: 0 });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch, maxRetries: 0 });
 
       try {
         await client.memories.list();
@@ -311,7 +311,7 @@ describe('Error Handling', () => {
         ok: false,
         body: { message: 'Internal server error' },
       });
-      const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch, maxRetries: 0 });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch, maxRetries: 0 });
 
       await expect(client.memories.list()).rejects.toThrow(ServerError);
     });
@@ -322,7 +322,7 @@ describe('Error Handling', () => {
         ok: false,
         body: { message: 'Bad gateway' },
       });
-      const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch, maxRetries: 0 });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch, maxRetries: 0 });
 
       await expect(client.memories.list()).rejects.toThrow(ServerError);
     });
@@ -333,7 +333,7 @@ describe('Error Handling', () => {
         ok: false,
         body: { message: 'Service unavailable' },
       });
-      const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch, maxRetries: 0 });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch, maxRetries: 0 });
 
       await expect(client.memories.list()).rejects.toThrow(ServerError);
     });
@@ -344,7 +344,7 @@ describe('Error Handling', () => {
         ok: false,
         body: { message: "I'm a teapot" },
       });
-      const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
       await expect(client.memories.list()).rejects.toThrow(APIError);
     });
@@ -357,7 +357,7 @@ describe('Error Handling', () => {
         headers: { 'X-API-Version': 'v1' },
         body: { data: [] },
       });
-      const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
       await expect(client.memories.list()).resolves.toBeDefined();
     });
@@ -368,7 +368,7 @@ describe('Error Handling', () => {
         headers: { 'X-API-Version': 'v99' },
         body: { data: [] },
       });
-      const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
       await expect(client.memories.list()).rejects.toThrow(APIVersionMismatchError);
     });
@@ -378,7 +378,7 @@ describe('Error Handling', () => {
         status: 200,
         body: { data: [] },
       });
-      const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
       await expect(client.memories.list()).resolves.toBeDefined();
     });
@@ -389,7 +389,7 @@ describe('Error Handling', () => {
         headers: { 'X-API-Version': 'invalid' },
         body: { data: [] },
       });
-      const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
       // Non-numeric versions are ignored
       await expect(client.memories.list()).resolves.toBeDefined();
@@ -412,7 +412,7 @@ describe('Memories Resource', () => {
   describe('create', () => {
     it('should create a memory', async () => {
       const mockFetch = createMockFetch({ status: 200, body: mockMemory });
-      const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
       const memory = await client.memories.create({ content: 'Test content' });
 
@@ -422,7 +422,7 @@ describe('Memories Resource', () => {
 
     it('should send correct request body', async () => {
       const mockFetch = createMockFetch({ status: 200, body: mockMemory });
-      const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
       await client.memories.create({
         content: 'Test content',
@@ -441,7 +441,7 @@ describe('Memories Resource', () => {
 
     it('should use POST method', async () => {
       const mockFetch = createMockFetch({ status: 200, body: mockMemory });
-      const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
       await client.memories.create({ content: 'Test content' });
 
@@ -456,7 +456,7 @@ describe('Memories Resource', () => {
         status: 200,
         body: { data: [mockMemory], pagination: { total: 1, page: 1, limit: 100, hasMore: false } },
       });
-      const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
       const result = await client.memories.list();
 
@@ -469,7 +469,7 @@ describe('Memories Resource', () => {
         status: 200,
         body: { data: [], pagination: { total: 0, page: 1, limit: 50, hasMore: false } },
       });
-      const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
       await client.memories.list({ q: 'search', limit: 50, page: 2 });
 
@@ -484,7 +484,7 @@ describe('Memories Resource', () => {
         status: 200,
         body: { data: [] },
       });
-      const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
       await client.memories.list();
 
@@ -496,7 +496,7 @@ describe('Memories Resource', () => {
   describe('get', () => {
     it('should get a memory by ID', async () => {
       const mockFetch = createMockFetch({ status: 200, body: mockMemory });
-      const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
       const memory = await client.memories.get('mem_123');
 
@@ -505,7 +505,7 @@ describe('Memories Resource', () => {
 
     it('should call correct endpoint', async () => {
       const mockFetch = createMockFetch({ status: 200, body: mockMemory });
-      const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
       await client.memories.get('mem_123');
 
@@ -518,7 +518,7 @@ describe('Memories Resource', () => {
     it('should update a memory', async () => {
       const updatedMemory = { ...mockMemory, content: 'Updated content' };
       const mockFetch = createMockFetch({ status: 200, body: updatedMemory });
-      const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
       const memory = await client.memories.update('mem_123', { content: 'Updated content' });
 
@@ -527,7 +527,7 @@ describe('Memories Resource', () => {
 
     it('should use PATCH method', async () => {
       const mockFetch = createMockFetch({ status: 200, body: mockMemory });
-      const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
       await client.memories.update('mem_123', { content: 'Updated' });
 
@@ -539,7 +539,7 @@ describe('Memories Resource', () => {
   describe('delete', () => {
     it('should delete a memory', async () => {
       const mockFetch = createMockFetch({ status: 204, body: {} });
-      const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
       await client.memories.delete('mem_123');
 
@@ -571,7 +571,7 @@ describe('Retry Logic', () => {
       });
     });
 
-    const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch, maxRetries: 3 });
+    const client = new Trix({ apiKey: 'test_key', fetch: mockFetch, maxRetries: 3 });
 
     await client.memories.list();
 
@@ -598,7 +598,7 @@ describe('Retry Logic', () => {
       });
     });
 
-    const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch, maxRetries: 3 });
+    const client = new Trix({ apiKey: 'test_key', fetch: mockFetch, maxRetries: 3 });
 
     await client.memories.list();
 
@@ -617,7 +617,7 @@ describe('Retry Logic', () => {
       });
     });
 
-    const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch, maxRetries: 3 });
+    const client = new Trix({ apiKey: 'test_key', fetch: mockFetch, maxRetries: 3 });
 
     await expect(client.memories.list()).rejects.toThrow(AuthenticationError);
     expect(callCount).toBe(1);
@@ -635,7 +635,7 @@ describe('Retry Logic', () => {
       });
     });
 
-    const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch, maxRetries: 3 });
+    const client = new Trix({ apiKey: 'test_key', fetch: mockFetch, maxRetries: 3 });
 
     await expect(client.memories.create({ content: '' })).rejects.toThrow(ValidationError);
     expect(callCount).toBe(1);
@@ -649,7 +649,7 @@ describe('Retry Logic', () => {
       json: () => Promise.resolve({ message: 'Service unavailable' }),
     });
 
-    const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch, maxRetries: 2 });
+    const client = new Trix({ apiKey: 'test_key', fetch: mockFetch, maxRetries: 2 });
 
     await expect(client.memories.list()).rejects.toThrow(ServerError);
     expect(mockFetch).toHaveBeenCalledTimes(3); // Initial + 2 retries
@@ -670,7 +670,7 @@ describe('Relationships Resource', () => {
 
   it('should create a relationship', async () => {
     const mockFetch = createMockFetch({ status: 200, body: mockRelationship });
-    const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch });
+    const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
     const relationship = await client.relationships.create('mem_123', 'mem_456', {
       relationshipType: 'related_to',
@@ -696,7 +696,7 @@ describe('Clusters Resource', () => {
 
   it('should create a cluster', async () => {
     const mockFetch = createMockFetch({ status: 200, body: mockCluster });
-    const client = new TrixDB({ apiKey: 'test_key', fetch: mockFetch });
+    const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
     const cluster = await client.clusters.create({
       name: 'Test Cluster',

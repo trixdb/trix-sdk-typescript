@@ -2,7 +2,7 @@
  * Enrichments resource - Memory enrichment operations
  */
 
-import type { TrixDB } from '../client.js';
+import type { Trix } from '../client.js';
 import type {
   Enrichment,
   EnrichmentResult,
@@ -28,7 +28,7 @@ import { validateId } from '../utils/security.js';
  * ```
  */
 export class Enrichments extends BaseResource {
-  constructor(client: TrixDB) {
+  constructor(client: Trix) {
     super(client);
   }
 

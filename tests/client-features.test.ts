@@ -1,8 +1,8 @@
 /**
- * Tests for new TrixDB client features: interceptors, per-request timeout, stream retry
+ * Tests for new Trix client features: interceptors, per-request timeout, stream retry
  */
 
-import { TrixDB, RequestContext, ResponseContext } from '../src/client';
+import { Trix, RequestContext, ResponseContext } from '../src/client';
 import type { RequestInterceptor, ResponseInterceptor, ErrorInterceptor } from '../src/client';
 import { retryStream, StreamRetryOptions } from '../src/utils/retry';
 import { NetworkError, RateLimitError, TimeoutError } from '../src/errors';
@@ -27,7 +27,7 @@ function createMockFetch(response: {
 describe('Request Interceptors', () => {
   describe('Registration', () => {
     it('should add request interceptor', () => {
-      const client = new TrixDB({ apiKey: 'test_key' });
+      const client = new Trix({ apiKey: 'test_key' });
 
       const interceptor: RequestInterceptor = (ctx) => ctx;
       const remove = client.addRequestInterceptor(interceptor);
@@ -36,7 +36,7 @@ describe('Request Interceptors', () => {
     });
 
     it('should remove request interceptor', () => {
-      const client = new TrixDB({ apiKey: 'test_key' });
+      const client = new Trix({ apiKey: 'test_key' });
 
       const callLog: string[] = [];
       const interceptor: RequestInterceptor = (ctx) => {
@@ -57,7 +57,7 @@ describe('Request Interceptors', () => {
         return ctx;
       };
 
-      const client = new TrixDB({
+      const client = new Trix({
         apiKey: 'test_key',
         requestInterceptors: [interceptor],
       });
@@ -76,7 +76,7 @@ describe('Request Interceptors', () => {
         return ctx;
       };
 
-      const client = new TrixDB({
+      const client = new Trix({
         apiKey: 'test_key',
         fetch: mockFetch,
         requestInterceptors: [interceptor],
@@ -103,7 +103,7 @@ describe('Request Interceptors', () => {
         return ctx;
       };
 
-      const client = new TrixDB({
+      const client = new Trix({
         apiKey: 'test_key',
         fetch: mockFetch,
         requestInterceptors: [interceptor1, interceptor2],
@@ -122,7 +122,7 @@ describe('Request Interceptors', () => {
         return ctx;
       };
 
-      const client = new TrixDB({
+      const client = new Trix({
         apiKey: 'test_key',
         fetch: mockFetch,
         requestInterceptors: [interceptor],
@@ -139,7 +139,7 @@ describe('Request Interceptors', () => {
 describe('Response Interceptors', () => {
   describe('Registration', () => {
     it('should add response interceptor', () => {
-      const client = new TrixDB({ apiKey: 'test_key' });
+      const client = new Trix({ apiKey: 'test_key' });
 
       const interceptor: ResponseInterceptor = (ctx) => ctx;
       const remove = client.addResponseInterceptor(interceptor);
@@ -150,7 +150,7 @@ describe('Response Interceptors', () => {
     it('should accept interceptors in config', () => {
       const interceptor: ResponseInterceptor = (ctx) => ctx;
 
-      const client = new TrixDB({
+      const client = new Trix({
         apiKey: 'test_key',
         responseInterceptors: [interceptor],
       });
@@ -169,7 +169,7 @@ describe('Response Interceptors', () => {
         return ctx;
       };
 
-      const client = new TrixDB({
+      const client = new Trix({
         apiKey: 'test_key',
         fetch: mockFetch,
         responseInterceptors: [interceptor],
@@ -198,7 +198,7 @@ describe('Response Interceptors', () => {
         return ctx;
       };
 
-      const client = new TrixDB({
+      const client = new Trix({
         apiKey: 'test_key',
         fetch: mockFetch,
         responseInterceptors: [interceptor],
@@ -216,7 +216,7 @@ describe('Response Interceptors', () => {
 describe('Error Interceptors', () => {
   describe('Registration', () => {
     it('should add error interceptor', () => {
-      const client = new TrixDB({ apiKey: 'test_key' });
+      const client = new Trix({ apiKey: 'test_key' });
 
       const interceptor: ErrorInterceptor = (err, ctx) => err;
       const remove = client.addErrorInterceptor(interceptor);
@@ -227,7 +227,7 @@ describe('Error Interceptors', () => {
     it('should accept interceptors in config', () => {
       const interceptor: ErrorInterceptor = (err, ctx) => err;
 
-      const client = new TrixDB({
+      const client = new Trix({
         apiKey: 'test_key',
         errorInterceptors: [interceptor],
       });
@@ -250,7 +250,7 @@ describe('Error Interceptors', () => {
         return err;
       };
 
-      const client = new TrixDB({
+      const client = new Trix({
         apiKey: 'test_key',
         fetch: mockFetch,
         errorInterceptors: [interceptor],
@@ -279,7 +279,7 @@ describe('Error Interceptors', () => {
         return new CustomError(err);
       };
 
-      const client = new TrixDB({
+      const client = new Trix({
         apiKey: 'test_key',
         fetch: mockFetch,
         maxRetries: 0,
@@ -299,7 +299,7 @@ describe('Error Interceptors', () => {
 
 describe('Per-Request Timeout', () => {
   it('should accept timeout in config', () => {
-    const client = new TrixDB({
+    const client = new Trix({
       apiKey: 'test_key',
       timeout: 60000,
     });
@@ -308,7 +308,7 @@ describe('Per-Request Timeout', () => {
   });
 
   it('should use default timeout of 30000ms', () => {
-    const client = new TrixDB({ apiKey: 'test_key' });
+    const client = new Trix({ apiKey: 'test_key' });
     expect(client).toBeDefined();
   });
 });
@@ -463,7 +463,7 @@ describe('Stream Retry', () => {
 
   describe('requestStreamWithRetry method', () => {
     it('should exist on client', () => {
-      const client = new TrixDB({ apiKey: 'test_key' });
+      const client = new Trix({ apiKey: 'test_key' });
       expect(typeof client.requestStreamWithRetry).toBe('function');
     });
   });
@@ -479,7 +479,7 @@ describe('Interceptor Removal', () => {
       return undefined;
     };
 
-    const client = new TrixDB({
+    const client = new Trix({
       apiKey: 'test_key',
       fetch: mockFetch,
     });
@@ -507,7 +507,7 @@ describe('Interceptor Removal', () => {
       return undefined;
     };
 
-    const client = new TrixDB({
+    const client = new Trix({
       apiKey: 'test_key',
       fetch: mockFetch,
     });
@@ -536,7 +536,7 @@ describe('Interceptor Removal', () => {
       return err;
     };
 
-    const client = new TrixDB({
+    const client = new Trix({
       apiKey: 'test_key',
       fetch: mockFetch,
     });

@@ -1,6 +1,6 @@
-# Contributing to TrixDB TypeScript SDK
+# Contributing to Trix TypeScript SDK
 
-Thank you for your interest in contributing to the TrixDB TypeScript SDK! This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to the Trix TypeScript SDK! This document provides guidelines and instructions for contributing.
 
 ## Getting Started
 
@@ -56,7 +56,7 @@ npm run lint
 trix-typescript-sdk/
 ├── src/
 │   ├── index.ts              # Main exports
-│   ├── client.ts             # TrixDB client class
+│   ├── client.ts             # Trix client class
 │   ├── types.ts              # TypeScript type definitions
 │   ├── errors.ts             # Custom error classes
 │   ├── resources/            # API resource implementations
@@ -288,4 +288,4 @@ docs: update README with new examples
 
 By contributing, you agree that your contributions will be licensed under the MIT License.
 
-Thank you for contributing to TrixDB TypeScript SDK!
+Thank you for contributing to Trix TypeScript SDK!

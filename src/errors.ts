@@ -1,22 +1,22 @@
 /**
- * Custom error classes for the TrixDB SDK
+ * Custom error classes for the Trix SDK
  */
 
 /**
- * Base error class for all TrixDB errors
+ * Base error class for all Trix errors
  */
-export class TrixDBError extends Error {
+export class TrixError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'TrixDBError';
-    Object.setPrototypeOf(this, TrixDBError.prototype);
+    this.name = 'TrixError';
+    Object.setPrototypeOf(this, TrixError.prototype);
   }
 }
 
 /**
  * Error thrown when authentication fails
  */
-export class AuthenticationError extends TrixDBError {
+export class AuthenticationError extends TrixError {
   constructor(message = 'Authentication failed') {
     super(message);
     this.name = 'AuthenticationError';
@@ -27,7 +27,7 @@ export class AuthenticationError extends TrixDBError {
 /**
  * Error thrown when a requested resource is not found
  */
-export class NotFoundError extends TrixDBError {
+export class NotFoundError extends TrixError {
   constructor(message = 'Resource not found') {
     super(message);
     this.name = 'NotFoundError';
@@ -38,7 +38,7 @@ export class NotFoundError extends TrixDBError {
 /**
  * Error thrown when permission is denied (403)
  */
-export class PermissionError extends TrixDBError {
+export class PermissionError extends TrixError {
   constructor(message = 'Permission denied') {
     super(message);
     this.name = 'PermissionError';
@@ -49,7 +49,7 @@ export class PermissionError extends TrixDBError {
 /**
  * Error thrown when request validation fails
  */
-export class ValidationError extends TrixDBError {
+export class ValidationError extends TrixError {
   public errors?: Array<{ field: string; message: string }>;
 
   constructor(message = 'Validation failed', errors?: Array<{ field: string; message: string }>) {
@@ -63,7 +63,7 @@ export class ValidationError extends TrixDBError {
 /**
  * Error thrown when rate limit is exceeded
  */
-export class RateLimitError extends TrixDBError {
+export class RateLimitError extends TrixError {
   public retryAfter?: number;
 
   constructor(message = 'Rate limit exceeded', retryAfter?: number) {
@@ -77,7 +77,7 @@ export class RateLimitError extends TrixDBError {
 /**
  * Error thrown when a network request fails
  */
-export class NetworkError extends TrixDBError {
+export class NetworkError extends TrixError {
   constructor(message = 'Network request failed') {
     super(message);
     this.name = 'NetworkError';
@@ -88,7 +88,7 @@ export class NetworkError extends TrixDBError {
 /**
  * Error thrown when the API returns an unexpected error
  */
-export class APIError extends TrixDBError {
+export class APIError extends TrixError {
   public statusCode?: number;
   public response?: unknown;
 
@@ -104,7 +104,7 @@ export class APIError extends TrixDBError {
 /**
  * Error thrown when a request timeout occurs
  */
-export class TimeoutError extends TrixDBError {
+export class TimeoutError extends TrixError {
   constructor(message = 'Request timeout') {
     super(message);
     this.name = 'TimeoutError';
@@ -115,7 +115,7 @@ export class TimeoutError extends TrixDBError {
 /**
  * Error thrown when server returns 5xx error
  */
-export class ServerError extends TrixDBError {
+export class ServerError extends TrixError {
   public statusCode: number;
   public response?: unknown;
 
@@ -131,7 +131,7 @@ export class ServerError extends TrixDBError {
 /**
  * Error thrown when SDK and API versions are incompatible
  */
-export class APIVersionMismatchError extends TrixDBError {
+export class APIVersionMismatchError extends TrixError {
   public sdkVersion: string;
   public apiVersion: string;
   public minSupported: string;

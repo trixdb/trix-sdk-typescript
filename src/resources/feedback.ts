@@ -2,7 +2,7 @@
  * Feedback resource
  */
 
-import type { TrixDB } from '../client.js';
+import type { Trix } from '../client.js';
 import type {
   SubmitFeedbackParams,
   FeedbackResult,
@@ -26,7 +26,7 @@ import { validateId } from '../utils/security.js';
  * ```
  */
 export class Feedback {
-  constructor(private readonly client: TrixDB) {}
+  constructor(private readonly client: Trix) {}
 
   /**
    * Submit feedback for a memory

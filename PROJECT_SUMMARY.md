@@ -1,8 +1,8 @@
-# TrixDB TypeScript SDK - Project Summary
+# Trix TypeScript SDK - Project Summary
 
 ## Overview
 
-This is a complete, production-ready TypeScript SDK for the TrixDB API - a memory and knowledge management system. The SDK is built with modern best practices and provides a clean, type-safe interface for all TrixDB API endpoints.
+This is a complete, production-ready TypeScript SDK for the Trix API - a memory and knowledge management system. The SDK is built with modern best practices and provides a clean, type-safe interface for all Trix API endpoints.
 
 ## Key Features
 
@@ -134,7 +134,7 @@ trix-typescript-sdk/
 ## Technical Highlights
 
 ### Client Architecture
-- Single `TrixDB` class with resource-based organization
+- Single `Trix` class with resource-based organization
 - Automatic authentication header injection
 - Configurable timeout and retry behavior
 - Custom fetch implementation support
@@ -168,9 +168,9 @@ trix-typescript-sdk/
 ## Usage Example
 
 ```typescript
-import { TrixDB } from 'trixdb';
+import { Trix } from '@trix/client';
 
-const client = new TrixDB({
+const client = new Trix({
   apiKey: 'your_api_key',
   baseUrl: 'https://api.trixdb.com'
 });

@@ -1,15 +1,15 @@
 /**
- * Agent session example for TrixDB SDK
+ * Agent session example for Trix SDK
  *
  * Demonstrates how to use agent sessions for tracking conversations
  * and interactions with context-aware memory management.
  */
 
-import { TrixDB } from '../src/index.js';
+import { Trix } from '../src/index.js';
 
 async function runAgentSession() {
-  const client = new TrixDB({
-    apiKey: process.env.TRIXDB_API_KEY || 'your_api_key',
+  const client = new Trix({
+    apiKey: process.env.TRIX_API_KEY || 'your_api_key',
   });
 
   try {

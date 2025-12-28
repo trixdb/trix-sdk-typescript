@@ -53,7 +53,7 @@ describe('Facts', () => {
 
     it('should create a fact with source attribution', async () => {
       const factData = {
-        subject: 'TrixDB',
+        subject: 'Trix',
         predicate: 'is_a',
         object: 'memory database',
         confidence: 1.0,

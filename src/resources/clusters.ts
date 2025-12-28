@@ -2,7 +2,7 @@
  * Clusters resource
  */
 
-import type { TrixDB } from '../client.js';
+import type { Trix } from '../client.js';
 import type {
   Cluster,
   CreateClusterParams,
@@ -34,7 +34,7 @@ import { validateId } from '../utils/security.js';
  * ```
  */
 export class Clusters extends BaseResource {
-  constructor(client: TrixDB) {
+  constructor(client: Trix) {
     super(client);
   }
 

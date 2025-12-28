@@ -1,11 +1,11 @@
 /**
- * Base resource classes and utilities for TrixDB SDK.
+ * Base resource classes and utilities for Trix SDK.
  *
  * This module provides base classes that eliminate duplication between
  * resource implementations.
  */
 
-import type { TrixDB } from '../client.js';
+import type { Trix } from '../client.js';
 import { validateId } from '../utils/security.js';
 
 /**
@@ -145,9 +145,9 @@ export function buildParams<T extends object>(
  * ```
  */
 export class BaseResource {
-  protected client: TrixDB;
+  protected client: Trix;
 
-  constructor(client: TrixDB) {
+  constructor(client: Trix) {
     this.client = client;
   }
 

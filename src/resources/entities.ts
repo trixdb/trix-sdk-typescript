@@ -22,7 +22,7 @@
  * ```
  */
 
-import type { TrixDB } from '../client.js';
+import type { Trix } from '../client.js';
 import type {
   Entity,
   CreateEntityParams,
@@ -51,7 +51,7 @@ import { validateId } from '../utils/security.js';
  * and can be linked to memories.
  */
 export class Entities extends BaseResource {
-  constructor(client: TrixDB) {
+  constructor(client: Trix) {
     super(client);
   }
 
@@ -64,7 +64,7 @@ export class Entities extends BaseResource {
    * @example
    * ```typescript
    * const entity = await client.entities.create({
-   *   name: 'TrixDB',
+   *   name: 'Trix',
    *   type: 'product',
    *   description: 'A powerful memory database',
    *   properties: { language: 'TypeScript', openSource: true },

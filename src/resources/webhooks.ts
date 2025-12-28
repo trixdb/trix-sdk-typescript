@@ -2,7 +2,7 @@
  * Webhooks resource
  */
 
-import type { TrixDB } from '../client.js';
+import type { Trix } from '../client.js';
 import type {
   Webhook,
   CreateWebhookParams,
@@ -33,7 +33,7 @@ import { validateId, validateWebhookUrl } from '../utils/security.js';
  * ```
  */
 export class Webhooks {
-  constructor(private readonly client: TrixDB) {}
+  constructor(private readonly client: Trix) {}
 
   /**
    * Create a new webhook
@@ -44,7 +44,7 @@ export class Webhooks {
    * @example
    * ```typescript
    * const webhook = await client.webhooks.create({
-   *   url: 'https://api.example.com/trixdb-webhook',
+   *   url: 'https://api.example.com/trix-webhook',
    *   events: ['memory.created', 'memory.deleted', 'cluster.updated'],
    *   secret: 'your_webhook_secret',
    *   active: true

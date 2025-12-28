@@ -2,7 +2,7 @@
  * Spaces resource
  */
 
-import type { TrixDB } from '../client.js';
+import type { Trix } from '../client.js';
 import type {
   Space,
   CreateSpaceParams,
@@ -26,7 +26,7 @@ import { validateId } from '../utils/security.js';
  * ```
  */
 export class Spaces extends BaseResource {
-  constructor(client: TrixDB) {
+  constructor(client: Trix) {
     super(client);
   }
 

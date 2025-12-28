@@ -1,20 +1,20 @@
 /**
- * Core type definitions for the TrixDB SDK
+ * Core type definitions for the Trix SDK
  */
 
 import type { RequestInterceptor, ResponseInterceptor, ErrorInterceptor } from './client.js';
 
 /**
- * Configuration options for the TrixDB client
+ * Configuration options for the Trix client
  */
-export interface TrixDBConfig {
+export interface TrixConfig {
   /**
    * API key or JWT token for authentication
    */
   apiKey: string;
 
   /**
-   * Base URL for the TrixDB API
+   * Base URL for the Trix API
    * @default 'https://api.trixdb.com'
    */
   baseUrl?: string;
@@ -76,7 +76,7 @@ export interface PaginatedResponse<T> {
 }
 
 /**
- * Memory types supported by TrixDB
+ * Memory types supported by Trix
  */
 export type MemoryType = 'text' | 'markdown' | 'url' | 'audio';
 

@@ -1,8 +1,8 @@
-# TrixDB TypeScript SDK
+# Trix TypeScript SDK
 
-Official TypeScript SDK for TrixDB - A memory and knowledge management API.
+Official TypeScript SDK for Trix - A memory and knowledge management API.
 
-[![npm version](https://img.shields.io/npm/v/trixdb.svg)](https://www.npmjs.com/package/trixdb)
+[![npm version](https://img.shields.io/npm/v/@trix/client.svg)](https://www.npmjs.com/package/@trix/client)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Features
@@ -19,23 +19,23 @@ Official TypeScript SDK for TrixDB - A memory and knowledge management API.
 ## Installation
 
 ```bash
-npm install trixdb
+npm install @trix/client
 ```
 
 ```bash
-yarn add trixdb
+yarn add @trix/client
 ```
 
 ```bash
-pnpm add trixdb
+pnpm add @trix/client
 ```
 
 ## Quick Start
 
 ```typescript
-import { TrixDB } from 'trixdb';
+import { Trix } from '@trix/client';
 
-const client = new TrixDB({
+const client = new Trix({
   apiKey: 'your_api_key',
   baseUrl: 'https://api.trixdb.com' // optional, defaults to production API
 });
@@ -64,8 +64,8 @@ const rel = await client.relationships.create(memory.id, otherMemory.id, {
 ## Configuration
 
 ```typescript
-const client = new TrixDB({
-  apiKey: 'your_api_key',        // Required: Your TrixDB API key
+const client = new Trix({
+  apiKey: 'your_api_key',        // Required: Your Trix API key
   baseUrl: 'https://api.trixdb.com', // Optional: API base URL
   maxRetries: 3,                 // Optional: Max retry attempts (default: 3)
   timeout: 30000,                // Optional: Request timeout in ms (default: 30000)
@@ -565,7 +565,7 @@ The SDK provides specific error classes for different scenarios:
 
 ```typescript
 import {
-  TrixDBError,
+  TrixError,
   AuthenticationError,
   NotFoundError,
   ValidationError,
@@ -573,7 +573,7 @@ import {
   NetworkError,
   TimeoutError,
   APIError
-} from 'trixdb';
+} from '@trix/client';
 
 try {
   const memory = await client.memories.get('invalid_id');
@@ -606,7 +606,7 @@ The SDK automatically retries failed requests with exponential backoff for:
 Configuration:
 
 ```typescript
-const client = new TrixDB({
+const client = new Trix({
   apiKey: 'your_api_key',
   maxRetries: 3, // Maximum number of retry attempts (default: 3)
   timeout: 30000 // Request timeout in milliseconds (default: 30000)
@@ -625,7 +625,7 @@ import type {
   CreateMemoryParams,
   ListMemoriesParams,
   PaginatedResponse
-} from 'trixdb';
+} from '@trix/client';
 
 const params: CreateMemoryParams = {
   content: 'Typed memory creation',
@@ -640,9 +640,9 @@ const memory: Memory = await client.memories.create(params);
 The SDK works in modern browsers that support the Fetch API:
 
 ```typescript
-import { TrixDB } from 'trixdb';
+import { Trix } from '@trix/client';
 
-const client = new TrixDB({
+const client = new Trix({
   apiKey: 'your_api_key'
 });
 
@@ -660,10 +660,10 @@ const memory = await client.memories.create({
 You can provide a custom fetch implementation for testing or specific environments:
 
 ```typescript
-import { TrixDB } from 'trixdb';
+import { Trix } from '@trix/client';
 import fetch from 'node-fetch';
 
-const client = new TrixDB({
+const client = new Trix({
   apiKey: 'your_api_key',
   fetch: fetch as any
 });
@@ -709,7 +709,7 @@ MIT License - see the [LICENSE](LICENSE) file for details.
 ## Support
 
 - Documentation: [https://docs.trixdb.com](https://docs.trixdb.com)
-- Issues: [GitHub Issues](https://github.com/trixdb/trix-typescript-sdk/issues)
+- Issues: [GitHub Issues](https://github.com/trix/trix-typescript-sdk/issues)
 - Email: support@trixdb.com
 
 ## Changelog
@@ -717,7 +717,7 @@ MIT License - see the [LICENSE](LICENSE) file for details.
 ### 1.0.0
 
 - Initial release
-- Full API coverage for TrixDB
+- Full API coverage for Trix
 - TypeScript support
 - Automatic retry with exponential backoff
 - Pagination helpers

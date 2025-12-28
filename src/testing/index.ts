@@ -1,18 +1,18 @@
 /**
- * Testing utilities for TrixDB SDK
+ * Testing utilities for Trix SDK
  *
  * This module provides mock clients and factory functions for testing
- * code that uses the TrixDB SDK without making real API calls.
+ * code that uses the Trix SDK without making real API calls.
  *
  * @example
  * ```typescript
- * import { MockTrixDB, createMockMemory } from 'trixdb/testing';
+ * import { MockTrix, createMockMemory } from '@trix/client/testing';
  *
  * describe('MyService', () => {
- *   let mockClient: MockTrixDB;
+ *   let mockClient: MockTrix;
  *
  *   beforeEach(() => {
- *     mockClient = new MockTrixDB();
+ *     mockClient = new MockTrix();
  *   });
  *
  *   it('should create a memory', async () => {
@@ -32,8 +32,7 @@
 
 export {
   // Main mock client
-  MockTrixDB,
-
+  MockTrix,
   // Mock resource classes (for advanced use cases)
   MockMemoriesResource,
   MockClustersResource,

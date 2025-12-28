@@ -1,5 +1,5 @@
 /**
- * Structured logging utilities for TrixDB SDK.
+ * Structured logging utilities for Trix SDK.
  */
 
 import { redactSensitiveData } from './security';
@@ -124,7 +124,7 @@ export class Logger {
   private context: Record<string, unknown>;
 
   constructor(
-    name: string = 'trixdb',
+    name: string = 'trix',
     config: Partial<LogConfig> = {},
     context: Record<string, unknown> = {}
   ) {
@@ -298,7 +298,7 @@ let globalLogger: Logger | null = null;
  * Set up global logging with configuration
  */
 export function setupLogging(config: Partial<LogConfig> = {}): Logger {
-  globalLogger = new Logger('trixdb', config);
+  globalLogger = new Logger('trix', config);
   return globalLogger;
 }
 
@@ -307,9 +307,9 @@ export function setupLogging(config: Partial<LogConfig> = {}): Logger {
  */
 export function getLogger(name?: string): Logger {
   if (!globalLogger) {
-    globalLogger = new Logger('trixdb');
+    globalLogger = new Logger('trix');
   }
-  if (name && name !== 'trixdb') {
+  if (name && name !== 'trix') {
     return new Logger(name, globalLogger['config']);
   }
   return globalLogger;

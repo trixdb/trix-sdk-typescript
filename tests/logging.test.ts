@@ -1,5 +1,5 @@
 /**
- * Tests for TrixDB structured logging utilities.
+ * Tests for Trix structured logging utilities.
  */
 
 import {

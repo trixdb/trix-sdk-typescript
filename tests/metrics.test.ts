@@ -1,5 +1,5 @@
 /**
- * Tests for TrixDB metrics and observability utilities.
+ * Tests for Trix metrics and observability utilities.
  */
 
 import {

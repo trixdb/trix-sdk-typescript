@@ -2,7 +2,7 @@
  * Agent resource
  */
 
-import type { TrixDB } from '../client.js';
+import type { Trix } from '../client.js';
 import type {
   ConsolidateParams,
   ConsolidateResult,
@@ -36,7 +36,7 @@ import { validateId } from '../utils/security.js';
  * ```
  */
 export class Agent {
-  constructor(private readonly client: TrixDB) {}
+  constructor(private readonly client: Trix) {}
 
   /**
    * Consolidate memories to optimize the knowledge graph

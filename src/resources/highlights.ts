@@ -2,7 +2,7 @@
  * Highlights resource
  */
 
-import type { TrixDB } from '../client.js';
+import type { Trix } from '../client.js';
 import type {
   Highlight,
   CreateHighlightParams,
@@ -34,7 +34,7 @@ import { validateId } from '../utils/security.js';
  * ```
  */
 export class Highlights {
-  constructor(private readonly client: TrixDB) {}
+  constructor(private readonly client: Trix) {}
 
   /**
    * Create a highlight in a memory

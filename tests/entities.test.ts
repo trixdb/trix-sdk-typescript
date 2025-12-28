@@ -69,7 +69,7 @@ describe('Entities', () => {
 
     it('should create an entity with properties', async () => {
       const entityData = {
-        name: 'TrixDB',
+        name: 'Trix',
         type: 'product',
         properties: {
           category: 'database',

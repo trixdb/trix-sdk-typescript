@@ -22,7 +22,7 @@
  * ```
  */
 
-import type { TrixDB } from '../client.js';
+import type { Trix } from '../client.js';
 import type {
   Fact,
   CreateFactParams,
@@ -45,7 +45,7 @@ import { validateId } from '../utils/security.js';
  * enabling powerful reasoning and querying over your knowledge base.
  */
 export class Facts extends BaseResource {
-  constructor(client: TrixDB) {
+  constructor(client: Trix) {
     super(client);
   }
 
@@ -58,7 +58,7 @@ export class Facts extends BaseResource {
    * @example
    * ```typescript
    * const fact = await client.facts.create({
-   *   subject: 'TrixDB',
+   *   subject: 'Trix',
    *   predicate: 'is_a',
    *   object: 'memory database',
    *   confidence: 1.0,

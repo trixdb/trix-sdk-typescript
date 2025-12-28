@@ -1,5 +1,5 @@
 /**
- * OpenTelemetry integration for TrixDB SDK
+ * OpenTelemetry integration for Trix SDK
  *
  * This module provides optional OpenTelemetry integration for distributed tracing.
  * The @opentelemetry/api package is an optional peer dependency.
@@ -7,7 +7,7 @@
  * @example
  * ```typescript
  * import { trace } from '@opentelemetry/api';
- * import { TrixDB, configureTelemetry } from 'trixdb';
+ * import { Trix, configureTelemetry } from '@trix/client';
  *
  * // Configure with your tracer
  * configureTelemetry({
@@ -16,7 +16,7 @@
  *   recordResponseBody: false,
  * });
  *
- * const client = new TrixDB({ apiKey: '...' });
+ * const client = new Trix({ apiKey: '...' });
  * // All requests will now create spans automatically
  * ```
  */
@@ -45,7 +45,7 @@ export interface TelemetryConfig {
   recordRequestBody?: boolean;
   /** Whether to record response bodies in span attributes (default: false) */
   recordResponseBody?: boolean;
-  /** Custom span name prefix (default: 'trixdb') */
+  /** Custom span name prefix (default: 'trix') */
   spanNamePrefix?: string;
   /** Additional attributes to add to all spans */
   defaultAttributes?: Record<string, string | number | boolean>;
@@ -78,11 +78,11 @@ let globalConfig: TelemetryConfig = {};
  * @example
  * ```typescript
  * import { trace } from '@opentelemetry/api';
- * import { configureTelemetry } from 'trixdb';
+ * import { configureTelemetry } from 'trix';
  *
  * configureTelemetry({
  *   tracer: trace.getTracer('my-service', '1.0.0'),
- *   spanNamePrefix: 'trixdb',
+ *   spanNamePrefix: 'trix',
  *   defaultAttributes: {
  *     'service.name': 'my-app',
  *     'deployment.environment': 'production',
@@ -127,7 +127,7 @@ export function createRequestSpan(
     return new NoOpRequestSpan();
   }
 
-  const prefix = config.spanNamePrefix || 'trixdb';
+  const prefix = config.spanNamePrefix || 'trix';
   const spanName = `${prefix}.${operation}`;
 
   const span = config.tracer.startSpan(spanName, {
@@ -136,7 +136,7 @@ export function createRequestSpan(
       'http.method': method,
       'http.url': path,
       'rpc.system': 'http',
-      'rpc.service': 'trixdb',
+      'rpc.service': 'trix',
       'rpc.method': operation,
       ...config.defaultAttributes,
     },

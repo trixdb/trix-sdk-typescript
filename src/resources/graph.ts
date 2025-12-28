@@ -2,7 +2,7 @@
  * Graph resource
  */
 
-import type { TrixDB } from '../client.js';
+import type { Trix } from '../client.js';
 import type {
   TraverseParams,
   GraphResult,
@@ -27,7 +27,7 @@ import { validateId } from '../utils/security.js';
  * ```
  */
 export class Graph {
-  constructor(private readonly client: TrixDB) {}
+  constructor(private readonly client: Trix) {}
 
   /**
    * Traverse the graph starting from a node
