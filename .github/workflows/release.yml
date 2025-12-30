@@ -110,7 +110,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: npm
-      url: https://www.npmjs.com/package/@trix/client
+      url: https://www.npmjs.com/package/@trixdb/client
     steps:
       - uses: actions/checkout@v4
 
@@ -198,19 +198,19 @@ jobs:
             ## Installation
 
             ```bash
-            npm install @trix/client@${{ steps.get_version.outputs.version }}
+            npm install @trixdb/client@${{ steps.get_version.outputs.version }}
             ```
 
             or
 
             ```bash
-            yarn add @trix/client@${{ steps.get_version.outputs.version }}
+            yarn add @trixdb/client@${{ steps.get_version.outputs.version }}
             ```
 
             or
 
             ```bash
-            pnpm add @trix/client@${{ steps.get_version.outputs.version }}
+            pnpm add @trixdb/client@${{ steps.get_version.outputs.version }}
             ```
 
             ## What's Changed
@@ -219,7 +219,7 @@ jobs:
 
             ## npm
 
-            📦 https://www.npmjs.com/package/@trix/client/v/${{ steps.get_version.outputs.version }}
+            📦 https://www.npmjs.com/package/@trixdb/client/v/${{ steps.get_version.outputs.version }}
           files: |
             trix-client-*.tgz
           draft: false
@@ -249,5 +249,5 @@ jobs:
       - name: Success message
         run: |
           echo "✅ TypeScript SDK v${{ steps.get_version.outputs.version }} released successfully!"
-          echo "📦 npm: https://www.npmjs.com/package/@trix/client/v/${{ steps.get_version.outputs.version }}"
+          echo "📦 npm: https://www.npmjs.com/package/@trixdb/client/v/${{ steps.get_version.outputs.version }}"
           echo "🎉 GitHub Release: https://github.com/${{ github.repository }}/releases/tag/v${{ steps.get_version.outputs.version }}"

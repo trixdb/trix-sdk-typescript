@@ -1,5 +1,5 @@
 {
-  "name": "@trix/client",
+  "name": "@trixdb/client",
   "version": "0.1.0",
   "description": "Official TypeScript SDK for Trix - A memory and knowledge management API",
   "main": "./dist/index.js",
@@ -43,12 +43,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/trix/trix-typescript-sdk.git"
+    "url": "https://github.com/trixdb/trix-sdk-typescript.git"
   },
   "bugs": {
-    "url": "https://github.com/trix/trix-typescript-sdk/issues"
+    "url": "https://github.com/trixdb/trix-sdk-typescript/issues"
   },
-  "homepage": "https://github.com/trix/trix-typescript-sdk#readme",
+  "homepage": "https://github.com/trixdb/trix-sdk-typescript#readme",
   "engines": {
     "node": ">=18.0.0"
   },
