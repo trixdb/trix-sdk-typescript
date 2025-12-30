@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0] - 2025-12-30
+
+### Fixed
+- Fixed invites test suite that was incorrectly importing from vitest instead of Jest
+- Fixed test assertion in invites.test.ts to use `query` instead of `params`
+
+### Changed
+- Migrated from Husky to Lefthook for git hooks
+- Added comprehensive pre-commit hooks: lint, typecheck, and tests
+- Added pre-push hooks: tests with coverage and build verification
+- Ensures tests run before commits to catch issues locally before CI
+
 ## [1.0.0] - 2025-12-25
 
 ### Added
@@ -60,5 +72,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for both API key and JWT authentication
 - Optional OpenTelemetry integration
 
-[Unreleased]: https://github.com/trix/trix-typescript-sdk/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/trix/trix-typescript-sdk/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/trix/trix-typescript-sdk/releases/tag/v0.1.0
 [1.0.0]: https://github.com/trix/trix-typescript-sdk/releases/tag/v1.0.0
