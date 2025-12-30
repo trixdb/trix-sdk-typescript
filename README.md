@@ -714,9 +714,9 @@ MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Changelog
 
-### 1.0.0
+### 0.1.0 (2025-12-30)
 
-- Initial release
+- Initial public release
 - Full API coverage for Trix
 - TypeScript support
 - Automatic retry with exponential backoff
