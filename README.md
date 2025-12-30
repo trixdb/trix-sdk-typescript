@@ -2,7 +2,7 @@
 
 Official TypeScript SDK for Trix - A memory and knowledge management API.
 
-[![npm version](https://img.shields.io/npm/v/@trix/client.svg)](https://www.npmjs.com/package/@trix/client)
+[![npm version](https://img.shields.io/npm/v/@trixdb/client.svg)](https://www.npmjs.com/package/@trixdb/client)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Features
@@ -19,21 +19,21 @@ Official TypeScript SDK for Trix - A memory and knowledge management API.
 ## Installation
 
 ```bash
-npm install @trix/client
+npm install @trixdb/client
 ```
 
 ```bash
-yarn add @trix/client
+yarn add @trixdb/client
 ```
 
 ```bash
-pnpm add @trix/client
+pnpm add @trixdb/client
 ```
 
 ## Quick Start
 
 ```typescript
-import { Trix } from '@trix/client';
+import { Trix } from '@trixdb/client';
 
 const client = new Trix({
   apiKey: 'your_api_key',
@@ -573,7 +573,7 @@ import {
   NetworkError,
   TimeoutError,
   APIError
-} from '@trix/client';
+} from '@trixdb/client';
 
 try {
   const memory = await client.memories.get('invalid_id');
@@ -625,7 +625,7 @@ import type {
   CreateMemoryParams,
   ListMemoriesParams,
   PaginatedResponse
-} from '@trix/client';
+} from '@trixdb/client';
 
 const params: CreateMemoryParams = {
   content: 'Typed memory creation',
@@ -640,7 +640,7 @@ const memory: Memory = await client.memories.create(params);
 The SDK works in modern browsers that support the Fetch API:
 
 ```typescript
-import { Trix } from '@trix/client';
+import { Trix } from '@trixdb/client';
 
 const client = new Trix({
   apiKey: 'your_api_key'
@@ -660,7 +660,7 @@ const memory = await client.memories.create({
 You can provide a custom fetch implementation for testing or specific environments:
 
 ```typescript
-import { Trix } from '@trix/client';
+import { Trix } from '@trixdb/client';
 import fetch from 'node-fetch';
 
 const client = new Trix({
@@ -698,18 +698,15 @@ if (transcriptionJob.status === 'completed') {
 const stream = await client.memories.streamAudio(audioMemory.id);
 ```
 
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
 ## License
 
 MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Support
 
+- Website: [https://trixdb.com](https://trixdb.com)
 - Documentation: [https://docs.trixdb.com](https://docs.trixdb.com)
-- Issues: [GitHub Issues](https://github.com/trix/trix-typescript-sdk/issues)
+- Support: [https://trixdb.com/support](https://trixdb.com/support)
 - Email: support@trixdb.com
 
 ## Changelog

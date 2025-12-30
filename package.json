@@ -41,14 +41,11 @@
   ],
   "author": "Trix",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/trixdb/trix-sdk-typescript.git"
-  },
   "bugs": {
-    "url": "https://github.com/trixdb/trix-sdk-typescript/issues"
+    "url": "https://trixdb.com/support",
+    "email": "support@trixdb.com"
   },
-  "homepage": "https://github.com/trixdb/trix-sdk-typescript#readme",
+  "homepage": "https://trixdb.com",
   "engines": {
     "node": ">=18.0.0"
   },
