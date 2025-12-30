@@ -2,13 +2,12 @@
  * Invites Resource Tests
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { Invites } from '../src/resources/invites.js';
 
 // Mock client
 function createMockClient() {
   return {
-    request: vi.fn(),
+    request: jest.fn(),
   };
 }
 
@@ -138,7 +137,7 @@ describe('Invites', () => {
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'GET',
         path: '/accounts/invites',
-        params: {
+        query: {
           status: 'accepted',
           limit: 10,
           offset: 20,

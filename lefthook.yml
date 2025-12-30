@@ -1,0 +1,23 @@
+# Lefthook configuration for trix-sdk-typescript
+# Documentation: https://github.com/evilmartians/lefthook
+
+pre-commit:
+  parallel: true
+  commands:
+    lint:
+      glob: "*.{js,ts}"
+      run: npm run lint
+    typecheck:
+      glob: "*.{js,ts}"
+      run: npm run typecheck
+    test:
+      glob: "*.{js,ts}"
+      run: npm test
+
+pre-push:
+  parallel: true
+  commands:
+    test:
+      run: npm test -- --coverage
+    build:
+      run: npm run build

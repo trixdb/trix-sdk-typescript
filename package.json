@@ -28,7 +28,7 @@
     "typecheck": "tsc --noEmit",
     "docs": "typedoc src/index.ts --out docs --plugin typedoc-plugin-markdown",
     "prepublishOnly": "npm run build",
-    "prepare": "husky"
+    "prepare": "lefthook install"
   },
   "keywords": [
     "trix",
@@ -58,8 +58,8 @@
     "@typescript-eslint/eslint-plugin": "^6.19.0",
     "@typescript-eslint/parser": "^6.19.0",
     "eslint": "^8.56.0",
-    "husky": "^9.1.7",
     "jest": "^29.7.0",
+    "lefthook": "^2.0.13",
     "ts-jest": "^29.4.6",
     "tsup": "^8.0.1",
     "typedoc": "^0.28.0",
