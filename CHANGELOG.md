@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2025-12-30
+
+### Changed
+- Updated package name from @trix/client to @trixdb/client to match npm organization
+- Updated homepage to https://trixdb.com
+- Updated support URLs to trixdb.com resources
+- Removed GitHub repository links (private repository)
+- Changed license to proprietary (UNLICENSED)
+- Updated README with correct package references and support links
+- Removed npm provenance flag for private repository compatibility
+
 ## [0.1.0] - 2025-12-30
 
 ### Fixed
@@ -72,6 +83,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for both API key and JWT authentication
 - Optional OpenTelemetry integration
 
-[Unreleased]: https://github.com/trix/trix-typescript-sdk/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/trix/trix-typescript-sdk/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/trix/trix-typescript-sdk/releases/tag/v0.1.1
 [0.1.0]: https://github.com/trix/trix-typescript-sdk/releases/tag/v0.1.0
 [1.0.0]: https://github.com/trix/trix-typescript-sdk/releases/tag/v1.0.0
