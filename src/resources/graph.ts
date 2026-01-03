@@ -12,7 +12,7 @@ import type {
   PathResult,
   GraphNeighbors,
   GraphStats,
-  ExpandParams,
+  GraphExpandParams,
   GraphExpansionResult,
 } from '../types.js';
 import { validateId } from '../utils/security.js';
@@ -178,7 +178,7 @@ export class Graph {
    * console.log(`Scoring applied: ${result.scoring?.applied}`);
    * ```
    */
-  async expand(params: ExpandParams): Promise<GraphExpansionResult> {
+  async expand(params: GraphExpandParams): Promise<GraphExpansionResult> {
     if (!params.seedMemoryIds || params.seedMemoryIds.length === 0) {
       throw new Error('seed_memory_ids cannot be empty');
     }

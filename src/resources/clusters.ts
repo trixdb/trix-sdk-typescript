@@ -10,8 +10,8 @@ import type {
   ListClustersParams,
   PaginatedResponse,
   BulkResult,
-  ExpandParams,
-  ExpandResult,
+  ClusterExpandParams,
+  ClusterExpandResult,
   ClusterStats,
   ClusterQuality,
   ClusterTopics,
@@ -303,9 +303,9 @@ export class Clusters extends BaseResource {
    * console.log(`Found ${result.newMemories.length} similar memories`);
    * ```
    */
-  async expand(clusterId: string, params?: ExpandParams): Promise<ExpandResult> {
+  async expand(clusterId: string, params?: ClusterExpandParams): Promise<ClusterExpandResult> {
     validateId(clusterId, 'cluster');
-    return this.request<ExpandResult>({
+    return this.request<ClusterExpandResult>({
       method: 'POST',
       path: `/clusters/${clusterId}/expand`,
       body: params,

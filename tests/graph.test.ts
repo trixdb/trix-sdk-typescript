@@ -3,7 +3,11 @@
  */
 
 import { Trix } from '../src/client';
-import type { GraphExpansionResult } from '../src/types';
+import type {
+  GraphExpansionResult,
+  GraphExpandParams,
+  ClusterExpandParams
+} from '../src/types';
 
 // Mock fetch for testing
 function createMockFetch(response: {
@@ -27,6 +31,32 @@ function createMockFetch(response: {
 }
 
 describe('Graph Expansion', () => {
+  describe('type definitions', () => {
+    it('should have distinct ClusterExpandParams and GraphExpandParams types', () => {
+      // This test verifies that both types exist and are distinct
+      // If types were colliding, TypeScript compilation would fail
+
+      const clusterParams: ClusterExpandParams = {
+        limit: 10,
+        threshold: 0.7
+      };
+
+      const graphParams: GraphExpandParams = {
+        seedMemoryIds: ['mem_1', 'mem_2'],
+        maxHops: 3,
+        minWeight: 0.5
+      };
+
+      // Verify the types have different required fields
+      expect(clusterParams).toBeDefined();
+      expect(graphParams).toBeDefined();
+      expect('limit' in clusterParams).toBe(true);
+      expect('seedMemoryIds' in graphParams).toBe(true);
+      expect('limit' in graphParams).toBe(false);
+      expect('seedMemoryIds' in clusterParams).toBe(false);
+    });
+  });
+
   describe('expand', () => {
     it('should expand graph from seed memories', async () => {
       const mockResponse = {

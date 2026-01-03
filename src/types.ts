@@ -361,15 +361,15 @@ export interface ListClustersParams {
 /**
  * Parameters for expanding a cluster
  */
-export interface ExpandParams {
+export interface ClusterExpandParams {
   limit?: number;
   threshold?: number;
 }
 
 /**
- * Expand result
+ * Cluster expansion result
  */
-export interface ExpandResult {
+export interface ClusterExpandResult {
   clusterId: string;
   newMemories: Array<{
     memoryId: string;
@@ -1435,7 +1435,7 @@ export interface GraphExpansionResult {
 /**
  * Parameters for graph expansion
  */
-export interface ExpandParams {
+export interface GraphExpandParams {
   seedMemoryIds: string[];
   maxHops?: number;
   minWeight?: number;
