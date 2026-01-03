@@ -42,6 +42,9 @@ export class Memories extends BaseResource {
   /**
    * Create a new memory
    *
+   * Supports audio formats: mp3, mp4, m4a, wav, webm, ogg, flac, aac
+   * Supports video formats: mp4, webm, mov, avi, mkv, flv, mpeg
+   *
    * @param params - Memory creation parameters
    * @returns Created memory
    *
@@ -61,10 +64,18 @@ export class Memories extends BaseResource {
    *   audioFile: audioBlob,
    *   tags: ['voice-note']
    * });
+   *
+   * // Create a video memory with transcription
+   * const videoMemory = await client.memories.create({
+   *   content: 'Meeting recording',
+   *   type: 'audio',
+   *   audioFile: videoBlob, // Works with video files too
+   *   tags: ['meeting']
+   * });
    * ```
    */
   async create(params: CreateMemoryParams): Promise<Memory> {
-    // Handle audio file upload with multipart/form-data
+    // Handle audio/video file upload with multipart/form-data
     if (params.audioFile) {
       const formData = new FormData();
       formData.append('file', params.audioFile);
@@ -306,10 +317,10 @@ export class Memories extends BaseResource {
   }
 
   /**
-   * Stream audio content for an audio memory
+   * Stream audio/video content for a memory
    *
    * @param id - Memory ID
-   * @returns Readable stream of audio data
+   * @returns Readable stream of audio/video data
    *
    * @example
    * ```typescript
@@ -326,7 +337,7 @@ export class Memories extends BaseResource {
   }
 
   /**
-   * Get transcript for an audio memory
+   * Get transcript for an audio or video memory
    *
    * @param id - Memory ID
    * @returns Transcript object
@@ -346,7 +357,7 @@ export class Memories extends BaseResource {
   }
 
   /**
-   * Request transcription for an audio memory
+   * Request transcription for an audio or video memory with advanced options
    *
    * @param id - Memory ID
    * @param params - Transcription parameters
@@ -354,9 +365,18 @@ export class Memories extends BaseResource {
    *
    * @example
    * ```typescript
+   * // Basic transcription
    * const job = await client.memories.transcribe('mem_123', {
-   *   language: 'en',
-   *   priority: 'high'
+   *   language: 'en'
+   * });
+   *
+   * // Advanced transcription with speaker diarization
+   * const job = await client.memories.transcribe('mem_123', {
+   *   provider: 'assemblyai',
+   *   enableSpeakerDiarization: true,
+   *   speakersExpected: 2,
+   *   enableAutoChapters: true,
+   *   enableEntityDetection: true
    * });
    * ```
    */

@@ -178,9 +178,24 @@ export interface Transcript {
  * Parameters for transcription
  */
 export interface TranscribeParams {
+  /** Language code for transcription (e.g., 'en', 'es') */
   language?: string;
-  model?: string;
-  priority?: 'low' | 'normal' | 'high';
+  /** Context to improve transcription accuracy */
+  prompt?: string;
+  /** Transcription provider ('assemblyai' or 'openai') */
+  provider?: 'assemblyai' | 'openai';
+  /** Enable speaker identification and labeling (diarization) */
+  enableSpeakerDiarization?: boolean;
+  /** Enable entity detection in transcript */
+  enableEntityDetection?: boolean;
+  /** Enable content safety labeling */
+  enableContentSafety?: boolean;
+  /** Enable automatic chapter generation */
+  enableAutoChapters?: boolean;
+  /** Enable automatic summarization */
+  enableAutoSummarization?: boolean;
+  /** Expected number of speakers (hint for diarization) */
+  speakersExpected?: number;
 }
 
 /**
