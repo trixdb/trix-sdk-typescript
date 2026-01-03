@@ -1391,6 +1391,60 @@ export interface GraphStats {
   components: number;
 }
 
+/**
+ * Weights used in hybrid scoring
+ */
+export interface HybridScoringWeights {
+  semantic: number;
+  graph: number;
+  coActivation: number;
+  recency: number;
+  salience: number;
+}
+
+/**
+ * Scoring metadata for graph expansion
+ */
+export interface GraphExpansionScoring {
+  applied: boolean;
+  weights?: HybridScoringWeights;
+}
+
+/**
+ * Statistics from graph expansion
+ */
+export interface GraphExpansionStats {
+  seedCount: number;
+  expandedCount: number;
+  finalCount: number;
+  relationshipsFound?: number;
+  hopsUsed?: number;
+}
+
+/**
+ * Result of graph expansion from seed memories
+ */
+export interface GraphExpansionResult {
+  seedMemories: string[];
+  expandedMemories: Memory[];
+  relationships: Relationship[];
+  stats: GraphExpansionStats;
+  scoring?: GraphExpansionScoring;
+}
+
+/**
+ * Parameters for graph expansion
+ */
+export interface ExpandParams {
+  seedMemoryIds: string[];
+  maxHops?: number;
+  minWeight?: number;
+  relationshipTypes?: string[];
+  direction?: 'incoming' | 'outgoing' | 'both';
+  includeContent?: boolean;
+  applyHybridScoring?: boolean;
+}
+
 // ============================================================================
 // Agent Core Memory Types
 // ============================================================================

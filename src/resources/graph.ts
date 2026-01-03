@@ -12,6 +12,8 @@ import type {
   PathResult,
   GraphNeighbors,
   GraphStats,
+  ExpandParams,
+  GraphExpansionResult,
 } from '../types.js';
 import { validateId } from '../utils/security.js';
 
@@ -148,6 +150,48 @@ export class Graph {
     return this.client.request<GraphStats>({
       method: 'GET',
       path: '/graph/stats',
+    });
+  }
+
+  /**
+   * Expand graph from seed memories using traversal and optional hybrid scoring
+   *
+   * @param params - Expansion parameters
+   * @returns Graph expansion result with expanded memories, relationships, and stats
+   *
+   * @example
+   * ```typescript
+   * // Basic expansion
+   * const result = await client.graph.expand({
+   *   seedMemoryIds: ['mem_123', 'mem_456']
+   * });
+   * console.log(`Expanded to ${result.stats.expandedCount} memories`);
+   *
+   * // Advanced expansion with hybrid scoring
+   * const result = await client.graph.expand({
+   *   seedMemoryIds: ['mem_123'],
+   *   maxHops: 3,
+   *   minWeight: 0.5,
+   *   relationshipTypes: ['related_to', 'supports'],
+   *   applyHybridScoring: true
+   * });
+   * console.log(`Scoring applied: ${result.scoring?.applied}`);
+   * ```
+   */
+  async expand(params: ExpandParams): Promise<GraphExpansionResult> {
+    if (!params.seedMemoryIds || params.seedMemoryIds.length === 0) {
+      throw new Error('seed_memory_ids cannot be empty');
+    }
+
+    // Validate all seed memory IDs
+    for (const id of params.seedMemoryIds) {
+      validateId(id, 'memory');
+    }
+
+    return this.client.request<GraphExpansionResult>({
+      method: 'POST',
+      path: '/graph/expand',
+      body: params,
     });
   }
 }
