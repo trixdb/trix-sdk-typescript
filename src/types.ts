@@ -159,19 +159,93 @@ export interface MemoryConfig {
 }
 
 /**
- * Transcript object
+ * Timestamp range for content safety labels
+ */
+export interface TimestampRange {
+  start: number;
+  end: number;
+}
+
+/**
+ * Content safety detection result
+ */
+export interface ContentSafetyLabel {
+  label: string;
+  confidence: number;
+  severity: string;
+  timestamp?: TimestampRange;
+}
+
+/**
+ * Word-level timestamp with optional speaker label
+ */
+export interface WordTimestamp {
+  word: string;
+  start: number;
+  end: number;
+  confidence?: number;
+  speaker?: string;
+}
+
+/**
+ * Transcript segment with speaker information and word-level details
+ */
+export interface TranscriptSegment {
+  id?: string;
+  startTime: number;
+  endTime: number;
+  text: string;
+  segmentIndex: number;
+  confidence?: number;
+  speaker?: string;
+  words?: WordTimestamp[];
+  wordConfidenceAvg?: number;
+}
+
+/**
+ * Detected entity in transcript
+ */
+export interface TranscriptEntity {
+  id?: string;
+  entityType: string;
+  text: string;
+  startTime: number;
+  endTime: number;
+  confidence: number;
+  metadata?: Record<string, any>;
+}
+
+/**
+ * Auto-generated chapter
+ */
+export interface TranscriptChapter {
+  id?: string;
+  chapterIndex: number;
+  headline: string;
+  summary: string;
+  gist: string;
+  startTime: number;
+  endTime: number;
+}
+
+/**
+ * Full transcript with metadata, segments, entities, and chapters
  */
 export interface Transcript {
   memoryId: string;
+  audioFileId?: string;
   text: string;
+  duration?: number;
   language?: string;
-  confidence?: number;
-  segments?: Array<{
-    start: number;
-    end: number;
-    text: string;
-  }>;
-  createdAt: string;
+  languageConfidence?: number;
+  provider?: string;
+  summary?: string;
+  contentSafetyLabels?: ContentSafetyLabel[];
+  providerMetadata?: Record<string, any>;
+  segments?: TranscriptSegment[];
+  entities?: TranscriptEntity[];
+  chapters?: TranscriptChapter[];
+  words?: WordTimestamp[];
 }
 
 /**
