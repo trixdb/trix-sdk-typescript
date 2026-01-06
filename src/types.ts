@@ -81,6 +81,35 @@ export interface PaginatedResponse<T> {
 export type MemoryType = 'text' | 'markdown' | 'url' | 'audio';
 
 /**
+ * Origin types for memory context classification
+ * These represent the life domain context of a memory
+ */
+export type OriginType = 'work' | 'private' | 'shared' | 'learning';
+
+/**
+ * Source types for memory provenance tracking
+ * These represent how/where the memory was captured
+ */
+export type SourceType =
+  | 'email'
+  | 'meeting'
+  | 'chat'
+  | 'document'
+  | 'webpage'
+  | 'audio'
+  | 'video'
+  | 'screenshot'
+  | 'manual'
+  | 'agent'
+  | 'api'
+  | 'import';
+
+/**
+ * Relationship types for memory-resource associations
+ */
+export type ResourceRelationshipType = 'primary' | 'related' | 'mentioned' | 'derived';
+
+/**
  * Memory object
  */
 export interface Memory {
@@ -94,6 +123,16 @@ export interface Memory {
   createdAt: string;
   updatedAt: string;
   transcriptStatus?: 'pending' | 'processing' | 'completed' | 'failed';
+  /** Origin/Context: Session ID this memory belongs to */
+  sessionId?: string;
+  /** Origin/Context: Life domain context */
+  originType?: OriginType;
+  /** Origin/Context: Ingestion method */
+  sourceType?: SourceType;
+  /** Origin/Context: External ID in source system */
+  sourceId?: string;
+  /** Origin/Context: Rich context from source */
+  sourceMetadata?: Record<string, unknown>;
 }
 
 /**
@@ -107,6 +146,18 @@ export interface CreateMemoryParams {
   spaceId?: string;
   embedding?: number[];
   audioFile?: Blob | Buffer;
+  /** Origin/Context: Session ID to link this memory to */
+  sessionId?: string;
+  /** Origin/Context: Life domain context */
+  originType?: OriginType;
+  /** Origin/Context: Ingestion method */
+  sourceType?: SourceType;
+  /** Origin/Context: External ID in source system */
+  sourceId?: string;
+  /** Origin/Context: Rich context from source */
+  sourceMetadata?: Record<string, unknown>;
+  /** Origin/Context: Resource IDs to link this memory to */
+  resourceIds?: string[];
 }
 
 /**
@@ -118,6 +169,14 @@ export interface UpdateMemoryParams {
   tags?: string[];
   metadata?: Record<string, unknown>;
   embedding?: number[];
+  /** Origin/Context: Life domain context */
+  originType?: OriginType;
+  /** Origin/Context: Ingestion method */
+  sourceType?: SourceType;
+  /** Origin/Context: External ID in source system */
+  sourceId?: string;
+  /** Origin/Context: Rich context from source */
+  sourceMetadata?: Record<string, unknown>;
 }
 
 /**
@@ -134,6 +193,18 @@ export interface ListMemoriesParams {
   spaceId?: string;
   sortBy?: 'createdAt' | 'updatedAt' | 'relevance';
   sortOrder?: 'asc' | 'desc';
+  /** Origin/Context: Filter by session ID */
+  sessionId?: string;
+  /** Origin/Context: Filter by life domain context */
+  originType?: OriginType;
+  /** Origin/Context: Filter by ingestion method */
+  sourceType?: SourceType;
+  /** Origin/Context: Filter by source ID */
+  sourceId?: string;
+  /** Origin/Context: Filter by resource ID */
+  resourceId?: string;
+  /** Origin/Context: Filter by multiple resource IDs (comma-separated) */
+  resourceIds?: string;
 }
 
 /**
@@ -1566,4 +1637,108 @@ export interface HighlightLinkResult {
   highlightId: string;
   memoryId: string;
   linked: boolean;
+}
+
+// ============================================================================
+// Resource Types - Project/Topic Management for Memory Context
+// ============================================================================
+
+/**
+ * Resource object - represents a project, topic, or other grouping for memories
+ */
+export interface Resource {
+  id: string;
+  name: string;
+  type: string;
+  description?: string;
+  metadata?: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Parameters for creating a resource
+ */
+export interface CreateResourceParams {
+  name: string;
+  type?: string;
+  description?: string;
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Parameters for updating a resource
+ */
+export interface UpdateResourceParams {
+  name?: string;
+  type?: string;
+  description?: string;
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Parameters for listing resources
+ */
+export interface ListResourcesParams {
+  type?: string;
+  limit?: number;
+  offset?: number;
+}
+
+/**
+ * Resource list response
+ */
+export interface ResourceListResult {
+  data: Resource[];
+  pagination: {
+    total: number;
+    limit: number;
+    offset: number;
+    hasMore: boolean;
+  };
+}
+
+/**
+ * Memory-resource link
+ */
+export interface MemoryResource {
+  memoryId: string;
+  resourceId: string;
+  relationshipType: ResourceRelationshipType;
+  createdAt: string;
+  resource?: Resource;
+}
+
+/**
+ * Memory resources list response
+ */
+export interface MemoryResourcesResult {
+  data: MemoryResource[];
+}
+
+/**
+ * Parameters for linking a resource to a memory
+ */
+export interface LinkResourceParams {
+  resourceId: string;
+  relationshipType?: ResourceRelationshipType;
+}
+
+/**
+ * Result of linking a resource to a memory
+ */
+export interface LinkResourceResult {
+  memoryId: string;
+  resourceId: string;
+  relationshipType: ResourceRelationshipType;
+  linked: boolean;
+}
+
+/**
+ * Result of unlinking a resource from a memory
+ */
+export interface UnlinkResourceResult {
+  memoryId: string;
+  resourceId: string;
+  unlinked: boolean;
 }
