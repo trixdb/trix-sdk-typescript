@@ -99,6 +99,8 @@ import { Entities } from './resources/entities.js';
 import { Enrichments } from './resources/enrichments.js';
 import { Billing } from './resources/billing.js';
 import { Invites } from './resources/invites.js';
+import { Sessions } from './resources/sessions.js';
+import { Resources } from './resources/resources.js';
 
 /**
  * HTTP request options
@@ -221,6 +223,8 @@ export class Trix {
   public readonly enrichments: Enrichments;
   public readonly billing: Billing;
   public readonly invites: Invites;
+  public readonly sessions: Sessions;
+  public readonly resources: Resources;
 
   /**
    * Create a Trix client from environment variables.
@@ -302,6 +306,8 @@ export class Trix {
     this.enrichments = new Enrichments(this);
     this.billing = new Billing(this);
     this.invites = new Invites(this);
+    this.sessions = new Sessions(this);
+    this.resources = new Resources(this);
   }
 
   /**

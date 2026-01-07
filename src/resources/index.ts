@@ -19,3 +19,5 @@ export * from './entities.js';
 export * from './enrichments.js';
 export * from './billing.js';
 export * from './invites.js';
+export * from './sessions.js';
+export * from './resources.js';

@@ -97,6 +97,7 @@ describe('Trix Client', () => {
       expect(client.feedback).toBeDefined();
       expect(client.highlights).toBeDefined();
       expect(client.jobs).toBeDefined();
+      expect(client.sessions).toBeDefined();
     });
   });
 

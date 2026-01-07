@@ -16,6 +16,10 @@ import type {
   Job,
   MemoryStatsParams,
   MemoryStats,
+  LinkResourceParams,
+  LinkResourceResult,
+  UnlinkResourceResult,
+  MemoryResourcesResult,
 } from '../types.js';
 import { BaseResource, buildParams, validateBulkArray, validateIds } from './base.js';
 import { paginateIterator } from '../utils/pagination.js';
@@ -411,6 +415,91 @@ export class Memories extends BaseResource {
       method: 'GET',
       path: '/memories/stats',
       params: buildParams(params || {}),
+    });
+  }
+
+  /**
+   * Link a resource to a memory
+   *
+   * @param id - Memory ID
+   * @param params - Link parameters including resource ID and relationship type
+   * @returns Link result
+   *
+   * @example
+   * ```typescript
+   * // Link with default relationship type ('related')
+   * const result = await client.memories.linkResource('mem_123', {
+   *   resourceId: 'res_456'
+   * });
+   *
+   * // Link with specific relationship type
+   * const result = await client.memories.linkResource('mem_123', {
+   *   resourceId: 'res_456',
+   *   relationshipType: 'primary'
+   * });
+   * ```
+   */
+  async linkResource(
+    id: string,
+    params: LinkResourceParams
+  ): Promise<LinkResourceResult> {
+    validateId(id, 'memory');
+    validateId(params.resourceId, 'resource');
+
+    return this.request<LinkResourceResult>({
+      method: 'POST',
+      path: `/memories/${id}/resources`,
+      body: {
+        resource_id: params.resourceId,
+        relationship_type: params.relationshipType,
+      },
+    });
+  }
+
+  /**
+   * Get resources linked to a memory
+   *
+   * @param id - Memory ID
+   * @returns List of resources linked to this memory
+   *
+   * @example
+   * ```typescript
+   * const result = await client.memories.getResources('mem_123');
+   * console.log(`Linked to ${result.data.length} resources`);
+   * ```
+   */
+  async getResources(id: string): Promise<MemoryResourcesResult> {
+    validateId(id, 'memory');
+
+    return this.request<MemoryResourcesResult>({
+      method: 'GET',
+      path: `/memories/${id}/resources`,
+    });
+  }
+
+  /**
+   * Unlink a resource from a memory
+   *
+   * @param id - Memory ID
+   * @param resourceId - Resource ID to unlink
+   * @returns Unlink result
+   *
+   * @example
+   * ```typescript
+   * const result = await client.memories.unlinkResource('mem_123', 'res_456');
+   * console.log(`Unlinked: ${result.unlinked}`);
+   * ```
+   */
+  async unlinkResource(
+    id: string,
+    resourceId: string
+  ): Promise<UnlinkResourceResult> {
+    validateId(id, 'memory');
+    validateId(resourceId, 'resource');
+
+    return this.request<UnlinkResourceResult>({
+      method: 'DELETE',
+      path: `/memories/${id}/resources/${resourceId}`,
     });
   }
 }

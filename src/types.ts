@@ -1681,8 +1681,11 @@ export interface UpdateResourceParams {
  */
 export interface ListResourcesParams {
   type?: string;
+  search?: string;
   limit?: number;
   offset?: number;
+  sort?: 'created_at' | 'updated_at' | 'name' | 'type';
+  order?: 'asc' | 'desc';
 }
 
 /**
@@ -1713,7 +1716,28 @@ export interface MemoryResource {
  * Memory resources list response
  */
 export interface MemoryResourcesResult {
-  data: MemoryResource[];
+  memoryId: string;
+  data: Array<Resource & { relationshipType: ResourceRelationshipType; linkedAt: string }>;
+}
+
+/**
+ * Resource memories list response
+ */
+export interface ResourceMemoriesResult {
+  resourceId: string;
+  data: Array<{
+    id: string;
+    content: string;
+    relationshipType: ResourceRelationshipType;
+    linkedAt: string;
+    [key: string]: unknown;
+  }>;
+  pagination: {
+    total: number;
+    limit: number;
+    offset: number;
+    hasMore: boolean;
+  };
 }
 
 /**
@@ -1741,4 +1765,123 @@ export interface UnlinkResourceResult {
   memoryId: string;
   resourceId: string;
   unlinked: boolean;
+}
+
+// ============================================================================
+// Session Types - CLI Session Management
+// ============================================================================
+
+/**
+ * Session type
+ */
+export type SessionType = 'conversation' | 'project' | 'task' | 'temporary';
+
+/**
+ * Session status
+ */
+export type SessionStatus = 'active' | 'paused' | 'completed' | 'archived';
+
+/**
+ * Session retention policy
+ */
+export type SessionRetentionPolicy = 'permanent' | 'auto_delete' | 'on_completion' | 'temporary';
+
+/**
+ * CLI Session object - represents a session for managing conversation/project/task contexts
+ */
+export interface CLISession {
+  id: string;
+  accountId: string;
+  userId: string;
+  createdBy: string;
+  name: string;
+  description?: string;
+  type: SessionType;
+  status: SessionStatus;
+  spaceId?: string;
+  originType?: string;
+  tags?: string[];
+  retentionPolicy: SessionRetentionPolicy;
+  retentionDays?: number;
+  summary?: string;
+  isPrivate: boolean;
+  messageCount: number;
+  memoryCount: number;
+  metadata?: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+  lastActiveAt: string;
+  pausedAt?: string;
+  completedAt?: string;
+  archivedAt?: string;
+}
+
+/**
+ * Parameters for creating a CLI session
+ */
+export interface CreateCLISessionParams {
+  name: string;
+  description?: string;
+  type?: SessionType;
+  spaceId?: string;
+  originType?: string;
+  tags?: string[];
+  retentionPolicy?: SessionRetentionPolicy;
+  retentionDays?: number;
+  isPrivate?: boolean;
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Parameters for updating a CLI session
+ */
+export interface UpdateCLISessionParams {
+  name?: string;
+  description?: string;
+  tags?: string[];
+  retentionPolicy?: SessionRetentionPolicy;
+  retentionDays?: number;
+  isPrivate?: boolean;
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Parameters for completing a CLI session
+ */
+export interface CompleteCLISessionParams {
+  summary?: string;
+}
+
+/**
+ * Parameters for listing CLI sessions
+ */
+export interface ListCLISessionsParams {
+  status?: SessionStatus;
+  type?: SessionType;
+  spaceId?: string;
+  tags?: string[];
+  search?: string;
+  limit?: number;
+  page?: number;
+  offset?: number;
+  sortBy?: 'createdAt' | 'updatedAt' | 'lastActiveAt' | 'name';
+  sortOrder?: 'asc' | 'desc';
+}
+
+/**
+ * CLI Sessions paginated response
+ */
+export interface CLISessionsResponse extends PaginatedResponse<CLISession> {}
+
+/**
+ * CLI Session statistics
+ */
+export interface CLISessionStats {
+  total: number;
+  byStatus: Record<SessionStatus, number>;
+  byType: Record<SessionType, number>;
+  avgMemoriesPerSession: number;
+  avgDurationMinutes: number;
+  activeSessionsCount: number;
+  totalMemories: number;
 }
