@@ -17,6 +17,7 @@ import type {
   ClusterTopics,
   IncrementalClusterParams,
   IncrementalClusterResult,
+  GetClusterOptions,
 } from '../types.js';
 import { BaseResource, buildParams, validateBulkArray, validateIds } from './base.js';
 import { paginateIterator } from '../utils/pagination.js';
@@ -107,6 +108,7 @@ export class Clusters extends BaseResource {
    * Get a specific cluster by ID
    *
    * @param id - Cluster ID
+   * @param options - Optional parameters
    * @returns Cluster object
    *
    * @throws ValidationError if ID format is invalid
@@ -114,14 +116,22 @@ export class Clusters extends BaseResource {
    *
    * @example
    * ```typescript
+   * // Get cluster without memories
    * const cluster = await client.clusters.get('clus_123');
+   *
+   * // Get cluster with full memory objects
+   * const withMemories = await client.clusters.get('clus_123', {
+   *   includeMemories: true
+   * });
+   * console.log(withMemories.memories); // Array of Memory objects
    * ```
    */
-  async get(id: string): Promise<Cluster> {
+  async get(id: string, options?: GetClusterOptions): Promise<Cluster> {
     validateId(id, 'cluster');
     return this.request<Cluster>({
       method: 'GET',
       path: `/clusters/${id}`,
+      params: buildParams(options || {}),
     });
   }
 

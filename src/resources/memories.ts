@@ -20,6 +20,14 @@ import type {
   LinkResourceResult,
   UnlinkResourceResult,
   MemoryResourcesResult,
+  ProtectionLevel,
+  Topic,
+  GetTopicsOptions,
+  TopicsResult,
+  EnrichMemoryOptions,
+  EnrichMemoryResult,
+  QualityScoreResult,
+  SearchByTopicOptions,
 } from '../types.js';
 import { BaseResource, buildParams, validateBulkArray, validateIds } from './base.js';
 import { paginateIterator } from '../utils/pagination.js';
@@ -501,5 +509,251 @@ export class Memories extends BaseResource {
       method: 'DELETE',
       path: `/memories/${id}/resources/${resourceId}`,
     });
+  }
+
+  // ============================================================================
+  // Memory Pinning & Protection
+  // ============================================================================
+
+  /**
+   * Pin a memory to protect it from automatic archival
+   *
+   * @param id - Memory ID
+   * @returns Updated memory with isPinned set to true
+   *
+   * @example
+   * ```typescript
+   * const memory = await client.memories.pin('mem_123');
+   * console.log(`Pinned: ${memory.isPinned}`); // true
+   * ```
+   */
+  async pin(id: string): Promise<Memory> {
+    validateId(id, 'memory');
+    return this.request<Memory>({
+      method: 'POST',
+      path: `/memories/${id}/pin`,
+    });
+  }
+
+  /**
+   * Unpin a memory to allow automatic archival
+   *
+   * @param id - Memory ID
+   * @returns Updated memory with isPinned set to false
+   *
+   * @example
+   * ```typescript
+   * const memory = await client.memories.unpin('mem_123');
+   * console.log(`Pinned: ${memory.isPinned}`); // false
+   * ```
+   */
+  async unpin(id: string): Promise<Memory> {
+    validateId(id, 'memory');
+    return this.request<Memory>({
+      method: 'POST',
+      path: `/memories/${id}/unpin`,
+    });
+  }
+
+  /**
+   * Set protection level for a memory
+   *
+   * Protection levels:
+   * - 'none': No protection, can be deleted normally
+   * - 'soft': Protected from automatic cleanup, can be manually deleted
+   * - 'hard': Fully protected, requires explicit unprotection before deletion
+   *
+   * @param id - Memory ID
+   * @param level - Protection level to set
+   * @returns Updated memory with new protection level
+   *
+   * @example
+   * ```typescript
+   * // Protect a memory from automatic cleanup
+   * const memory = await client.memories.setProtectionLevel('mem_123', 'soft');
+   *
+   * // Fully protect a critical memory
+   * const protected = await client.memories.setProtectionLevel('mem_456', 'hard');
+   * ```
+   */
+  async setProtectionLevel(id: string, level: ProtectionLevel): Promise<Memory> {
+    validateId(id, 'memory');
+    return this.request<Memory>({
+      method: 'POST',
+      path: `/memories/${id}/protection`,
+      body: { level },
+    });
+  }
+
+  // ============================================================================
+  // Soft Delete & Restore
+  // ============================================================================
+
+  /**
+   * Soft delete a memory (mark as deleted without permanent removal)
+   *
+   * Soft-deleted memories can be restored with `restore()`.
+   * Use `delete()` for permanent deletion.
+   *
+   * @param id - Memory ID
+   * @returns Memory with isDeleted set to true
+   *
+   * @example
+   * ```typescript
+   * const memory = await client.memories.softDelete('mem_123');
+   * console.log(`Deleted: ${memory.isDeleted}`); // true
+   * ```
+   */
+  async softDelete(id: string): Promise<Memory> {
+    validateId(id, 'memory');
+    return this.request<Memory>({
+      method: 'POST',
+      path: `/memories/${id}/soft-delete`,
+    });
+  }
+
+  /**
+   * Restore a soft-deleted memory
+   *
+   * @param id - Memory ID
+   * @returns Restored memory with isDeleted set to false
+   *
+   * @example
+   * ```typescript
+   * const memory = await client.memories.restore('mem_123');
+   * console.log(`Deleted: ${memory.isDeleted}`); // false
+   * ```
+   */
+  async restore(id: string): Promise<Memory> {
+    validateId(id, 'memory');
+    return this.request<Memory>({
+      method: 'POST',
+      path: `/memories/${id}/restore`,
+    });
+  }
+
+  // ============================================================================
+  // Topic Extraction
+  // ============================================================================
+
+  /**
+   * Get topics extracted from a memory
+   *
+   * @param id - Memory ID
+   * @param options - Topic retrieval options
+   * @returns List of topics with relevance scores
+   *
+   * @example
+   * ```typescript
+   * // Get all topics
+   * const result = await client.memories.getTopics('mem_123');
+   *
+   * // Get topics with minimum relevance and specific categories
+   * const filtered = await client.memories.getTopics('mem_123', {
+   *   minRelevance: 0.5,
+   *   categories: ['technology', 'business']
+   * });
+   *
+   * // Force refresh topics
+   * const refreshed = await client.memories.getTopics('mem_123', { refresh: true });
+   * ```
+   */
+  async getTopics(id: string, options?: GetTopicsOptions): Promise<Topic[]> {
+    validateId(id, 'memory');
+    const response = await this.request<TopicsResult>({
+      method: 'GET',
+      path: `/memories/${id}/topics`,
+      params: buildParams(options || {}),
+    });
+    return response.topics;
+  }
+
+  /**
+   * Search memories by topic
+   *
+   * @param topic - Topic name to search for
+   * @param options - Search options
+   * @returns Memories matching the topic
+   *
+   * @example
+   * ```typescript
+   * // Search for memories about "machine learning"
+   * const memories = await client.memories.searchByTopic('machine learning');
+   *
+   * // With options
+   * const filtered = await client.memories.searchByTopic('machine learning', {
+   *   limit: 20,
+   *   minRelevance: 0.7
+   * });
+   * ```
+   */
+  async searchByTopic(topic: string, options?: SearchByTopicOptions): Promise<Memory[]> {
+    const response = await this.request<PaginatedResponse<Memory>>({
+      method: 'GET',
+      path: '/memories/search/by-topic',
+      params: buildParams({
+        topic,
+        ...options,
+      }),
+    });
+    return response.data;
+  }
+
+  // ============================================================================
+  // Quality & Enrichment
+  // ============================================================================
+
+  /**
+   * Enrich a memory with additional metadata
+   *
+   * Runs enrichment operations like topic extraction, summarization,
+   * entity detection, and quality scoring.
+   *
+   * @param id - Memory ID
+   * @param options - Enrichment options
+   * @returns Enrichment results
+   *
+   * @example
+   * ```typescript
+   * // Run all enrichments
+   * const result = await client.memories.enrich('mem_123');
+   *
+   * // Run specific enrichments
+   * const specific = await client.memories.enrich('mem_123', {
+   *   operations: ['topics', 'summary']
+   * });
+   * ```
+   */
+  async enrich(id: string, options?: EnrichMemoryOptions): Promise<EnrichMemoryResult> {
+    validateId(id, 'memory');
+    return this.request<EnrichMemoryResult>({
+      method: 'POST',
+      path: `/memories/${id}/enrich`,
+      body: options || {},
+    });
+  }
+
+  /**
+   * Get quality score for a memory
+   *
+   * Quality score (0-1) indicates the overall quality of the memory
+   * based on factors like content length, structure, and relevance.
+   *
+   * @param id - Memory ID
+   * @returns Quality score (0-1)
+   *
+   * @example
+   * ```typescript
+   * const score = await client.memories.getQualityScore('mem_123');
+   * console.log(`Quality: ${(score * 100).toFixed(1)}%`);
+   * ```
+   */
+  async getQualityScore(id: string): Promise<number> {
+    validateId(id, 'memory');
+    const response = await this.request<QualityScoreResult>({
+      method: 'GET',
+      path: `/memories/${id}/quality`,
+    });
+    return response.score;
   }
 }

@@ -110,6 +110,14 @@ export type SourceType =
 export type ResourceRelationshipType = 'primary' | 'related' | 'mentioned' | 'derived';
 
 /**
+ * Protection level for memories
+ * - 'none': No protection, can be deleted normally
+ * - 'soft': Protected from automatic cleanup, can be manually deleted
+ * - 'hard': Fully protected, requires explicit unprotection before deletion
+ */
+export type ProtectionLevel = 'none' | 'soft' | 'hard';
+
+/**
  * Memory object
  */
 export interface Memory {
@@ -133,6 +141,16 @@ export interface Memory {
   sourceId?: string;
   /** Origin/Context: Rich context from source */
   sourceMetadata?: Record<string, unknown>;
+  /** Whether this memory is pinned (protected from auto-archival) */
+  isPinned?: boolean;
+  /** Protection level for this memory */
+  protectionLevel?: ProtectionLevel;
+  /** Whether this memory has been soft deleted */
+  isDeleted?: boolean;
+  /** Timestamp when memory was soft deleted */
+  deletedAt?: string;
+  /** Quality score for this memory (0-1) */
+  qualityScore?: number;
 }
 
 /**
@@ -158,6 +176,10 @@ export interface CreateMemoryParams {
   sourceMetadata?: Record<string, unknown>;
   /** Origin/Context: Resource IDs to link this memory to */
   resourceIds?: string[];
+  /** Pin this memory on creation (protects from auto-archival) */
+  isPinned?: boolean;
+  /** Protection level for this memory */
+  protectionLevel?: ProtectionLevel;
 }
 
 /**
@@ -177,6 +199,10 @@ export interface UpdateMemoryParams {
   sourceId?: string;
   /** Origin/Context: Rich context from source */
   sourceMetadata?: Record<string, unknown>;
+  /** Pin/unpin this memory */
+  isPinned?: boolean;
+  /** Protection level for this memory */
+  protectionLevel?: ProtectionLevel;
 }
 
 /**
@@ -205,6 +231,14 @@ export interface ListMemoriesParams {
   resourceId?: string;
   /** Origin/Context: Filter by multiple resource IDs (comma-separated) */
   resourceIds?: string;
+  /** Filter by pinned status */
+  pinned?: boolean;
+  /** Filter by protection status (any non-'none' protection level) */
+  protected?: boolean;
+  /** Filter by minimum quality score (0-1) */
+  minQuality?: number;
+  /** Include soft-deleted memories in results */
+  includeDeleted?: boolean;
 }
 
 /**
@@ -383,6 +417,14 @@ export interface ReinforceParams {
 }
 
 /**
+ * Cluster scale for multi-scale clustering
+ * - 'fine': Fine-grained clusters with fewer, highly similar memories
+ * - 'medium': Medium-sized clusters with balanced similarity
+ * - 'coarse': Coarse-grained clusters with more memories, broader topics
+ */
+export type ClusterScale = 'fine' | 'medium' | 'coarse';
+
+/**
  * Cluster object
  */
 export interface Cluster {
@@ -395,6 +437,10 @@ export interface Cluster {
   metadata?: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
+  /** Scale of this cluster (fine, medium, coarse) */
+  scale?: ClusterScale;
+  /** Memory objects when includeMemories is true */
+  memories?: Memory[];
 }
 
 /**
@@ -427,6 +473,16 @@ export interface ListClustersParams {
   spaceId?: string;
   sortBy?: 'createdAt' | 'updatedAt' | 'name';
   sortOrder?: 'asc' | 'desc';
+  /** Filter by cluster scale */
+  scale?: ClusterScale;
+}
+
+/**
+ * Options for getting a cluster
+ */
+export interface GetClusterOptions {
+  /** Include full memory objects in the response */
+  includeMemories?: boolean;
 }
 
 /**
@@ -1298,6 +1354,108 @@ export interface EnrichmentResult {
   triggered: string[];
   jobIds?: string[];
   status: 'queued' | 'processing';
+}
+
+// ============================================================================
+// Topic Types - Topic Extraction
+// ============================================================================
+
+/**
+ * Topic extracted from a memory
+ */
+export interface Topic {
+  /** Topic name/label */
+  name: string;
+  /** Relevance score (0-1) indicating how relevant the topic is to the memory */
+  relevance: number;
+  /** Category or domain of the topic */
+  category: string;
+}
+
+/**
+ * Options for getting topics from a memory
+ */
+export interface GetTopicsOptions {
+  /** Force refresh topics (re-extract even if cached) */
+  refresh?: boolean;
+  /** Minimum relevance score filter (0-1) */
+  minRelevance?: number;
+  /** Filter by topic categories */
+  categories?: string[];
+}
+
+/**
+ * Result of topic extraction
+ */
+export interface TopicsResult {
+  memoryId: string;
+  topics: Topic[];
+  extractedAt: string;
+}
+
+// ============================================================================
+// Quality & Enrichment Types
+// ============================================================================
+
+/**
+ * Enrichment operation types for enrich endpoint
+ */
+export type EnrichmentOperation = 'topics' | 'summary' | 'entities' | 'quality';
+
+/**
+ * Options for enriching a memory
+ */
+export interface EnrichMemoryOptions {
+  /** Specific operations to run (defaults to all) */
+  operations?: EnrichmentOperation[];
+}
+
+/**
+ * Result of memory enrichment
+ */
+export interface EnrichMemoryResult {
+  memoryId: string;
+  operations: EnrichmentOperation[];
+  results: Record<string, unknown>;
+}
+
+/**
+ * Quality score result
+ */
+export interface QualityScoreResult {
+  memoryId: string;
+  score: number;
+  factors?: Record<string, number>;
+}
+
+// ============================================================================
+// Search Types - Extended
+// ============================================================================
+
+/**
+ * Extended search options with cluster scale support
+ */
+export interface SearchOptions {
+  /** Maximum number of results to return */
+  limit?: number;
+  /** Minimum similarity threshold */
+  threshold?: number;
+  /** Cluster scale to search within */
+  clusterScale?: ClusterScale;
+  /** Space ID to search within */
+  spaceId?: string;
+}
+
+/**
+ * Options for searching by topic
+ */
+export interface SearchByTopicOptions {
+  /** Maximum number of results to return */
+  limit?: number;
+  /** Minimum relevance score */
+  minRelevance?: number;
+  /** Space ID to search within */
+  spaceId?: string;
 }
 
 // ============================================================================

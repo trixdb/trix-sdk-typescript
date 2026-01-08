@@ -9,6 +9,9 @@ import type {
   EmbedResult,
   EmbedAllResult,
   SearchConfig,
+  Memory,
+  SearchOptions,
+  PaginatedResponse,
 } from '../types.js';
 import { validateId } from '../utils/security.js';
 
@@ -123,5 +126,45 @@ export class Search {
       method: 'GET',
       path: '/search/config',
     });
+  }
+
+  /**
+   * Search memories by query text with optional cluster scale filtering
+   *
+   * This method performs semantic search across memories, with support for
+   * multi-scale clustering to narrow down search scope.
+   *
+   * @param query - Search query text
+   * @param options - Search options including cluster scale
+   * @returns Array of matching memories
+   *
+   * @example
+   * ```typescript
+   * // Basic semantic search
+   * const results = await client.search.query('machine learning algorithms');
+   *
+   * // Search with cluster scale filter
+   * const fineClusters = await client.search.query('neural networks', {
+   *   clusterScale: 'fine',
+   *   limit: 10
+   * });
+   *
+   * // Search within coarse clusters for broader results
+   * const broadResults = await client.search.query('artificial intelligence', {
+   *   clusterScale: 'coarse',
+   *   limit: 50
+   * });
+   * ```
+   */
+  async query(query: string, options?: SearchOptions): Promise<Memory[]> {
+    const response = await this.client.request<PaginatedResponse<Memory>>({
+      method: 'POST',
+      path: '/search/query',
+      body: {
+        query,
+        ...options,
+      },
+    });
+    return response.data;
   }
 }
