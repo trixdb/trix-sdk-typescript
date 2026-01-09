@@ -28,6 +28,22 @@ import type {
   EnrichMemoryResult,
   QualityScoreResult,
   SearchByTopicOptions,
+  CreateImageMemoryParams,
+  VisualSearchParams,
+  VisualSearchResult,
+  TextToImageSearchParams,
+  FindSimilarImagesParams,
+  SimilarImagesResult,
+  CheckDuplicatesParams,
+  DuplicateCheckResult,
+  ClusterImagesParams,
+  ClusterImagesResult,
+  AutoTagParams,
+  AutoTagResult,
+  BatchAutoTagParams,
+  BatchAutoTagResult,
+  SuggestQueriesParams,
+  QuerySuggestionsResult,
 } from '../types.js';
 import { BaseResource, buildParams, validateBulkArray, validateIds } from './base.js';
 import { paginateIterator } from '../utils/pagination.js';
@@ -755,5 +771,532 @@ export class Memories extends BaseResource {
       path: `/memories/${id}/quality`,
     });
     return response.score;
+  }
+
+  // ============================================================================
+  // Image Support
+  // ============================================================================
+
+  /**
+   * Create an image memory by uploading an image file
+   *
+   * Supports image formats: jpg, jpeg, png, gif, webp, bmp, tiff
+   *
+   * @param params - Image memory creation parameters
+   * @returns Created memory
+   *
+   * @example
+   * ```typescript
+   * // Upload image from Buffer
+   * const imageBuffer = fs.readFileSync('photo.jpg');
+   * const memory = await client.memories.createImage({
+   *   image: imageBuffer,
+   *   content: 'Beach sunset photo',
+   *   tags: ['vacation', 'sunset']
+   * });
+   *
+   * // Upload image from Blob (browser)
+   * const fileInput = document.querySelector('input[type="file"]');
+   * const memory = await client.memories.createImage({
+   *   image: fileInput.files[0],
+   *   tags: ['upload']
+   * });
+   *
+   * // Upload image from base64 string
+   * const base64Image = 'data:image/jpeg;base64,/9j/4AAQ...';
+   * const memory = await client.memories.createImage({
+   *   image: base64Image,
+   *   content: 'Profile photo'
+   * });
+   * ```
+   */
+  async createImage(params: CreateImageMemoryParams): Promise<Memory> {
+    const formData = new FormData();
+
+    // Handle different image input types
+    if (typeof params.image === 'string') {
+      // Base64 string - convert to Blob
+      const base64Data = params.image.includes(',')
+        ? params.image.split(',')[1]
+        : params.image;
+      const binaryString = atob(base64Data);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      const blob = new Blob([bytes], { type: 'image/jpeg' });
+      formData.append('image', blob, 'image.jpg');
+    } else if (params.image instanceof Blob) {
+      formData.append('image', params.image);
+    } else {
+      // Buffer (Node.js)
+      const blob = new Blob([params.image]);
+      formData.append('image', blob, 'image.jpg');
+    }
+
+    // Add optional fields
+    if (params.content) {
+      formData.append('content', params.content);
+    }
+    formData.append('type', 'image');
+    if (params.tags) {
+      formData.append('tags', JSON.stringify(params.tags));
+    }
+    if (params.metadata) {
+      formData.append('metadata', JSON.stringify(params.metadata));
+    }
+    if (params.spaceId) {
+      formData.append('spaceId', params.spaceId);
+    }
+    if (params.sessionId) {
+      formData.append('sessionId', params.sessionId);
+    }
+    if (params.originType) {
+      formData.append('originType', params.originType);
+    }
+    if (params.sourceType) {
+      formData.append('sourceType', params.sourceType);
+    }
+    if (params.sourceId) {
+      formData.append('sourceId', params.sourceId);
+    }
+    if (params.sourceMetadata) {
+      formData.append('sourceMetadata', JSON.stringify(params.sourceMetadata));
+    }
+    if (params.resourceIds) {
+      formData.append('resourceIds', JSON.stringify(params.resourceIds));
+    }
+    if (params.isPinned !== undefined) {
+      formData.append('isPinned', String(params.isPinned));
+    }
+    if (params.protectionLevel) {
+      formData.append('protectionLevel', params.protectionLevel);
+    }
+
+    return this.client.requestMultipart<Memory>({
+      method: 'POST',
+      path: '/memories',
+      formData,
+    });
+  }
+
+  /**
+   * Get original image data for an image memory
+   *
+   * @param id - Memory ID
+   * @returns Image data as ArrayBuffer
+   *
+   * @example
+   * ```typescript
+   * const imageData = await client.memories.getImage('mem_123');
+   * // Use in Node.js
+   * fs.writeFileSync('downloaded.jpg', Buffer.from(imageData));
+   *
+   * // Use in browser
+   * const blob = new Blob([imageData]);
+   * const url = URL.createObjectURL(blob);
+   * ```
+   */
+  async getImage(id: string): Promise<ArrayBuffer> {
+    validateId(id, 'memory');
+    const stream = await this.client.requestStream({
+      method: 'GET',
+      path: `/memories/${id}/image`,
+    });
+
+    // Convert ReadableStream to ArrayBuffer
+    const reader = stream.getReader();
+    const chunks: Uint8Array[] = [];
+
+    let readResult = await reader.read();
+    while (!readResult.done) {
+      chunks.push(readResult.value);
+      readResult = await reader.read();
+    }
+
+    const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
+    const result = new Uint8Array(totalLength);
+    let offset = 0;
+    for (const chunk of chunks) {
+      result.set(chunk, offset);
+      offset += chunk.length;
+    }
+
+    return result.buffer;
+  }
+
+  /**
+   * Get thumbnail image for an image memory
+   *
+   * @param id - Memory ID
+   * @returns Thumbnail image data as ArrayBuffer
+   *
+   * @example
+   * ```typescript
+   * const thumbnail = await client.memories.getThumbnail('mem_123');
+   * // Use for displaying previews
+   * ```
+   */
+  async getThumbnail(id: string): Promise<ArrayBuffer> {
+    validateId(id, 'memory');
+    const stream = await this.client.requestStream({
+      method: 'GET',
+      path: `/memories/${id}/thumbnail`,
+    });
+
+    // Convert ReadableStream to ArrayBuffer
+    const reader = stream.getReader();
+    const chunks: Uint8Array[] = [];
+
+    let readResult = await reader.read();
+    while (!readResult.done) {
+      chunks.push(readResult.value);
+      readResult = await reader.read();
+    }
+
+    const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
+    const result = new Uint8Array(totalLength);
+    let offset = 0;
+    for (const chunk of chunks) {
+      result.set(chunk, offset);
+      offset += chunk.length;
+    }
+
+    return result.buffer;
+  }
+
+  /**
+   * Search for visually similar images by uploading an image
+   *
+   * @param params - Visual search parameters
+   * @returns Visually similar memories with similarity scores
+   *
+   * @example
+   * ```typescript
+   * const results = await client.memories.searchVisual({
+   *   image: imageBuffer,
+   *   limit: 10,
+   *   threshold: 0.7
+   * });
+   *
+   * results.results.forEach(({ memory, similarity }) => {
+   *   console.log(`Found: ${memory.id} (${(similarity * 100).toFixed(1)}% similar)`);
+   * });
+   * ```
+   */
+  async searchVisual(params: VisualSearchParams): Promise<VisualSearchResult> {
+    const formData = new FormData();
+
+    // Handle different image input types
+    if (typeof params.image === 'string') {
+      // Base64 string - convert to Blob
+      const base64Data = params.image.includes(',')
+        ? params.image.split(',')[1]
+        : params.image;
+      const binaryString = atob(base64Data);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      const blob = new Blob([bytes], { type: 'image/jpeg' });
+      formData.append('image', blob, 'search.jpg');
+    } else if (params.image instanceof Blob) {
+      formData.append('image', params.image);
+    } else {
+      // Buffer (Node.js)
+      const blob = new Blob([params.image]);
+      formData.append('image', blob, 'search.jpg');
+    }
+
+    // Add optional parameters
+    if (params.limit !== undefined) {
+      formData.append('limit', String(params.limit));
+    }
+    if (params.threshold !== undefined) {
+      formData.append('threshold', String(params.threshold));
+    }
+    if (params.spaceId) {
+      formData.append('spaceId', params.spaceId);
+    }
+    if (params.tags) {
+      formData.append('tags', JSON.stringify(params.tags));
+    }
+
+    return this.client.requestMultipart<VisualSearchResult>({
+      method: 'POST',
+      path: '/memories/search/visual',
+      formData,
+    });
+  }
+
+  /**
+   * Search for images using text query (multi-modal text-to-image search)
+   *
+   * @param params - Text-to-image search parameters
+   * @returns Matching image memories with similarity scores
+   *
+   * @example
+   * ```typescript
+   * // Find images matching a text description
+   * const results = await client.memories.searchByText({
+   *   query: 'sunset on the beach',
+   *   limit: 10
+   * });
+   *
+   * // Search with filters
+   * const filtered = await client.memories.searchByText({
+   *   query: 'team meeting',
+   *   spaceId: 'space_123',
+   *   tags: ['work'],
+   *   threshold: 0.5
+   * });
+   * ```
+   */
+  async searchByText(params: TextToImageSearchParams): Promise<VisualSearchResult> {
+    return this.request<VisualSearchResult>({
+      method: 'POST',
+      path: '/memories/search/text',
+      body: params,
+    });
+  }
+
+  /**
+   * Find visually similar images to an existing image memory
+   *
+   * @param id - Memory ID of the image to find similar images for
+   * @param params - Search parameters
+   * @returns Similar image memories with similarity scores
+   *
+   * @example
+   * ```typescript
+   * // Find images similar to an existing one
+   * const similar = await client.memories.findSimilar('mem_123', {
+   *   type: 'image',
+   *   limit: 20,
+   *   threshold: 0.6
+   * });
+   *
+   * // Find by both image and content similarity
+   * const combined = await client.memories.findSimilar('mem_123', {
+   *   type: 'both',
+   *   limit: 10
+   * });
+   * ```
+   */
+  async findSimilar(id: string, params?: FindSimilarImagesParams): Promise<SimilarImagesResult> {
+    validateId(id, 'memory');
+    return this.request<SimilarImagesResult>({
+      method: 'GET',
+      path: `/memories/${id}/similar`,
+      params: buildParams(params || {}),
+    });
+  }
+
+  /**
+   * Check for duplicate images by uploading an image
+   *
+   * @param params - Duplicate check parameters with image file
+   * @returns Duplicate check result with potential duplicates
+   *
+   * @example
+   * ```typescript
+   * // Check if image already exists before uploading
+   * const result = await client.memories.checkDuplicates({
+   *   image: imageBuffer,
+   *   threshold: 0.95
+   * });
+   *
+   * if (result.hasDuplicates) {
+   *   console.log('Found duplicates:', result.duplicates.map(d => d.memory.id));
+   * } else {
+   *   // Safe to upload
+   *   await client.memories.createImage({ image: imageBuffer });
+   * }
+   * ```
+   */
+  async checkDuplicates(params: CheckDuplicatesParams): Promise<DuplicateCheckResult> {
+    const formData = new FormData();
+
+    // Handle different image input types
+    if (typeof params.image === 'string') {
+      // Base64 string - convert to Blob
+      const base64Data = params.image.includes(',')
+        ? params.image.split(',')[1]
+        : params.image;
+      const binaryString = atob(base64Data);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      const blob = new Blob([bytes], { type: 'image/jpeg' });
+      formData.append('image', blob, 'check.jpg');
+    } else if (params.image instanceof Blob) {
+      formData.append('image', params.image);
+    } else {
+      // Buffer (Node.js)
+      const blob = new Blob([params.image]);
+      formData.append('image', blob, 'check.jpg');
+    }
+
+    // Add optional parameters
+    if (params.threshold !== undefined) {
+      formData.append('threshold', String(params.threshold));
+    }
+    if (params.spaceId) {
+      formData.append('spaceId', params.spaceId);
+    }
+
+    return this.client.requestMultipart<DuplicateCheckResult>({
+      method: 'POST',
+      path: '/memories/check-duplicates',
+      formData,
+    });
+  }
+
+  /**
+   * Check for duplicates of an existing image memory
+   *
+   * @param id - Memory ID of the image to check duplicates for
+   * @param threshold - Similarity threshold for considering duplicates (0-1, default: 0.95)
+   * @returns Duplicate check result with potential duplicates
+   *
+   * @example
+   * ```typescript
+   * // Check if an existing image has duplicates
+   * const result = await client.memories.checkDuplicatesById('mem_123', 0.9);
+   *
+   * if (result.hasDuplicates) {
+   *   console.log(`Found ${result.duplicates.length} duplicates`);
+   * }
+   * ```
+   */
+  async checkDuplicatesById(id: string, threshold?: number): Promise<DuplicateCheckResult> {
+    validateId(id, 'memory');
+    return this.request<DuplicateCheckResult>({
+      method: 'POST',
+      path: `/memories/${id}/check-duplicates`,
+      body: threshold !== undefined ? { threshold } : {},
+    });
+  }
+
+  /**
+   * Cluster images by visual similarity
+   *
+   * Creates clusters of visually similar images for organization
+   * and discovery purposes.
+   *
+   * @param params - Clustering parameters
+   * @returns Clustering job result
+   *
+   * @example
+   * ```typescript
+   * // Cluster all images in a space
+   * const result = await client.memories.clusterImages({
+   *   spaceId: 'space_123',
+   *   numClusters: 10
+   * });
+   *
+   * // Track clustering progress
+   * const job = await client.jobs.get(result.jobId);
+   * console.log(`Status: ${job.status}, Progress: ${job.progress}%`);
+   * ```
+   */
+  async clusterImages(params?: ClusterImagesParams): Promise<ClusterImagesResult> {
+    return this.request<ClusterImagesResult>({
+      method: 'POST',
+      path: '/memories/images/cluster',
+      body: params || {},
+    });
+  }
+
+  /**
+   * Auto-generate tags for an image using AI
+   *
+   * @param imageId - Memory ID of the image to auto-tag
+   * @param params - Auto-tag parameters
+   * @returns Auto-tag result with generated tags
+   *
+   * @example
+   * ```typescript
+   * // Generate tags without saving
+   * const result = await client.memories.autoTag('mem_123');
+   * console.log('Suggested tags:', result.tags.map(t => t.tag));
+   *
+   * // Generate and save tags
+   * const saved = await client.memories.autoTag('mem_123', {
+   *   save: true,
+   *   minConfidence: 0.8,
+   *   maxTags: 5
+   * });
+   * ```
+   */
+  async autoTag(imageId: string, params?: AutoTagParams): Promise<AutoTagResult> {
+    validateId(imageId, 'memory');
+    return this.request<AutoTagResult>({
+      method: 'POST',
+      path: `/memories/images/${imageId}/auto-tag`,
+      body: params || {},
+    });
+  }
+
+  /**
+   * Auto-generate tags for multiple images using AI
+   *
+   * @param params - Batch auto-tag parameters
+   * @returns Batch auto-tag results
+   *
+   * @example
+   * ```typescript
+   * // Auto-tag multiple images
+   * const result = await client.memories.batchAutoTag({
+   *   imageIds: ['mem_1', 'mem_2', 'mem_3'],
+   *   save: true,
+   *   minConfidence: 0.7
+   * });
+   *
+   * console.log(`Tagged ${result.success} images`);
+   * if (result.failed > 0) {
+   *   console.log('Errors:', result.errors);
+   * }
+   * ```
+   */
+  async batchAutoTag(params: BatchAutoTagParams): Promise<BatchAutoTagResult> {
+    validateBulkArray(params.imageIds, 'batchAutoTag');
+    validateIds(params.imageIds, 'memory');
+    return this.request<BatchAutoTagResult>({
+      method: 'POST',
+      path: '/memories/images/batch-auto-tag',
+      body: params,
+    });
+  }
+
+  /**
+   * Get suggested queries based on image collection
+   *
+   * Returns query suggestions based on the visual content in your
+   * image collection for discovery purposes.
+   *
+   * @param params - Query suggestion parameters
+   * @returns Suggested queries for image search
+   *
+   * @example
+   * ```typescript
+   * // Get query suggestions
+   * const suggestions = await client.memories.suggestQueries({
+   *   limit: 10,
+   *   type: 'visual'
+   * });
+   *
+   * suggestions.suggestions.forEach(s => {
+   *   console.log(`Try searching: "${s.query}" (~${s.estimatedResults} results)`);
+   * });
+   * ```
+   */
+  async suggestQueries(params?: SuggestQueriesParams): Promise<QuerySuggestionsResult> {
+    return this.request<QuerySuggestionsResult>({
+      method: 'GET',
+      path: '/memories/images/suggest-queries',
+      params: buildParams(params || {}),
+    });
   }
 }
