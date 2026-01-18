@@ -510,6 +510,7 @@ export interface ClusterExpandResult {
 export interface Space {
   id: string;
   name: string;
+  slug: string;
   description?: string;
   metadata?: Record<string, unknown>;
   createdAt: string;
@@ -521,6 +522,7 @@ export interface Space {
  */
 export interface CreateSpaceParams {
   name: string;
+  slug?: string;
   description?: string;
   metadata?: Record<string, unknown>;
 }
@@ -530,6 +532,7 @@ export interface CreateSpaceParams {
  */
 export interface UpdateSpaceParams {
   name?: string;
+  slug?: string;
   description?: string;
   metadata?: Record<string, unknown>;
 }

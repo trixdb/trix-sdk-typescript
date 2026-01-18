@@ -94,6 +94,29 @@ export class Spaces extends BaseResource {
   }
 
   /**
+   * Get a specific space by slug
+   *
+   * @param slug - Space slug (URL-friendly identifier)
+   * @returns Space object
+   *
+   * @throws NotFoundError if space doesn't exist
+   *
+   * @example
+   * ```typescript
+   * const space = await client.spaces.getBySlug('my-project');
+   * ```
+   */
+  async getBySlug(slug: string): Promise<Space> {
+    if (!slug || typeof slug !== 'string') {
+      throw new Error('Slug must be a non-empty string');
+    }
+    return this.request<Space>({
+      method: 'GET',
+      path: `/spaces/${encodeURIComponent(slug)}`,
+    });
+  }
+
+  /**
    * Update a space
    *
    * @param id - Space ID
