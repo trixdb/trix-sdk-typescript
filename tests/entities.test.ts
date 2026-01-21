@@ -40,7 +40,7 @@ describe('Entities', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'POST',
-        path: '/entities',
+        path: '/knowledge/entities',
         body: entityData,
       });
       expect(result.id).toBe('ent_123');
@@ -167,7 +167,7 @@ describe('Entities', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'GET',
-        path: '/entities/ent_123',
+        path: '/knowledge/entities/ent_123',
       });
       expect(result.id).toBe('ent_123');
     });
@@ -191,7 +191,7 @@ describe('Entities', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'GET',
-        path: '/entities',
+        path: '/knowledge/entities',
         query: {},
       });
       expect(result.data).toHaveLength(2);
@@ -207,7 +207,7 @@ describe('Entities', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'GET',
-        path: '/entities',
+        path: '/knowledge/entities',
         query: { type: 'person' },
       });
     });
@@ -222,7 +222,7 @@ describe('Entities', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'GET',
-        path: '/entities',
+        path: '/knowledge/entities',
         query: { spaceId: 'space_123' },
       });
     });
@@ -237,7 +237,7 @@ describe('Entities', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'GET',
-        path: '/entities',
+        path: '/knowledge/entities',
         query: { limit: 10, page: 2 },
       });
     });
@@ -260,7 +260,7 @@ describe('Entities', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'PATCH',
-        path: '/entities/ent_123',
+        path: '/knowledge/entities/ent_123',
         body: { description: 'Theoretical physicist' },
       });
       expect(result.description).toBe('Theoretical physicist');
@@ -279,7 +279,7 @@ describe('Entities', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'PATCH',
-        path: '/entities/ent_123',
+        path: '/knowledge/entities/ent_123',
         body: { aliases: ['Einstein', 'E=mc² guy'] },
       });
     });
@@ -297,7 +297,7 @@ describe('Entities', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'PATCH',
-        path: '/entities/ent_123',
+        path: '/knowledge/entities/ent_123',
         body: { properties: { birthYear: 1879, deathYear: 1955 } },
       });
     });
@@ -311,7 +311,7 @@ describe('Entities', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'DELETE',
-        path: '/entities/ent_123',
+        path: '/knowledge/entities/ent_123',
       });
     });
   });
@@ -328,7 +328,7 @@ describe('Entities', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'POST',
-        path: '/entities/search',
+        path: '/knowledge/entities/search',
         body: { query: 'Einstein' },
       });
       expect(result.data).toHaveLength(1);
@@ -341,7 +341,7 @@ describe('Entities', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'POST',
-        path: '/entities/search',
+        path: '/knowledge/entities/search',
         body: { query: 'Einstein', type: 'person' },
       });
     });
@@ -353,7 +353,7 @@ describe('Entities', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'POST',
-        path: '/entities/search',
+        path: '/knowledge/entities/search',
         body: { query: 'Berlin', limit: 5 },
       });
     });
@@ -372,7 +372,7 @@ describe('Entities', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'GET',
-        path: '/entities',
+        path: '/knowledge/entities',
         query: { type: 'person' },
       });
       expect(result.data).toHaveLength(2);
@@ -410,7 +410,7 @@ describe('Entities', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'POST',
-        path: '/entities/resolve',
+        path: '/knowledge/entities/resolve',
         body: { text: 'Einstein' },
       });
       expect(result.entity?.id).toBe('ent_123');
@@ -428,7 +428,7 @@ describe('Entities', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'POST',
-        path: '/entities/resolve',
+        path: '/knowledge/entities/resolve',
         body: { text: 'Einstein', context: 'Physics Nobel Prize' },
       });
     });
@@ -449,7 +449,7 @@ describe('Entities', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'POST',
-        path: '/entities/ent_1/merge',
+        path: '/knowledge/entities/ent_1/merge',
         body: { sourceId: 'ent_2' },
       });
       expect(result.deletedId).toBe('ent_2');
@@ -468,7 +468,7 @@ describe('Entities', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'POST',
-        path: '/entities/ent_123/memories',
+        path: '/knowledge/entities/ent_123/memories',
         body: { memoryId: 'mem_456' },
       });
       expect(result.linked).toBe(true);
@@ -483,7 +483,7 @@ describe('Entities', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'DELETE',
-        path: '/entities/ent_123/memories/mem_456',
+        path: '/knowledge/entities/ent_123/memories/mem_456',
       });
     });
   });
@@ -508,7 +508,7 @@ describe('Entities', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'POST',
-        path: '/entities/bulk',
+        path: '/knowledge/entities/bulk',
         body: { entities: entitiesData },
       });
       expect(result.success).toBe(2);
@@ -534,8 +534,8 @@ describe('Entities', () => {
       const result = await entities.bulkDelete(['ent_1', 'ent_2', 'ent_3']);
 
       expect(mockClient.request).toHaveBeenCalledWith({
-        method: 'DELETE',
-        path: '/entities/bulk',
+        method: 'POST',
+        path: '/knowledge/entities/bulk/delete',
         body: { ids: ['ent_1', 'ent_2', 'ent_3'] },
       });
       expect(result.success).toBe(3);
@@ -594,7 +594,7 @@ describe('Entities', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'GET',
-        path: '/entities/types',
+        path: '/knowledge/entities/types',
       });
       expect(result.types).toHaveLength(3);
     });
@@ -614,7 +614,7 @@ describe('Entities', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'GET',
-        path: '/entities/ent_123/facts',
+        path: '/knowledge/entities/ent_123/facts',
       });
       expect(result.facts).toHaveLength(2);
     });

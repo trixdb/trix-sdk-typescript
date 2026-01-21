@@ -42,7 +42,7 @@ describe('Facts', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'POST',
-        path: '/facts',
+        path: '/knowledge/facts',
         body: factData,
       });
       expect(result.id).toBe('fact_123');
@@ -139,7 +139,7 @@ describe('Facts', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'GET',
-        path: '/facts/fact_123',
+        path: '/knowledge/facts/fact_123',
       });
       expect(result.id).toBe('fact_123');
     });
@@ -163,7 +163,7 @@ describe('Facts', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'GET',
-        path: '/facts',
+        path: '/knowledge/facts',
         query: {},
       });
       expect(result.data).toHaveLength(2);
@@ -183,7 +183,7 @@ describe('Facts', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'GET',
-        path: '/facts',
+        path: '/knowledge/facts',
         query: { subject: 'Einstein', predicate: 'discovered', limit: 5 },
       });
     });
@@ -198,7 +198,7 @@ describe('Facts', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'GET',
-        path: '/facts',
+        path: '/knowledge/facts',
         query: { minConfidence: 0.8 },
       });
     });
@@ -213,7 +213,7 @@ describe('Facts', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'GET',
-        path: '/facts',
+        path: '/knowledge/facts',
         query: { spaceId: 'space_123' },
       });
     });
@@ -238,7 +238,7 @@ describe('Facts', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'PATCH',
-        path: '/facts/fact_123',
+        path: '/knowledge/facts/fact_123',
         body: { object: 'General Relativity', confidence: 1.0 },
       });
       expect(result.object).toBe('General Relativity');
@@ -257,7 +257,7 @@ describe('Facts', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'PATCH',
-        path: '/facts/fact_123',
+        path: '/knowledge/facts/fact_123',
         body: { validTo: '2024-06-30T00:00:00Z' },
       });
     });
@@ -271,7 +271,7 @@ describe('Facts', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'DELETE',
-        path: '/facts/fact_123',
+        path: '/knowledge/facts/fact_123',
       });
     });
   });
@@ -294,7 +294,7 @@ describe('Facts', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'POST',
-        path: '/facts/query',
+        path: '/knowledge/facts/query',
         body: { query: 'Where was Einstein born?' },
       });
       expect(result.data).toHaveLength(1);
@@ -311,7 +311,7 @@ describe('Facts', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'POST',
-        path: '/facts/query',
+        path: '/knowledge/facts/query',
         body: {
           query: 'Einstein discoveries',
           limit: 5,
@@ -335,7 +335,7 @@ describe('Facts', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'GET',
-        path: '/facts',
+        path: '/knowledge/facts',
         query: { subject: 'Einstein' },
       });
       expect(result.data).toHaveLength(2);
@@ -355,7 +355,7 @@ describe('Facts', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'GET',
-        path: '/facts',
+        path: '/knowledge/facts',
         query: { predicate: 'discovered' },
       });
       expect(result.data).toHaveLength(2);
@@ -374,7 +374,7 @@ describe('Facts', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'GET',
-        path: '/facts',
+        path: '/knowledge/facts',
         query: { object: 'Germany' },
       });
       expect(result.data).toHaveLength(1);
@@ -401,7 +401,7 @@ describe('Facts', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'POST',
-        path: '/facts/bulk',
+        path: '/knowledge/facts/bulk',
         body: { facts: factsData },
       });
       expect(result.success).toBe(2);
@@ -433,8 +433,8 @@ describe('Facts', () => {
       const result = await facts.bulkDelete(['fact_1', 'fact_2', 'fact_3']);
 
       expect(mockClient.request).toHaveBeenCalledWith({
-        method: 'DELETE',
-        path: '/facts/bulk',
+        method: 'POST',
+        path: '/knowledge/facts/bulk/delete',
         body: { ids: ['fact_1', 'fact_2', 'fact_3'] },
       });
       expect(result.success).toBe(3);
@@ -495,7 +495,7 @@ describe('Facts', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'POST',
-        path: '/facts/fact_123/verify',
+        path: '/knowledge/facts/fact_123/verify',
         body: {},
       });
       expect(result.verified).toBe(true);
