@@ -98,6 +98,9 @@ export type {
   ClusterTopics,
   IncrementalClusterParams,
   IncrementalClusterResult,
+  ClusterConfig,
+  UpdateClusterConfigParams,
+  ClusterStatus,
 } from './cluster.types.js';
 
 // Space types
@@ -161,6 +164,8 @@ export type {
   GetContextParams,
   EndSessionParams,
   EndedSession,
+  AddSessionMessageParams,
+  SessionMessage,
   SessionType,
   SessionStatus,
   SessionRetentionPolicy,

@@ -18,6 +18,8 @@ import type {
   ContextResult,
   EndSessionParams,
   EndedSession,
+  AddSessionMessageParams,
+  SessionMessage,
   CoreMemory,
   CoreMemoryBlock,
   CoreMemoryContext,
@@ -105,6 +107,44 @@ export class Agent {
     return this.client.request<SessionMemory>({
       method: 'POST',
       path: `/agent/sessions/${sessionId}/memories`,
+      body: params,
+    });
+  }
+
+  /**
+   * Add a simple message to a session
+   *
+   * This is a simpler alternative to addSessionMemory for basic chat messages.
+   *
+   * @param sessionId - Session ID
+   * @param params - Message parameters (role and content)
+   * @returns Session message with turn number
+   *
+   * @example
+   * ```typescript
+   * // Add a user message
+   * const userMsg = await client.agent.addSessionMessage('sess_123', {
+   *   role: 'user',
+   *   content: 'What is the weather today?'
+   * });
+   *
+   * // Add an assistant response
+   * const assistantMsg = await client.agent.addSessionMessage('sess_123', {
+   *   role: 'assistant',
+   *   content: 'The weather is sunny and 72°F.'
+   * });
+   *
+   * console.log(`Turn ${userMsg.turnNumber}: ${userMsg.content}`);
+   * ```
+   */
+  async addSessionMessage(
+    sessionId: string,
+    params: AddSessionMessageParams
+  ): Promise<SessionMessage> {
+    validateId(sessionId, 'session');
+    return this.client.request<SessionMessage>({
+      method: 'POST',
+      path: `/agent/sessions/${sessionId}/message`,
       body: params,
     });
   }

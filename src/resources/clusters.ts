@@ -18,6 +18,9 @@ import type {
   IncrementalClusterParams,
   IncrementalClusterResult,
   GetClusterOptions,
+  ClusterConfig,
+  UpdateClusterConfigParams,
+  ClusterStatus,
 } from '../types.js';
 import { BaseResource, buildParams, validateBulkArray, validateIds } from './base.js';
 import { paginateIterator } from '../utils/pagination.js';
@@ -401,6 +404,71 @@ export class Clusters extends BaseResource {
     return this.request<ClusterTopics>({
       method: 'GET',
       path: `/clusters/${clusterId}/topics`,
+    });
+  }
+
+  /**
+   * Get clustering configuration for the account
+   *
+   * @returns Clustering configuration
+   *
+   * @example
+   * ```typescript
+   * const config = await client.clusters.getConfig();
+   * console.log(`Min cluster size: ${config.minClusterSize}`);
+   * console.log(`Auto-enabled: ${config.autoEnabled}`);
+   * ```
+   */
+  async getConfig(): Promise<ClusterConfig> {
+    return this.request<ClusterConfig>({
+      method: 'GET',
+      path: '/clusters/config',
+    });
+  }
+
+  /**
+   * Update clustering configuration for the account
+   *
+   * @param params - Configuration parameters to update
+   * @returns Updated clustering configuration
+   *
+   * @example
+   * ```typescript
+   * const config = await client.clusters.updateConfig({
+   *   minClusterSize: 10,
+   *   autoEnabled: true
+   * });
+   * ```
+   */
+  async updateConfig(params: UpdateClusterConfigParams): Promise<ClusterConfig> {
+    return this.request<ClusterConfig>({
+      method: 'POST',
+      path: '/clusters/config',
+      body: {
+        min_cluster_size: params.minClusterSize,
+        algorithm: params.algorithm,
+        auto_enabled: params.autoEnabled,
+      },
+    });
+  }
+
+  /**
+   * Get clustering status for the account
+   *
+   * @returns Clustering status including last run information
+   *
+   * @example
+   * ```typescript
+   * const status = await client.clusters.getStatus();
+   * console.log(`Status: ${status.status}`);
+   * console.log(`Clusters found: ${status.clustersFound}`);
+   * console.log(`Last run: ${status.lastRunAt}`);
+   * ```
+   */
+  async getStatus(): Promise<ClusterStatus> {
+    return this.request<ClusterStatus>({
+      method: 'GET',
+      path: '/clusters/status',
     });
   }
 }

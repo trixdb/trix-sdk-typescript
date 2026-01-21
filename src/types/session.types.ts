@@ -103,6 +103,34 @@ export interface EndedSession {
   consolidationJobId?: string;
 }
 
+/**
+ * Parameters for adding a simple message to a session.
+ */
+export interface AddSessionMessageParams {
+  /** Message role: 'user' or 'assistant' */
+  role: 'user' | 'assistant';
+  /** Message content */
+  content: string;
+}
+
+/**
+ * Result of adding a session message.
+ */
+export interface SessionMessage {
+  /** Memory ID created for this message */
+  id: string;
+  /** Session ID the message was added to */
+  sessionId: string;
+  /** Role of the message */
+  role: 'user' | 'assistant';
+  /** Content of the message */
+  content: string;
+  /** When the message was created */
+  createdAt: string;
+  /** Turn number in the conversation */
+  turnNumber: number;
+}
+
 // ============================================================================
 // CLI Session Types (Extended)
 // ============================================================================

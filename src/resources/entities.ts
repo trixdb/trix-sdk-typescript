@@ -74,7 +74,7 @@ export class Entities extends BaseResource {
   async create(params: CreateEntityParams): Promise<Entity> {
     return this.request<Entity>({
       method: 'POST',
-      path: '/entities',
+      path: '/knowledge/entities',
       body: params,
     });
   }
@@ -92,7 +92,7 @@ export class Entities extends BaseResource {
     validateId(id, 'entity');
     return this.request<Entity>({
       method: 'GET',
-      path: `/entities/${id}`,
+      path: `/knowledge/entities/${id}`,
     });
   }
 
@@ -114,7 +114,7 @@ export class Entities extends BaseResource {
   async list(params?: ListEntitiesParams): Promise<PaginatedResponse<Entity>> {
     return this.request<PaginatedResponse<Entity>>({
       method: 'GET',
-      path: '/entities',
+      path: '/knowledge/entities',
       params: buildParams(params || {}),
     });
   }
@@ -133,7 +133,7 @@ export class Entities extends BaseResource {
     validateId(id, 'entity');
     return this.request<Entity>({
       method: 'PATCH',
-      path: `/entities/${id}`,
+      path: `/knowledge/entities/${id}`,
       body: params,
     });
   }
@@ -150,7 +150,7 @@ export class Entities extends BaseResource {
     validateId(id, 'entity');
     return this.request<void>({
       method: 'DELETE',
-      path: `/entities/${id}`,
+      path: `/knowledge/entities/${id}`,
     });
   }
 
@@ -175,7 +175,7 @@ export class Entities extends BaseResource {
   ): Promise<{ data: ScoredEntity[] }> {
     return this.request<{ data: ScoredEntity[] }>({
       method: 'POST',
-      path: '/entities/search',
+      path: '/knowledge/entities/search',
       body: { query, ...options },
     });
   }
@@ -234,7 +234,7 @@ export class Entities extends BaseResource {
   ): Promise<EntityResolutionResult> {
     return this.request<EntityResolutionResult>({
       method: 'POST',
-      path: '/entities/resolve',
+      path: '/knowledge/entities/resolve',
       body: { text, ...options },
     });
   }
@@ -262,7 +262,7 @@ export class Entities extends BaseResource {
     validateId(sourceId, 'entity');
     return this.request<EntityMergeResult>({
       method: 'POST',
-      path: `/entities/${targetId}/merge`,
+      path: `/knowledge/entities/${targetId}/merge`,
       body: { sourceId },
     });
   }
@@ -282,7 +282,7 @@ export class Entities extends BaseResource {
     validateId(memoryId, 'memory');
     return this.request<EntityMemoryLinkResult>({
       method: 'POST',
-      path: `/entities/${entityId}/memories`,
+      path: `/knowledge/entities/${entityId}/memories`,
       body: { memoryId },
     });
   }
@@ -298,7 +298,7 @@ export class Entities extends BaseResource {
     validateId(memoryId, 'memory');
     return this.request<void>({
       method: 'DELETE',
-      path: `/entities/${entityId}/memories/${memoryId}`,
+      path: `/knowledge/entities/${entityId}/memories/${memoryId}`,
     });
   }
 
@@ -325,7 +325,7 @@ export class Entities extends BaseResource {
     validateBulkArray(entities, 'bulkCreate');
     return this.request<BulkResult & { entities?: Entity[] }>({
       method: 'POST',
-      path: '/entities/bulk',
+      path: '/knowledge/entities/bulk',
       body: { entities },
     });
   }
@@ -339,8 +339,8 @@ export class Entities extends BaseResource {
   async bulkDelete(ids: string[]): Promise<BulkResult> {
     validateBulkArray(ids, 'bulkDelete');
     return this.request<BulkResult>({
-      method: 'DELETE',
-      path: '/entities/bulk',
+      method: 'POST',
+      path: '/knowledge/entities/bulk/delete',
       body: { ids },
     });
   }
@@ -392,7 +392,7 @@ export class Entities extends BaseResource {
   async getTypes(): Promise<EntityTypesResult> {
     return this.request<EntityTypesResult>({
       method: 'GET',
-      path: '/entities/types',
+      path: '/knowledge/entities/types',
     });
   }
 
@@ -416,7 +416,7 @@ export class Entities extends BaseResource {
     validateId(entityId, 'entity');
     return this.request<EntityFactsResult>({
       method: 'GET',
-      path: `/entities/${entityId}/facts`,
+      path: `/knowledge/entities/${entityId}/facts`,
     });
   }
 }

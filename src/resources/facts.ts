@@ -69,7 +69,7 @@ export class Facts extends BaseResource {
   async create(params: CreateFactParams): Promise<Fact> {
     return this.request<Fact>({
       method: 'POST',
-      path: '/facts',
+      path: '/knowledge/facts',
       body: params,
     });
   }
@@ -87,7 +87,7 @@ export class Facts extends BaseResource {
     validateId(id, 'fact');
     return this.request<Fact>({
       method: 'GET',
-      path: `/facts/${id}`,
+      path: `/knowledge/facts/${id}`,
     });
   }
 
@@ -109,7 +109,7 @@ export class Facts extends BaseResource {
   async list(params?: ListFactsParams): Promise<PaginatedResponse<Fact>> {
     return this.request<PaginatedResponse<Fact>>({
       method: 'GET',
-      path: '/facts',
+      path: '/knowledge/facts',
       params: buildParams(params || {}),
     });
   }
@@ -128,7 +128,7 @@ export class Facts extends BaseResource {
     validateId(id, 'fact');
     return this.request<Fact>({
       method: 'PATCH',
-      path: `/facts/${id}`,
+      path: `/knowledge/facts/${id}`,
       body: params,
     });
   }
@@ -145,7 +145,7 @@ export class Facts extends BaseResource {
     validateId(id, 'fact');
     return this.request<void>({
       method: 'DELETE',
-      path: `/facts/${id}`,
+      path: `/knowledge/facts/${id}`,
     });
   }
 
@@ -170,7 +170,7 @@ export class Facts extends BaseResource {
   ): Promise<{ data: ScoredFact[] }> {
     return this.request<{ data: ScoredFact[] }>({
       method: 'POST',
-      path: '/facts/query',
+      path: '/knowledge/facts/query',
       body: { query, ...options },
     });
   }
@@ -240,7 +240,7 @@ export class Facts extends BaseResource {
     validateBulkArray(facts, 'bulkCreate');
     return this.request<BulkResult & { facts?: Fact[] }>({
       method: 'POST',
-      path: '/facts/bulk',
+      path: '/knowledge/facts/bulk',
       body: { facts },
     });
   }
@@ -254,8 +254,8 @@ export class Facts extends BaseResource {
   async bulkDelete(ids: string[]): Promise<BulkResult> {
     validateBulkArray(ids, 'bulkDelete');
     return this.request<BulkResult>({
-      method: 'DELETE',
-      path: '/facts/bulk',
+      method: 'POST',
+      path: '/knowledge/facts/bulk/delete',
       body: { ids },
     });
   }
@@ -312,7 +312,7 @@ export class Facts extends BaseResource {
     validateId(factId, 'fact');
     return this.request<FactVerificationResult>({
       method: 'POST',
-      path: `/facts/${factId}/verify`,
+      path: `/knowledge/facts/${factId}/verify`,
       body: options || {},
     });
   }

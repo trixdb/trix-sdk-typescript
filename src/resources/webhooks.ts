@@ -308,8 +308,8 @@ export class Webhooks {
   async bulkDelete(ids: string[]): Promise<BulkResult> {
     ids.forEach((id) => validateId(id, 'webhook'));
     return this.client.request<BulkResult>({
-      method: 'DELETE',
-      path: '/webhooks/bulk',
+      method: 'POST',
+      path: '/webhooks/bulk/delete',
       body: { ids },
     });
   }

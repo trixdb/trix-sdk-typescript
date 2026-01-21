@@ -150,3 +150,57 @@ export interface IncrementalClusterResult {
   status: 'queued' | 'processing';
   estimatedMemories: number;
 }
+
+// ============================================================================
+// Cluster Configuration and Status
+// ============================================================================
+
+/**
+ * Clustering configuration for an account.
+ */
+export interface ClusterConfig {
+  /** Minimum cluster size for automatic clustering */
+  minClusterSize: number;
+  /** Clustering algorithm to use */
+  algorithm: string;
+  /** Whether automatic clustering is enabled */
+  autoEnabled: boolean;
+  /** Success message (returned from API) */
+  message?: string;
+}
+
+/**
+ * Parameters for updating clustering configuration.
+ */
+export interface UpdateClusterConfigParams {
+  /** Minimum cluster size for automatic clustering */
+  minClusterSize?: number;
+  /** Clustering algorithm to use */
+  algorithm?: string;
+  /** Whether automatic clustering is enabled */
+  autoEnabled?: boolean;
+}
+
+/**
+ * Clustering status for an account.
+ */
+export interface ClusterStatus {
+  /** Current clustering status */
+  status: 'not_run' | 'completed' | 'running' | 'failed';
+  /** Clustering algorithm used */
+  algorithm: string;
+  /** Minimum cluster size configured */
+  minClusterSize: number;
+  /** Total number of memories */
+  memoriesTotal: number;
+  /** Number of clustered memories */
+  memoriesClustered: number;
+  /** Number of clusters found */
+  clustersFound: number;
+  /** Timestamp of last clustering run */
+  lastRunAt: string | null;
+  /** Timestamp of next scheduled clustering run */
+  nextScheduledAt: string | null;
+  /** Human-readable status message */
+  message: string;
+}
