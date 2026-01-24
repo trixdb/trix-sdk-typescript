@@ -12,14 +12,9 @@ import type {
   BulkResult,
   ClusterExpandParams,
   ClusterExpandResult,
-  ClusterStats,
   ClusterQuality,
   ClusterTopics,
-  IncrementalClusterParams,
-  IncrementalClusterResult,
   GetClusterOptions,
-  ClusterConfig,
-  UpdateClusterConfigParams,
   ClusterStatus,
 } from '../types.js';
 import { BaseResource, buildParams, validateBulkArray, validateIds } from './base.js';
@@ -326,60 +321,6 @@ export class Clusters extends BaseResource {
   }
 
   /**
-   * Get cluster statistics
-   *
-   * @returns Cluster statistics
-   */
-  async getStats(): Promise<ClusterStats> {
-    return this.request<ClusterStats>({
-      method: 'GET',
-      path: '/clusters/stats',
-    });
-  }
-
-  /**
-   * Trigger incremental clustering
-   *
-   * @param params - Incremental clustering parameters
-   * @returns Clustering job result
-   */
-  async incrementalClustering(params?: IncrementalClusterParams): Promise<IncrementalClusterResult> {
-    return this.request<IncrementalClusterResult>({
-      method: 'POST',
-      path: '/clusters/incremental',
-      body: params,
-    });
-  }
-
-  /**
-   * Refresh quality metrics for a cluster
-   *
-   * @param clusterId - Cluster ID
-   * @returns Updated cluster
-   */
-  async refreshMetrics(clusterId: string): Promise<Cluster> {
-    validateId(clusterId, 'cluster');
-    return this.request<Cluster>({
-      method: 'POST',
-      path: `/clusters/${clusterId}/refresh-metrics`,
-    });
-  }
-
-  /**
-   * Recompute centroid for a cluster
-   *
-   * @param clusterId - Cluster ID
-   * @returns Updated cluster
-   */
-  async recomputeCentroid(clusterId: string): Promise<Cluster> {
-    validateId(clusterId, 'cluster');
-    return this.request<Cluster>({
-      method: 'POST',
-      path: `/clusters/${clusterId}/recompute-centroid`,
-    });
-  }
-
-  /**
    * Get quality metrics for a cluster
    *
    * @param clusterId - Cluster ID
@@ -404,51 +345,6 @@ export class Clusters extends BaseResource {
     return this.request<ClusterTopics>({
       method: 'GET',
       path: `/clusters/${clusterId}/topics`,
-    });
-  }
-
-  /**
-   * Get clustering configuration for the account
-   *
-   * @returns Clustering configuration
-   *
-   * @example
-   * ```typescript
-   * const config = await client.clusters.getConfig();
-   * console.log(`Min cluster size: ${config.minClusterSize}`);
-   * console.log(`Auto-enabled: ${config.autoEnabled}`);
-   * ```
-   */
-  async getConfig(): Promise<ClusterConfig> {
-    return this.request<ClusterConfig>({
-      method: 'GET',
-      path: '/clusters/config',
-    });
-  }
-
-  /**
-   * Update clustering configuration for the account
-   *
-   * @param params - Configuration parameters to update
-   * @returns Updated clustering configuration
-   *
-   * @example
-   * ```typescript
-   * const config = await client.clusters.updateConfig({
-   *   minClusterSize: 10,
-   *   autoEnabled: true
-   * });
-   * ```
-   */
-  async updateConfig(params: UpdateClusterConfigParams): Promise<ClusterConfig> {
-    return this.request<ClusterConfig>({
-      method: 'POST',
-      path: '/clusters/config',
-      body: {
-        min_cluster_size: params.minClusterSize,
-        algorithm: params.algorithm,
-        auto_enabled: params.autoEnabled,
-      },
     });
   }
 

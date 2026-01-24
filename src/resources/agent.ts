@@ -4,8 +4,6 @@
 
 import type { Trix } from '../client.js';
 import type {
-  ConsolidateParams,
-  ConsolidateResult,
   CreateSessionParams,
   Session,
   AddMemoryParams,
@@ -20,9 +18,6 @@ import type {
   EndedSession,
   AddSessionMessageParams,
   SessionMessage,
-  CoreMemory,
-  CoreMemoryBlock,
-  CoreMemoryContext,
 } from '../types.js';
 import { paginateIterator } from '../utils/pagination.js';
 import { validateId } from '../utils/security.js';
@@ -39,31 +34,6 @@ import { validateId } from '../utils/security.js';
  */
 export class Agent {
   constructor(private readonly client: Trix) {}
-
-  /**
-   * Consolidate memories to optimize the knowledge graph
-   *
-   * @param params - Consolidation parameters
-   * @returns Consolidation result with job information
-   *
-   * @example
-   * ```typescript
-   * const result = await client.agent.consolidate({
-   *   threshold: 0.8,
-   *   maxClusters: 100,
-   *   priority: 'high'
-   * });
-   *
-   * console.log(`Consolidation job: ${result.jobId}`);
-   * ```
-   */
-  async consolidate(params?: ConsolidateParams): Promise<ConsolidateResult> {
-    return this.client.request<ConsolidateResult>({
-      method: 'POST',
-      path: '/agent/consolidate',
-      body: params,
-    });
-  }
 
   /**
    * Create a new agent session
@@ -251,13 +221,8 @@ export class Agent {
    * @example
    * ```typescript
    * const ended = await client.agent.endSession('sess_123', {
-   *   consolidate: true,
    *   metadata: { resolution: 'resolved' }
    * });
-   *
-   * if (ended.consolidationJobId) {
-   *   console.log(`Consolidation started: ${ended.consolidationJobId}`);
-   * }
    * ```
    */
   async endSession(sessionId: string, params?: EndSessionParams): Promise<EndedSession> {
@@ -266,90 +231,6 @@ export class Agent {
       method: 'POST',
       path: `/agent/sessions/${sessionId}/end`,
       body: params,
-    });
-  }
-
-  /**
-   * Get core memory
-   *
-   * @returns Core memory with all blocks
-   */
-  async getCoreMemory(): Promise<CoreMemory> {
-    return this.client.request<CoreMemory>({
-      method: 'GET',
-      path: '/agent/memory/core',
-    });
-  }
-
-  /**
-   * Get a specific core memory block
-   *
-   * @param blockType - Block type
-   * @returns Core memory block
-   */
-  async getBlock(blockType: string): Promise<CoreMemoryBlock> {
-    return this.client.request<CoreMemoryBlock>({
-      method: 'GET',
-      path: `/agent/memory/core/${blockType}`,
-    });
-  }
-
-  /**
-   * Create or replace a core memory block
-   *
-   * @param blockType - Block type
-   * @param content - Block content
-   * @param metadata - Optional metadata
-   * @returns Updated block
-   */
-  async updateBlock(
-    blockType: string,
-    content: string,
-    metadata?: Record<string, unknown>
-  ): Promise<CoreMemoryBlock> {
-    return this.client.request<CoreMemoryBlock>({
-      method: 'PUT',
-      path: `/agent/memory/core/${blockType}`,
-      body: { content, metadata },
-    });
-  }
-
-  /**
-   * Append content to a core memory block
-   *
-   * @param blockType - Block type
-   * @param content - Content to append
-   * @returns Updated block
-   */
-  async appendBlock(blockType: string, content: string): Promise<CoreMemoryBlock> {
-    return this.client.request<CoreMemoryBlock>({
-      method: 'PATCH',
-      path: `/agent/memory/core/${blockType}`,
-      body: { content },
-    });
-  }
-
-  /**
-   * Delete a core memory block
-   *
-   * @param blockType - Block type
-   */
-  async deleteBlock(blockType: string): Promise<void> {
-    return this.client.request<void>({
-      method: 'DELETE',
-      path: `/agent/memory/core/${blockType}`,
-    });
-  }
-
-  /**
-   * Get formatted core memory context
-   *
-   * @returns Formatted context string
-   */
-  async getFormattedContext(): Promise<CoreMemoryContext> {
-    return this.client.request<CoreMemoryContext>({
-      method: 'GET',
-      path: '/agent/memory/core/context',
     });
   }
 }

@@ -93,11 +93,9 @@ import { Webhooks } from './resources/webhooks.js';
 import { Agent } from './resources/agent.js';
 import { Feedback } from './resources/feedback.js';
 import { Highlights } from './resources/highlights.js';
-import { Jobs } from './resources/jobs.js';
 import { Facts } from './resources/facts.js';
 import { Entities } from './resources/entities.js';
 import { Enrichments } from './resources/enrichments.js';
-import { Billing } from './resources/billing.js';
 import { Invites } from './resources/invites.js';
 import { Sessions } from './resources/sessions.js';
 import { Resources } from './resources/resources.js';
@@ -139,6 +137,38 @@ export interface ResponseContext {
  * Request interceptor function.
  * Can modify the request context before it's sent.
  * Return undefined to leave unchanged, or return modified context.
+ *
+ * **Interceptor Mutation Constraints:**
+ *
+ * When modifying the request context, be aware of the following limitations:
+ *
+ * 1. **Method**: Changing the HTTP method may cause unexpected behavior
+ *    if the body format doesn't match (e.g., GET requests cannot have bodies).
+ *
+ * 2. **URL**: Modifying the URL is supported, but ensure the new URL is
+ *    accessible and returns a compatible response format.
+ *
+ * 3. **Headers**: You can add or modify headers, but removing required headers
+ *    (Authorization, Content-Type) may cause authentication or parsing failures.
+ *
+ * 4. **Body**: Modifying the body is supported for JSON requests. Ensure the
+ *    modified body is JSON-serializable. Do not set body for GET/HEAD requests.
+ *
+ * Interceptors run sequentially. If an interceptor throws, the request is aborted.
+ *
+ * @example
+ * ```typescript
+ * // Safe: Adding a custom header
+ * client.addRequestInterceptor((ctx) => {
+ *   return { ...ctx, headers: { ...ctx.headers, 'X-Custom': 'value' } };
+ * });
+ *
+ * // Safe: Logging request details
+ * client.addRequestInterceptor((ctx) => {
+ *   console.log(`${ctx.method} ${ctx.url}`);
+ *   return ctx;
+ * });
+ * ```
  */
 export type RequestInterceptor = (
   context: RequestContext
@@ -148,6 +178,18 @@ export type RequestInterceptor = (
  * Response interceptor function.
  * Can modify or observe the response after it's received.
  * Return undefined to leave unchanged, or return modified context.
+ *
+ * **Interceptor Mutation Constraints:**
+ *
+ * When modifying the response context, be aware of the following:
+ *
+ * 1. **Body**: Modifying the body will change what the caller receives.
+ *    Ensure the modified body matches the expected type.
+ *
+ * 2. **Headers/Status**: Modifying headers or status has no effect on the
+ *    actual response, but may affect downstream interceptors that read them.
+ *
+ * Interceptors run sequentially after a successful response.
  */
 export type ResponseInterceptor = (
   context: ResponseContext
@@ -157,6 +199,17 @@ export type ResponseInterceptor = (
  * Error interceptor function.
  * Can observe or transform errors before they're thrown.
  * Return the same or different error, or throw a new error.
+ *
+ * **Usage Notes:**
+ *
+ * 1. The error returned (or thrown) by the last interceptor is what the
+ *    caller will receive.
+ *
+ * 2. You can transform errors (e.g., wrap in a custom error type) or
+ *    log them for monitoring purposes.
+ *
+ * 3. To suppress an error (not recommended), return a non-Error value,
+ *    but this may cause type issues for the caller.
  */
 export type ErrorInterceptor = (
   error: unknown,
@@ -217,11 +270,9 @@ export class Trix {
   public readonly agent: Agent;
   public readonly feedback: Feedback;
   public readonly highlights: Highlights;
-  public readonly jobs: Jobs;
   public readonly facts: Facts;
   public readonly entities: Entities;
   public readonly enrichments: Enrichments;
-  public readonly billing: Billing;
   public readonly invites: Invites;
   public readonly sessions: Sessions;
   public readonly resources: Resources;
@@ -300,11 +351,9 @@ export class Trix {
     this.agent = new Agent(this);
     this.feedback = new Feedback(this);
     this.highlights = new Highlights(this);
-    this.jobs = new Jobs(this);
     this.facts = new Facts(this);
     this.entities = new Entities(this);
     this.enrichments = new Enrichments(this);
-    this.billing = new Billing(this);
     this.invites = new Invites(this);
     this.sessions = new Sessions(this);
     this.resources = new Resources(this);

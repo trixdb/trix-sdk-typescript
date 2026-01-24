@@ -5,7 +5,6 @@
 import { Trix } from '../src/client';
 import type {
   CLISession,
-  CLISessionStats,
   CreateCLISessionParams,
   UpdateCLISessionParams,
   CompleteCLISessionParams,
@@ -241,60 +240,6 @@ describe('CLI Sessions Resource', () => {
       const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
       await client.sessions.getActive();
-
-      const [, options] = mockFetch.mock.calls[0];
-      expect(options.method).toBe('GET');
-    });
-  });
-
-  describe('getStats', () => {
-    it('should get session statistics', async () => {
-      const mockStats: CLISessionStats = {
-        total: 10,
-        byStatus: {
-          active: 3,
-          paused: 2,
-          completed: 4,
-          archived: 1,
-        },
-        byType: {
-          conversation: 5,
-          project: 3,
-          task: 2,
-          temporary: 0,
-        },
-        avgMemoriesPerSession: 25.5,
-        avgDurationMinutes: 45.2,
-        activeSessionsCount: 3,
-        totalMemories: 255,
-      };
-
-      const mockFetch = createMockFetch({ status: 200, body: mockStats });
-      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
-
-      const stats = await client.sessions.getStats();
-
-      expect(stats.total).toBe(10);
-      expect(stats.byStatus.active).toBe(3);
-      expect(stats.byType.conversation).toBe(5);
-      expect(stats.avgMemoriesPerSession).toBe(25.5);
-    });
-
-    it('should call /cli-sessions/stats endpoint', async () => {
-      const mockFetch = createMockFetch({ status: 200, body: {} });
-      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
-
-      await client.sessions.getStats();
-
-      const [url] = mockFetch.mock.calls[0];
-      expect(url).toContain('/cli-sessions/stats');
-    });
-
-    it('should use GET method', async () => {
-      const mockFetch = createMockFetch({ status: 200, body: {} });
-      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
-
-      await client.sessions.getStats();
 
       const [, options] = mockFetch.mock.calls[0];
       expect(options.method).toBe('GET');

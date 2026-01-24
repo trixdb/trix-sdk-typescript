@@ -4,12 +4,65 @@
  * Provides image conversion and form data building utilities.
  */
 
-import { FileSizeError } from '../../errors.js';
+import { FileSizeError, ValidationError } from '../../errors.js';
 
 /**
  * Maximum file size for uploads (100MB).
  */
 export const MAX_FILE_SIZE = 100 * 1024 * 1024;
+
+/**
+ * Allowed MIME types for images.
+ */
+const ALLOWED_IMAGE_MIME_TYPES = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'image/webp',
+  'image/bmp',
+  'image/tiff',
+]);
+
+/**
+ * Validate that a string is valid base64 encoding.
+ *
+ * @param str - String to validate
+ * @returns true if valid base64
+ */
+function isValidBase64(str: string): boolean {
+  // Base64 must only contain valid characters and have valid padding
+  const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/;
+  if (!base64Regex.test(str)) {
+    return false;
+  }
+  // Length must be multiple of 4 (after padding)
+  return str.length % 4 === 0;
+}
+
+/**
+ * Extract MIME type from data URI prefix.
+ *
+ * @param dataUri - Data URI string (e.g., "data:image/png;base64,...")
+ * @returns MIME type or null if not found
+ */
+function extractMimeType(dataUri: string): string | null {
+  const match = dataUri.match(/^data:([^;,]+)/);
+  return match ? match[1] : null;
+}
+
+/**
+ * Validate MIME type for images.
+ *
+ * @param mimeType - MIME type to validate
+ * @throws ValidationError if MIME type is not allowed
+ */
+function validateImageMimeType(mimeType: string): void {
+  if (!ALLOWED_IMAGE_MIME_TYPES.has(mimeType)) {
+    throw new ValidationError(
+      `Invalid image MIME type: ${mimeType}. Allowed types: ${Array.from(ALLOWED_IMAGE_MIME_TYPES).join(', ')}`
+    );
+  }
+}
 
 /**
  * Validate that a file does not exceed the maximum allowed size.
@@ -32,14 +85,44 @@ export function validateFileSize(
  * Convert base64 image string to Blob.
  *
  * @param base64Image - Base64 encoded image (with or without data URI prefix)
- * @param mimeType - MIME type (default: image/jpeg)
+ * @param defaultMimeType - Default MIME type if not specified in data URI (default: image/jpeg)
  * @returns Blob containing the image data
+ * @throws ValidationError if base64 encoding is invalid or MIME type is not allowed
  */
-export function base64ToBlob(base64Image: string, mimeType = 'image/jpeg'): Blob {
-  const base64Data = base64Image.includes(',')
-    ? base64Image.split(',')[1]
-    : base64Image;
-  const binaryString = atob(base64Data);
+export function base64ToBlob(base64Image: string, defaultMimeType = 'image/jpeg'): Blob {
+  let base64Data: string;
+  let mimeType: string;
+
+  // Check if it's a data URI and extract MIME type
+  if (base64Image.includes(',')) {
+    const extractedMime = extractMimeType(base64Image);
+    mimeType = extractedMime ?? defaultMimeType;
+    base64Data = base64Image.split(',')[1];
+  } else {
+    mimeType = defaultMimeType;
+    base64Data = base64Image;
+  }
+
+  // Validate MIME type
+  validateImageMimeType(mimeType);
+
+  // Validate base64 encoding
+  if (!isValidBase64(base64Data)) {
+    throw new ValidationError(
+      'Invalid base64 encoding: string contains invalid characters or has incorrect padding'
+    );
+  }
+
+  // Attempt to decode base64
+  let binaryString: string;
+  try {
+    binaryString = atob(base64Data);
+  } catch {
+    throw new ValidationError(
+      'Failed to decode base64 image: the provided string is not valid base64 encoded data'
+    );
+  }
+
   const bytes = new Uint8Array(binaryString.length);
   for (let i = 0; i < binaryString.length; i++) {
     bytes[i] = binaryString.charCodeAt(i);

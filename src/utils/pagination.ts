@@ -15,8 +15,28 @@ export interface PaginationOptions {
 /** Default maximum pages to prevent infinite loops */
 const DEFAULT_MAX_PAGES = 1000;
 
+/** Maximum size for duplicate detection set to prevent memory issues */
+const MAX_SEEN_IDS_SIZE = 100000;
+
+/**
+ * Extract ID from an item for duplicate detection.
+ * Supports objects with id, _id, or uses JSON stringification as fallback.
+ */
+function getItemId<T>(item: T): string {
+  if (item && typeof item === 'object') {
+    const obj = item as Record<string, unknown>;
+    if (typeof obj.id === 'string') return obj.id;
+    if (typeof obj._id === 'string') return obj._id;
+  }
+  // Fallback: use stringified version (less efficient but handles edge cases)
+  return JSON.stringify(item);
+}
+
 /**
  * Async iterator for paginated results with safety limits
+ *
+ * Includes duplicate detection to prevent infinite loops when the API
+ * returns the same items repeatedly (e.g., due to cursor issues).
  *
  * @param fetchPage - Function to fetch a page of results
  * @param params - Pagination parameters
@@ -38,12 +58,44 @@ export async function* paginateIterator<T, P extends PaginationOptions>(
   const limit = params.limit ?? 100;
   let hasMore = true;
   let pagesIterated = 0;
+  const seenIds = new Set<string>();
+  let consecutiveDuplicatePages = 0;
 
   while (hasMore && pagesIterated < maxPages) {
     const response = await fetchPage({ ...params, page, limit } as P);
 
+    // Track duplicates in this page
+    let duplicatesInPage = 0;
+
     for (const item of response.data) {
+      const itemId = getItemId(item);
+
+      // Check for duplicate
+      if (seenIds.has(itemId)) {
+        duplicatesInPage++;
+        continue; // Skip duplicate items
+      }
+
+      // Add to seen set (with size limit to prevent memory issues)
+      if (seenIds.size < MAX_SEEN_IDS_SIZE) {
+        seenIds.add(itemId);
+      }
+
       yield item;
+    }
+
+    // Detect if entire page was duplicates (infinite loop condition)
+    if (response.data.length > 0 && duplicatesInPage === response.data.length) {
+      consecutiveDuplicatePages++;
+      if (consecutiveDuplicatePages >= 3) {
+        console.warn(
+          'Pagination stopped: detected 3 consecutive pages of duplicate items. ' +
+          'This may indicate an API pagination issue.'
+        );
+        break;
+      }
+    } else {
+      consecutiveDuplicatePages = 0;
     }
 
     hasMore = response.pagination.hasMore;

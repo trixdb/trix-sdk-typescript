@@ -10,7 +10,6 @@ import type {
   CompleteCLISessionParams,
   ListCLISessionsParams,
   CLISessionsResponse,
-  CLISessionStats,
   PaginatedResponse,
   Memory,
 } from '../types.js';
@@ -134,29 +133,6 @@ export class Sessions extends BaseResource {
     return this.request<CLISessionsResponse>({
       method: 'GET',
       path: '/cli-sessions/active',
-    });
-  }
-
-  /**
-   * Get session statistics
-   *
-   * Retrieves aggregate statistics about sessions including counts by status,
-   * type, and various averages.
-   *
-   * @returns Session statistics
-   *
-   * @example
-   * ```typescript
-   * const stats = await client.sessions.getStats();
-   * console.log(`Total sessions: ${stats.total}`);
-   * console.log(`Active: ${stats.byStatus.active}`);
-   * console.log(`Average memories per session: ${stats.avgMemoriesPerSession}`);
-   * ```
-   */
-  async getStats(): Promise<CLISessionStats> {
-    return this.request<CLISessionStats>({
-      method: 'GET',
-      path: '/cli-sessions/stats',
     });
   }
 

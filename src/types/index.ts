@@ -15,7 +15,6 @@
  * - search.types.ts: Search configuration and options
  * - webhook.types.ts: Webhook types
  * - session.types.ts: Session types (legacy and CLI)
- * - job.types.ts: Job and consolidation types
  * - fact.types.ts: Fact (knowledge graph triple) types
  * - entity.types.ts: Named entity types
  * - enrichment.types.ts: Enrichment and topic types
@@ -35,6 +34,8 @@ export type {
   BaseEntity,
   BaseEntityWithMetadata,
   TestResult,
+  JobStatus,
+  Job,
 } from './common.types.js';
 
 // Memory types
@@ -53,9 +54,6 @@ export type {
   MemoryConfig,
   MemoryStatsParams,
   MemoryStats,
-  CoreMemoryBlock,
-  CoreMemory,
-  CoreMemoryContext,
 } from './memory.types.js';
 
 // Transcript types
@@ -177,17 +175,6 @@ export type {
   CLISessionsResponse,
   CLISessionStats,
 } from './session.types.js';
-
-// Job types
-export type {
-  Job,
-  JobStats,
-  ListJobsParams,
-  CleanParams,
-  CleanResult,
-  ConsolidateParams,
-  ConsolidateResult,
-} from './job.types.js';
 
 // Fact types
 export type {

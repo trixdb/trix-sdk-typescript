@@ -131,7 +131,6 @@ export type {
   Agent,
   Feedback,
   Highlights,
-  Jobs,
 } from './resources/index.js';
 
 // Re-export testing utilities for convenience

@@ -908,27 +908,8 @@ export class Memories extends BaseResource {
    */
   async searchVisual(params: VisualSearchParams): Promise<VisualSearchResult> {
     const formData = new FormData();
-
-    // Handle different image input types
-    if (typeof params.image === 'string') {
-      // Base64 string - convert to Blob
-      const base64Data = params.image.includes(',')
-        ? params.image.split(',')[1]
-        : params.image;
-      const binaryString = atob(base64Data);
-      const bytes = new Uint8Array(binaryString.length);
-      for (let i = 0; i < binaryString.length; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
-      }
-      const blob = new Blob([bytes], { type: 'image/jpeg' });
-      formData.append('image', blob, 'search.jpg');
-    } else if (params.image instanceof Blob) {
-      formData.append('image', params.image);
-    } else {
-      // Buffer (Node.js)
-      const blob = new Blob([params.image]);
-      formData.append('image', blob, 'search.jpg');
-    }
+    const { blob, filename } = normalizeImageInput(params.image, 'search.jpg');
+    formData.append('image', blob, filename);
 
     // Add optional parameters
     if (params.limit !== undefined) {
@@ -1038,27 +1019,8 @@ export class Memories extends BaseResource {
    */
   async checkDuplicates(params: CheckDuplicatesParams): Promise<DuplicateCheckResult> {
     const formData = new FormData();
-
-    // Handle different image input types
-    if (typeof params.image === 'string') {
-      // Base64 string - convert to Blob
-      const base64Data = params.image.includes(',')
-        ? params.image.split(',')[1]
-        : params.image;
-      const binaryString = atob(base64Data);
-      const bytes = new Uint8Array(binaryString.length);
-      for (let i = 0; i < binaryString.length; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
-      }
-      const blob = new Blob([bytes], { type: 'image/jpeg' });
-      formData.append('image', blob, 'check.jpg');
-    } else if (params.image instanceof Blob) {
-      formData.append('image', params.image);
-    } else {
-      // Buffer (Node.js)
-      const blob = new Blob([params.image]);
-      formData.append('image', blob, 'check.jpg');
-    }
+    const { blob, filename } = normalizeImageInput(params.image, 'check.jpg');
+    formData.append('image', blob, filename);
 
     // Add optional parameters
     if (params.threshold !== undefined) {

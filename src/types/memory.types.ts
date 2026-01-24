@@ -173,33 +173,3 @@ export interface MemoryStats {
   avgContentLength?: number;
   totalSize?: number;
 }
-
-// ============================================================================
-// Core Memory (Agent)
-// ============================================================================
-
-/**
- * Core memory block.
- */
-export interface CoreMemoryBlock {
-  type: string;
-  content: string;
-  metadata?: Record<string, unknown>;
-  updatedAt: string;
-}
-
-/**
- * Core memory.
- */
-export interface CoreMemory {
-  blocks: CoreMemoryBlock[];
-  updatedAt: string;
-}
-
-/**
- * Formatted core memory context.
- */
-export interface CoreMemoryContext {
-  formatted: string;
-  blocks: CoreMemoryBlock[];
-}

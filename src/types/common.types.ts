@@ -112,3 +112,36 @@ export interface TestResult {
   response?: string;
   error?: string;
 }
+
+// ============================================================================
+// Job Types
+// ============================================================================
+
+/** Job status */
+export type JobStatus = 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
+
+/**
+ * Asynchronous job for long-running operations.
+ */
+export interface Job {
+  /** Unique job identifier */
+  id: string;
+  /** Current job status */
+  status: JobStatus;
+  /** Job type (e.g., 'transcription', 'clustering') */
+  type?: string;
+  /** Progress percentage (0-100) */
+  progress?: number;
+  /** Error message if the job failed */
+  error?: string;
+  /** Result data when job completes */
+  result?: Record<string, unknown>;
+  /** When the job was created */
+  createdAt: string;
+  /** When the job was last updated */
+  updatedAt: string;
+  /** When the job started processing */
+  startedAt?: string;
+  /** When the job completed */
+  completedAt?: string;
+}
