@@ -4,6 +4,30 @@
  * Provides image conversion and form data building utilities.
  */
 
+import { FileSizeError } from '../../errors.js';
+
+/**
+ * Maximum file size for uploads (100MB).
+ */
+export const MAX_FILE_SIZE = 100 * 1024 * 1024;
+
+/**
+ * Validate that a file does not exceed the maximum allowed size.
+ *
+ * @param file - File, Blob, or Buffer to validate
+ * @param maxSize - Maximum allowed size in bytes (default: MAX_FILE_SIZE)
+ * @throws FileSizeError if file exceeds the maximum size
+ */
+export function validateFileSize(
+  file: Blob | Buffer,
+  maxSize = MAX_FILE_SIZE
+): void {
+  const size = file instanceof Blob ? file.size : file.length;
+  if (size > maxSize) {
+    throw new FileSizeError(size, maxSize);
+  }
+}
+
 /**
  * Convert base64 image string to Blob.
  *
@@ -104,21 +128,25 @@ export function appendNumberField(
  */
 export async function streamToArrayBuffer(stream: ReadableStream): Promise<ArrayBuffer> {
   const reader = stream.getReader();
-  const chunks: Uint8Array[] = [];
+  try {
+    const chunks: Uint8Array[] = [];
 
-  let readResult = await reader.read();
-  while (!readResult.done) {
-    chunks.push(readResult.value);
-    readResult = await reader.read();
+    let readResult = await reader.read();
+    while (!readResult.done) {
+      chunks.push(readResult.value);
+      readResult = await reader.read();
+    }
+
+    const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
+    const result = new Uint8Array(totalLength);
+    let offset = 0;
+    for (const chunk of chunks) {
+      result.set(chunk, offset);
+      offset += chunk.length;
+    }
+
+    return result.buffer;
+  } finally {
+    reader.releaseLock();
   }
-
-  const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
-  const result = new Uint8Array(totalLength);
-  let offset = 0;
-  for (const chunk of chunks) {
-    result.set(chunk, offset);
-    offset += chunk.length;
-  }
-
-  return result.buffer;
 }

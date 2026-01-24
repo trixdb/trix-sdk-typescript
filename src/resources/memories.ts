@@ -48,6 +48,14 @@ import type {
 import { BaseResource, buildParams, validateBulkArray, validateIds } from './base.js';
 import { paginateIterator } from '../utils/pagination.js';
 import { validateId } from '../utils/security.js';
+import {
+  streamToArrayBuffer,
+  normalizeImageInput,
+  appendStringField,
+  appendJsonField,
+  appendBooleanField,
+  validateFileSize,
+} from './memories/memories.helpers.js';
 
 /**
  * Memories resource for managing memory objects
@@ -105,21 +113,15 @@ export class Memories extends BaseResource {
   async create(params: CreateMemoryParams): Promise<Memory> {
     // Handle audio/video file upload with multipart/form-data
     if (params.audioFile) {
+      validateFileSize(params.audioFile);
+
       const formData = new FormData();
       formData.append('file', params.audioFile);
       formData.append('content', params.content);
-      if (params.type) {
-        formData.append('type', params.type);
-      }
-      if (params.tags) {
-        formData.append('tags', JSON.stringify(params.tags));
-      }
-      if (params.metadata) {
-        formData.append('metadata', JSON.stringify(params.metadata));
-      }
-      if (params.spaceId) {
-        formData.append('spaceId', params.spaceId);
-      }
+      appendStringField(formData, 'type', params.type);
+      appendJsonField(formData, 'tags', params.tags);
+      appendJsonField(formData, 'metadata', params.metadata);
+      appendStringField(formData, 'spaceId', params.spaceId);
 
       return this.client.requestMultipart<Memory>({
         method: 'POST',
@@ -812,66 +814,24 @@ export class Memories extends BaseResource {
    */
   async createImage(params: CreateImageMemoryParams): Promise<Memory> {
     const formData = new FormData();
+    const { blob, filename } = normalizeImageInput(params.image, 'image.jpg');
 
-    // Handle different image input types
-    if (typeof params.image === 'string') {
-      // Base64 string - convert to Blob
-      const base64Data = params.image.includes(',')
-        ? params.image.split(',')[1]
-        : params.image;
-      const binaryString = atob(base64Data);
-      const bytes = new Uint8Array(binaryString.length);
-      for (let i = 0; i < binaryString.length; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
-      }
-      const blob = new Blob([bytes], { type: 'image/jpeg' });
-      formData.append('image', blob, 'image.jpg');
-    } else if (params.image instanceof Blob) {
-      formData.append('image', params.image);
-    } else {
-      // Buffer (Node.js)
-      const blob = new Blob([params.image]);
-      formData.append('image', blob, 'image.jpg');
-    }
+    validateFileSize(blob);
+    formData.append('image', blob, filename);
 
-    // Add optional fields
-    if (params.content) {
-      formData.append('content', params.content);
-    }
+    appendStringField(formData, 'content', params.content);
     formData.append('type', 'image');
-    if (params.tags) {
-      formData.append('tags', JSON.stringify(params.tags));
-    }
-    if (params.metadata) {
-      formData.append('metadata', JSON.stringify(params.metadata));
-    }
-    if (params.spaceId) {
-      formData.append('spaceId', params.spaceId);
-    }
-    if (params.sessionId) {
-      formData.append('sessionId', params.sessionId);
-    }
-    if (params.originType) {
-      formData.append('originType', params.originType);
-    }
-    if (params.sourceType) {
-      formData.append('sourceType', params.sourceType);
-    }
-    if (params.sourceId) {
-      formData.append('sourceId', params.sourceId);
-    }
-    if (params.sourceMetadata) {
-      formData.append('sourceMetadata', JSON.stringify(params.sourceMetadata));
-    }
-    if (params.resourceIds) {
-      formData.append('resourceIds', JSON.stringify(params.resourceIds));
-    }
-    if (params.isPinned !== undefined) {
-      formData.append('isPinned', String(params.isPinned));
-    }
-    if (params.protectionLevel) {
-      formData.append('protectionLevel', params.protectionLevel);
-    }
+    appendJsonField(formData, 'tags', params.tags);
+    appendJsonField(formData, 'metadata', params.metadata);
+    appendStringField(formData, 'spaceId', params.spaceId);
+    appendStringField(formData, 'sessionId', params.sessionId);
+    appendStringField(formData, 'originType', params.originType);
+    appendStringField(formData, 'sourceType', params.sourceType);
+    appendStringField(formData, 'sourceId', params.sourceId);
+    appendJsonField(formData, 'sourceMetadata', params.sourceMetadata);
+    appendJsonField(formData, 'resourceIds', params.resourceIds);
+    appendBooleanField(formData, 'isPinned', params.isPinned);
+    appendStringField(formData, 'protectionLevel', params.protectionLevel);
 
     return this.client.requestMultipart<Memory>({
       method: 'POST',
@@ -903,26 +863,7 @@ export class Memories extends BaseResource {
       method: 'GET',
       path: `/memories/${id}/image`,
     });
-
-    // Convert ReadableStream to ArrayBuffer
-    const reader = stream.getReader();
-    const chunks: Uint8Array[] = [];
-
-    let readResult = await reader.read();
-    while (!readResult.done) {
-      chunks.push(readResult.value);
-      readResult = await reader.read();
-    }
-
-    const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
-    const result = new Uint8Array(totalLength);
-    let offset = 0;
-    for (const chunk of chunks) {
-      result.set(chunk, offset);
-      offset += chunk.length;
-    }
-
-    return result.buffer;
+    return streamToArrayBuffer(stream);
   }
 
   /**
@@ -943,26 +884,7 @@ export class Memories extends BaseResource {
       method: 'GET',
       path: `/memories/${id}/thumbnail`,
     });
-
-    // Convert ReadableStream to ArrayBuffer
-    const reader = stream.getReader();
-    const chunks: Uint8Array[] = [];
-
-    let readResult = await reader.read();
-    while (!readResult.done) {
-      chunks.push(readResult.value);
-      readResult = await reader.read();
-    }
-
-    const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
-    const result = new Uint8Array(totalLength);
-    let offset = 0;
-    for (const chunk of chunks) {
-      result.set(chunk, offset);
-      offset += chunk.length;
-    }
-
-    return result.buffer;
+    return streamToArrayBuffer(stream);
   }
 
   /**
