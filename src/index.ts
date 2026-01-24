@@ -56,6 +56,9 @@ export { paginateAll, paginateIterator } from './utils/pagination.js';
 export { retry } from './utils/retry.js';
 export type { RetryOptions } from './utils/retry.js';
 
+// Export file validation utilities
+export { MAX_FILE_SIZE, validateFileSize } from './resources/memories/memories.helpers.js';
+
 // Export security utilities
 export {
   validateId,

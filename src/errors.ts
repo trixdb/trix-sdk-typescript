@@ -153,3 +153,21 @@ export class APIVersionMismatchError extends TrixError {
     Object.setPrototypeOf(this, APIVersionMismatchError.prototype);
   }
 }
+
+/**
+ * Error thrown when file size exceeds the maximum allowed limit
+ */
+export class FileSizeError extends TrixError {
+  public fileSize: number;
+  public maxSize: number;
+
+  constructor(fileSize: number, maxSize: number) {
+    const fileSizeMB = (fileSize / (1024 * 1024)).toFixed(2);
+    const maxSizeMB = (maxSize / (1024 * 1024)).toFixed(0);
+    super(`File size ${fileSizeMB}MB exceeds maximum allowed size of ${maxSizeMB}MB`);
+    this.name = 'FileSizeError';
+    this.fileSize = fileSize;
+    this.maxSize = maxSize;
+    Object.setPrototypeOf(this, FileSizeError.prototype);
+  }
+}
