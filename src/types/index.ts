@@ -284,3 +284,32 @@ export type {
   SuggestQueriesParams,
   QuerySuggestionsResult,
 } from './image.types.js';
+
+// Task types
+export type {
+  TaskStatus,
+  TaskPriority,
+  AssigneeType,
+  TaskLinkType,
+  TaskLinkEntityType,
+  TaskLabel,
+  TaskLink,
+  TaskRecurrence,
+  TaskReminder,
+  Task,
+  CreateTaskParams,
+  CreateSubtaskParams,
+  UpdateTaskParams,
+  ListTasksParams,
+  GetTaskOptions,
+  TaskListResult,
+  SuggestedTasksParams,
+  TaskSuggestion,
+  SuggestedTasksResult,
+  BulkCreateTaskItem,
+  BulkUpdateTaskItem,
+  BulkTaskFailure,
+  BulkCreateTasksResult,
+  BulkUpdateTasksResult,
+  BulkDeleteTasksResult,
+} from './task.types.js';

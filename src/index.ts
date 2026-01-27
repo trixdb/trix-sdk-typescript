@@ -131,6 +131,7 @@ export type {
   Agent,
   Feedback,
   Highlights,
+  Tasks,
 } from './resources/index.js';
 
 // Re-export testing utilities for convenience
