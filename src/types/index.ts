@@ -285,6 +285,17 @@ export type {
   QuerySuggestionsResult,
 } from './image.types.js';
 
+// Persona types
+export type {
+  PersonaSpaceRole,
+  PersonaGoal,
+  PersonaSpace,
+  Persona,
+  CreatePersonaParams,
+  UpdatePersonaParams,
+  AddPersonaSpaceParams,
+} from './persona.types.js';
+
 // Task types
 export type {
   TaskStatus,

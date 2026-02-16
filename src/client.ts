@@ -100,6 +100,7 @@ import { Invites } from './resources/invites.js';
 import { Sessions } from './resources/sessions.js';
 import { Resources } from './resources/resources.js';
 import { Tasks } from './resources/tasks.js';
+import { Personas } from './resources/personas.js';
 
 /**
  * HTTP request options
@@ -257,6 +258,7 @@ export class Trix {
   private readonly maxRetries: number;
   private readonly timeout: number;
   private readonly fetchImpl: typeof fetch;
+  private _personaId?: string;
   private requestInterceptors: RequestInterceptor[] = [];
   private responseInterceptors: ResponseInterceptor[] = [];
   private errorInterceptors: ErrorInterceptor[] = [];
@@ -278,6 +280,7 @@ export class Trix {
   public readonly sessions: Sessions;
   public readonly resources: Resources;
   public readonly tasks: Tasks;
+  public readonly personas: Personas;
 
   /**
    * Create a Trix client from environment variables.
@@ -360,6 +363,22 @@ export class Trix {
     this.sessions = new Sessions(this);
     this.resources = new Resources(this);
     this.tasks = new Tasks(this);
+    this.personas = new Personas(this);
+  }
+
+  /**
+   * Set the active persona for all subsequent requests.
+   * @param personaId - The persona ID to use
+   */
+  setPersona(personaId: string): void {
+    this._personaId = personaId;
+  }
+
+  /**
+   * Clear the active persona.
+   */
+  clearPersona(): void {
+    this._personaId = undefined;
   }
 
   /**
@@ -737,6 +756,7 @@ export class Trix {
       'User-Agent': `trix-typescript-sdk/${SDK_VERSION}`,
       'X-SDK-Version': SDK_VERSION,
       'X-API-Version': API_VERSION,
+      ...(this._personaId ? { 'X-Persona-Id': this._personaId } : {}),
       ...customHeaders,
     };
   }
