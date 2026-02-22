@@ -101,6 +101,7 @@ import { Sessions } from './resources/sessions.js';
 import { Resources } from './resources/resources.js';
 import { Tasks } from './resources/tasks.js';
 import { Personas } from './resources/personas.js';
+import { Bots } from './resources/bots.js';
 
 /**
  * HTTP request options
@@ -281,6 +282,7 @@ export class Trix {
   public readonly resources: Resources;
   public readonly tasks: Tasks;
   public readonly personas: Personas;
+  public readonly bots: Bots;
 
   /**
    * Create a Trix client from environment variables.
@@ -364,6 +366,7 @@ export class Trix {
     this.resources = new Resources(this);
     this.tasks = new Tasks(this);
     this.personas = new Personas(this);
+    this.bots = new Bots(this);
   }
 
   /**

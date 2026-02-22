@@ -324,3 +324,26 @@ export type {
   BulkUpdateTasksResult,
   BulkDeleteTasksResult,
 } from './task.types.js';
+
+// Bot types
+export type {
+  BotStatus,
+  MemoryStrategy,
+  TriggerType,
+  BotRunStatus,
+  BotSpacePermission,
+  BotTool,
+  BotSpace,
+  BotTrigger,
+  Bot,
+  BotAction,
+  BotRun,
+  CreateBotParams,
+  UpdateBotParams,
+  ListBotsParams,
+  AddBotSpaceParams,
+  CreateTriggerParams,
+  UpdateTriggerParams,
+  RunBotParams,
+  ListRunsParams,
+} from './bot.types.js';
