@@ -378,3 +378,27 @@ export interface BulkDeleteTasksResult {
   deletedIds: string[];
   failed?: BulkTaskFailure[];
 }
+
+// ============================================================================
+// Task Handoff
+// ============================================================================
+
+/**
+ * Parameters for handing off a task to another agent.
+ */
+export interface TaskHandoffParams {
+  targetAgentId: string;
+  handoffNotes?: string;
+  checkpointData?: Record<string, unknown>;
+}
+
+/**
+ * Result of a task handoff operation.
+ */
+export interface TaskHandoffResult {
+  handoffId: string;
+  task: Task;
+  previousAssigneeId: string | null;
+  newAssigneeId: string;
+  checkpointStored: boolean;
+}

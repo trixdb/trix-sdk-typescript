@@ -323,6 +323,8 @@ export type {
   BulkCreateTasksResult,
   BulkUpdateTasksResult,
   BulkDeleteTasksResult,
+  TaskHandoffParams,
+  TaskHandoffResult,
 } from './task.types.js';
 
 // Bot types

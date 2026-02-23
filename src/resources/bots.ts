@@ -117,6 +117,7 @@ export class Bots extends BaseResource {
 
   // Execution
   async run(botId: string, params?: RunBotParams): Promise<BotRun> {
+    validateId(botId, 'bot');
     return this.request<BotRun>({
       method: 'POST',
       path: `/bots/${encodeURIComponent(botId)}/run`,
@@ -125,6 +126,7 @@ export class Bots extends BaseResource {
   }
 
   async listRuns(botId: string, params?: ListRunsParams): Promise<BotRun[]> {
+    validateId(botId, 'bot');
     const result = await this.request<{ runs: BotRun[] }>({
       method: 'GET',
       path: `/bots/${encodeURIComponent(botId)}/runs`,

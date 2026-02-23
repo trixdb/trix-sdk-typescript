@@ -44,6 +44,8 @@ import type {
   BulkCreateTasksResult,
   BulkUpdateTasksResult,
   BulkDeleteTasksResult,
+  TaskHandoffParams,
+  TaskHandoffResult,
 } from '../types.js';
 import { BaseResource, buildParams, validateBulkArray } from './base.js';
 import { validateId } from '../utils/security.js';
@@ -460,6 +462,38 @@ export class Tasks extends BaseResource {
    * }
    * ```
    */
+  /**
+   * Hand off a task to another agent.
+   *
+   * Transfers task assignment to a different agent, optionally storing
+   * handoff notes and checkpoint data for continuity.
+   *
+   * @param taskId - Task ID
+   * @param params - Handoff parameters
+   * @returns Handoff result with task and metadata
+   *
+   * @throws ValidationError if task ID format is invalid
+   * @throws NotFoundError if task doesn't exist
+   * @throws PermissionError if user lacks write access
+   *
+   * @example
+   * ```typescript
+   * const result = await client.tasks.handoff('task_123', {
+   *   targetAgentId: 'agent_456',
+   *   handoffNotes: 'Completed research phase, ready for writing',
+   *   checkpointData: { researchUrls: ['https://example.com'] }
+   * });
+   * ```
+   */
+  async handoff(taskId: string, params: TaskHandoffParams): Promise<TaskHandoffResult> {
+    validateId(taskId, 'task');
+    return this.request<TaskHandoffResult>({
+      method: 'POST',
+      path: `/tasks/${taskId}/handoff`,
+      body: toSnakeCase(params as unknown as Record<string, unknown>),
+    });
+  }
+
   async bulkDelete(
     ids: string[],
     options?: { cascade?: boolean }
