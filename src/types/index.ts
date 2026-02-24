@@ -327,6 +327,26 @@ export type {
   TaskHandoffResult,
 } from './task.types.js';
 
+// Habit types
+export type {
+  HabitType,
+  HabitFrequency,
+  HabitStatus,
+  CompletionSource,
+  StreakInfo,
+  HabitCompletion,
+  Habit,
+  CreateHabitParams,
+  UpdateHabitParams,
+  ListHabitsParams,
+  CheckInParams,
+  HabitHistoryParams,
+  HabitListResult,
+  CheckInResult,
+  HabitHistoryResult,
+  DueHabitsResult,
+} from './habit.types.js';
+
 // Bot types
 export type {
   BotStatus,
@@ -349,3 +369,29 @@ export type {
   RunBotParams,
   ListRunsParams,
 } from './bot.types.js';
+
+// Space config types
+export type {
+  SpaceConfigCategory,
+  SpaceConfig,
+  SpaceConfigPatch,
+  SpaceConfigValidation,
+  SpaceConfigAuditEvent,
+  SpaceConfigAuditResponse,
+} from './space-config.types.js';
+
+// Skill types
+export type {
+  SkillVisibility,
+  SkillStatus,
+  SkillScript,
+  SkillResource,
+  Skill,
+  BotSkillAttachment,
+  CreateSkillParams,
+  UpdateSkillParams,
+  ListSkillsParams,
+  MarketplaceSearchParams,
+  AttachSkillParams,
+  UpdateBotSkillParams,
+} from './skill.types.js';

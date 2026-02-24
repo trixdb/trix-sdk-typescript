@@ -132,6 +132,8 @@ export type {
   Feedback,
   Highlights,
   Tasks,
+  Skills,
+  SpaceConfigResource,
 } from './resources/index.js';
 
 // Re-export testing utilities for convenience

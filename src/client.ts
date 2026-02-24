@@ -100,8 +100,11 @@ import { Invites } from './resources/invites.js';
 import { Sessions } from './resources/sessions.js';
 import { Resources } from './resources/resources.js';
 import { Tasks } from './resources/tasks.js';
+import { Habits } from './resources/habits.js';
 import { Personas } from './resources/personas.js';
 import { Bots } from './resources/bots.js';
+import { Skills } from './resources/skills.js';
+import { SpaceConfigResource } from './resources/space-config.js';
 
 /**
  * HTTP request options
@@ -281,8 +284,11 @@ export class Trix {
   public readonly sessions: Sessions;
   public readonly resources: Resources;
   public readonly tasks: Tasks;
+  public readonly habits: Habits;
   public readonly personas: Personas;
   public readonly bots: Bots;
+  public readonly skills: Skills;
+  public readonly spaceConfig: SpaceConfigResource;
 
   /**
    * Create a Trix client from environment variables.
@@ -365,8 +371,11 @@ export class Trix {
     this.sessions = new Sessions(this);
     this.resources = new Resources(this);
     this.tasks = new Tasks(this);
+    this.habits = new Habits(this);
     this.personas = new Personas(this);
     this.bots = new Bots(this);
+    this.skills = new Skills(this);
+    this.spaceConfig = new SpaceConfigResource(this);
   }
 
   /**
