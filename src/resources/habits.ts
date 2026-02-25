@@ -32,6 +32,7 @@ import type {
   HabitHistoryResult,
   HabitListResult,
   DueHabitsResult,
+  HabitAnalytics,
 } from '../types.js';
 import { BaseResource, buildParams } from './base.js';
 import { validateId } from '../utils/security.js';
@@ -120,6 +121,14 @@ export class Habits extends BaseResource {
       method: 'GET',
       path: '/habits/due',
       params: date ? { date } : undefined,
+    });
+  }
+
+  async analytics(id: string): Promise<HabitAnalytics> {
+    validateId(id, 'habit');
+    return this.request<HabitAnalytics>({
+      method: 'GET',
+      path: `/habits/${id}/analytics`,
     });
   }
 

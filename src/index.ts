@@ -133,6 +133,7 @@ export type {
   Highlights,
   Tasks,
   Skills,
+  Goals,
   SpaceConfigResource,
 } from './resources/index.js';
 

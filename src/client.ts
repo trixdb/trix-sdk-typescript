@@ -104,6 +104,7 @@ import { Habits } from './resources/habits.js';
 import { Personas } from './resources/personas.js';
 import { Bots } from './resources/bots.js';
 import { Skills } from './resources/skills.js';
+import { Goals } from './resources/goals.js';
 import { SpaceConfigResource } from './resources/space-config.js';
 
 /**
@@ -288,6 +289,7 @@ export class Trix {
   public readonly personas: Personas;
   public readonly bots: Bots;
   public readonly skills: Skills;
+  public readonly goals: Goals;
   public readonly spaceConfig: SpaceConfigResource;
 
   /**
@@ -375,6 +377,7 @@ export class Trix {
     this.personas = new Personas(this);
     this.bots = new Bots(this);
     this.skills = new Skills(this);
+    this.goals = new Goals(this);
     this.spaceConfig = new SpaceConfigResource(this);
   }
 

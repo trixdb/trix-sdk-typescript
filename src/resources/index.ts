@@ -22,5 +22,6 @@ export * from './resources.js';
 export * from './tasks.js';
 export * from './bots.js';
 export * from './skills.js';
+export * from './goals.js';
 export * from './space-config.js';
 export * from './habits.js';

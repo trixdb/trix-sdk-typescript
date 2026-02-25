@@ -345,6 +345,9 @@ export type {
   CheckInResult,
   HabitHistoryResult,
   DueHabitsResult,
+  WeeklyTrendEntry,
+  BestDay,
+  HabitAnalytics,
 } from './habit.types.js';
 
 // Bot types
@@ -379,6 +382,32 @@ export type {
   SpaceConfigAuditEvent,
   SpaceConfigAuditResponse,
 } from './space-config.types.js';
+
+// Goal types
+export type {
+  GoalType,
+  GoalStatus,
+  GoalVisibility,
+  GoalProgressType,
+  GoalContributor,
+  Goal,
+  CreateGoalParams,
+  UpdateGoalParams,
+  ListGoalsParams,
+  GoalProgressUpdateParams,
+  GoalStatusTransitionParams,
+  GoalContributorCreateParams,
+  GoalContributorUpdateParams,
+  ProgressHistoryParams,
+  GoalListResult,
+  ProgressHistoryEntry,
+  ProgressHistoryResult,
+  CreateKeyResultParams,
+  PaceAnalysis,
+  GoalMemoryLinkType,
+  GoalMemoryLink,
+  GoalMemoryListResponse,
+} from './goal.types.js';
 
 // Skill types
 export type {

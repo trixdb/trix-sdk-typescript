@@ -132,3 +132,24 @@ export interface DueHabitsResult {
   habits: Habit[];
   date: string;
 }
+
+export interface WeeklyTrendEntry {
+  weekStart: string;
+  count: number;
+}
+
+export interface BestDay {
+  day: string;
+  count: number;
+}
+
+export interface HabitAnalytics {
+  habitId: string;
+  completionRate: number | null;
+  currentStreak: number;
+  longestStreak: number;
+  totalCompletions: number;
+  bestDay: BestDay | null;
+  consistencyScore: number;
+  weeklyTrend: WeeklyTrendEntry[];
+}
