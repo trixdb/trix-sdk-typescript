@@ -25,3 +25,4 @@ export * from './skills.js';
 export * from './goals.js';
 export * from './space-config.js';
 export * from './habits.js';
+export * from './workflows.js';

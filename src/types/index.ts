@@ -424,3 +424,21 @@ export type {
   AttachSkillParams,
   UpdateBotSkillParams,
 } from './skill.types.js';
+
+// Workflow types
+export type {
+  WorkflowStatus,
+  WorkflowRunStatus,
+  WorkflowTriggerType,
+  Workflow,
+  WorkflowRun,
+  WorkflowTrigger,
+  CreateWorkflowParams,
+  UpdateWorkflowParams,
+  ListWorkflowsParams,
+  WorkflowListResult,
+  WorkflowRunListResult,
+  TriggerWorkflowParams,
+  CreateTriggerParams as CreateWorkflowTriggerParams,
+  UpdateTriggerParams as UpdateWorkflowTriggerParams,
+} from './workflow.types.js';
