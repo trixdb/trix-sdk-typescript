@@ -449,6 +449,10 @@ export type {
   NoteMemoryLink,
   LinkNoteMemoryParams,
   NoteMemoryListResult,
+  CreateFromTemplateParams,
+  NoteSummaryResult,
+  NoteExtractTasksResult,
+  NoteSuggestLinksResult,
 } from './note.types.js';
 
 // Workflow types

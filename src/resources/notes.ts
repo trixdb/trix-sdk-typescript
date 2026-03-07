@@ -39,6 +39,10 @@ import type {
   LinkNoteMemoryParams,
   NoteMemoryListResult,
   PaginationParams,
+  CreateFromTemplateParams,
+  NoteSummaryResult,
+  NoteExtractTasksResult,
+  NoteSuggestLinksResult,
 } from '../types.js';
 import { BaseResource, buildParams } from './base.js';
 import { validateId } from '../utils/security.js';
@@ -213,6 +217,69 @@ export class Notes extends BaseResource {
     return this.request<void>({
       method: 'DELETE',
       path: `/notes/${noteId}/memories/${memoryId}`,
+    });
+  }
+
+  // Daily Notes & Templates (Phase 4)
+
+  async getDailyNote(date: string): Promise<Note> {
+    return this.request<Note>({
+      method: 'GET',
+      path: `/notes/daily/${encodeURIComponent(date)}`,
+    });
+  }
+
+  async createDailyNote(params?: { date?: string }): Promise<Note> {
+    return this.request<Note>({
+      method: 'POST',
+      path: '/notes/daily',
+      body: params,
+    });
+  }
+
+  async listTemplates(params?: PaginationParams): Promise<NoteListResult> {
+    return this.request<NoteListResult>({
+      method: 'GET',
+      path: '/notes/templates',
+      params: params ? buildParams(params) : undefined,
+    });
+  }
+
+  async createFromTemplate(
+    templateId: string,
+    params?: CreateFromTemplateParams
+  ): Promise<Note> {
+    validateId(templateId, 'template');
+    return this.request<Note>({
+      method: 'POST',
+      path: `/notes/from-template/${templateId}`,
+      body: params,
+    });
+  }
+
+  // AI Features (Phase 4)
+
+  async summarize(noteId: string): Promise<NoteSummaryResult> {
+    validateId(noteId, 'note');
+    return this.request<NoteSummaryResult>({
+      method: 'POST',
+      path: `/notes/${noteId}/ai/summarize`,
+    });
+  }
+
+  async extractTasks(noteId: string): Promise<NoteExtractTasksResult> {
+    validateId(noteId, 'note');
+    return this.request<NoteExtractTasksResult>({
+      method: 'POST',
+      path: `/notes/${noteId}/ai/extract-tasks`,
+    });
+  }
+
+  async suggestLinks(noteId: string): Promise<NoteSuggestLinksResult> {
+    validateId(noteId, 'note');
+    return this.request<NoteSuggestLinksResult>({
+      method: 'POST',
+      path: `/notes/${noteId}/ai/suggest-links`,
     });
   }
 }

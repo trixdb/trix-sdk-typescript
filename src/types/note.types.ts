@@ -188,3 +188,28 @@ export interface NoteListResult {
   limit: number;
   offset: number;
 }
+
+// ============================================================================
+// Phase 4: Templates & AI
+// ============================================================================
+
+export interface CreateFromTemplateParams {
+  title?: string;
+  spaceId?: string;
+  visibility?: 'private' | 'space' | 'account';
+}
+
+export interface NoteSummaryResult {
+  noteId: string;
+  summary: string;
+}
+
+export interface NoteExtractTasksResult {
+  noteId: string;
+  tasks: Array<{ title: string; description?: string }>;
+}
+
+export interface NoteSuggestLinksResult {
+  noteId: string;
+  suggestions: Array<{ noteId: string; title: string; reason: string }>;
+}
