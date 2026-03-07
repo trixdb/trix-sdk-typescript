@@ -107,6 +107,7 @@ import { Skills } from './resources/skills.js';
 import { Goals } from './resources/goals.js';
 import { SpaceConfigResource } from './resources/space-config.js';
 import { Workflows } from './resources/workflows.js';
+import { Notes } from './resources/notes.js';
 
 /**
  * HTTP request options
@@ -292,6 +293,7 @@ export class Trix {
   public readonly skills: Skills;
   public readonly goals: Goals;
   public readonly workflows: Workflows;
+  public readonly notes: Notes;
   public readonly spaceConfig: SpaceConfigResource;
 
   /**
@@ -381,6 +383,7 @@ export class Trix {
     this.skills = new Skills(this);
     this.goals = new Goals(this);
     this.workflows = new Workflows(this);
+    this.notes = new Notes(this);
     this.spaceConfig = new SpaceConfigResource(this);
   }
 

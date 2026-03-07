@@ -26,3 +26,4 @@ export * from './goals.js';
 export * from './space-config.js';
 export * from './habits.js';
 export * from './workflows.js';
+export * from './notes.js';

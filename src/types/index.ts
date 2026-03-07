@@ -425,6 +425,25 @@ export type {
   UpdateBotSkillParams,
 } from './skill.types.js';
 
+// Note types
+export type {
+  NoteType,
+  NoteVisibility,
+  NoteBlockType,
+  NotePermission,
+  NoteActorType,
+  NoteBlock,
+  NoteCollaborator,
+  Note,
+  CreateNoteParams,
+  UpdateNoteParams,
+  ListNotesParams,
+  AddNoteBlockParams,
+  UpdateNoteBlockParams,
+  AddNoteCollaboratorParams,
+  NoteListResult,
+} from './note.types.js';
+
 // Workflow types
 export type {
   WorkflowStatus,
