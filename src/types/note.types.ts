@@ -128,6 +128,57 @@ export interface AddNoteCollaboratorParams {
 }
 
 // ============================================================================
+// Link Types (Phase 3)
+// ============================================================================
+
+export type NoteLinkType = 'reference' | 'embed' | 'ai_suggested';
+export type NoteMemoryLinkType = 'manual' | 'auto' | 'ai_suggested';
+
+export interface NoteLink {
+  id: string;
+  sourceNoteId: string;
+  sourceBlockId: string | null;
+  targetNoteId: string;
+  targetBlockId: string | null;
+  linkType: NoteLinkType;
+  targetTitle?: string;
+  targetNoteType?: string;
+  sourceTitle?: string;
+  sourceNoteType?: string;
+  createdAt: string;
+}
+
+export interface CreateNoteLinkParams {
+  targetNoteId: string;
+  sourceBlockId?: string;
+  targetBlockId?: string;
+  linkType?: NoteLinkType;
+}
+
+export interface NoteMemoryLink {
+  noteId: string;
+  memoryId: string;
+  blockId: string | null;
+  linkType: NoteMemoryLinkType;
+  relevanceScore: number | null;
+  createdAt: string;
+}
+
+export interface LinkNoteMemoryParams {
+  memoryId: string;
+  blockId?: string;
+  linkType?: NoteMemoryLinkType;
+  relevanceScore?: number;
+}
+
+export interface NoteMemoryListResult {
+  memories: NoteMemoryLink[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+// ============================================================================
 // Response Types
 // ============================================================================
 

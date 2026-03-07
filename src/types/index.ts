@@ -442,6 +442,13 @@ export type {
   UpdateNoteBlockParams,
   AddNoteCollaboratorParams,
   NoteListResult,
+  NoteLinkType,
+  NoteMemoryLinkType,
+  NoteLink,
+  CreateNoteLinkParams,
+  NoteMemoryLink,
+  LinkNoteMemoryParams,
+  NoteMemoryListResult,
 } from './note.types.js';
 
 // Workflow types

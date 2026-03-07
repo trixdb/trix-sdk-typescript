@@ -33,6 +33,12 @@ import type {
   AddNoteBlockParams,
   UpdateNoteBlockParams,
   AddNoteCollaboratorParams,
+  NoteLink,
+  CreateNoteLinkParams,
+  NoteMemoryLink,
+  LinkNoteMemoryParams,
+  NoteMemoryListResult,
+  PaginationParams,
 } from '../types.js';
 import { BaseResource, buildParams } from './base.js';
 import { validateId } from '../utils/security.js';
@@ -140,6 +146,73 @@ export class Notes extends BaseResource {
     return this.request<void>({
       method: 'DELETE',
       path: `/notes/${noteId}/collaborators/${collaboratorId}`,
+    });
+  }
+
+  // Links (Phase 3)
+
+  async createLink(noteId: string, params: CreateNoteLinkParams): Promise<NoteLink> {
+    validateId(noteId, 'note');
+    return this.request<NoteLink>({
+      method: 'POST',
+      path: `/notes/${noteId}/links`,
+      body: params,
+    });
+  }
+
+  async getLinks(noteId: string): Promise<NoteLink[]> {
+    validateId(noteId, 'note');
+    return this.request<NoteLink[]>({
+      method: 'GET',
+      path: `/notes/${noteId}/links`,
+    });
+  }
+
+  async getBacklinks(noteId: string): Promise<NoteLink[]> {
+    validateId(noteId, 'note');
+    return this.request<NoteLink[]>({
+      method: 'GET',
+      path: `/notes/${noteId}/backlinks`,
+    });
+  }
+
+  async removeLink(noteId: string, linkId: string): Promise<void> {
+    validateId(noteId, 'note');
+    validateId(linkId, 'link');
+    return this.request<void>({
+      method: 'DELETE',
+      path: `/notes/${noteId}/links/${linkId}`,
+    });
+  }
+
+  // Memories (Phase 3)
+
+  async linkMemory(noteId: string, params: LinkNoteMemoryParams): Promise<NoteMemoryLink> {
+    validateId(noteId, 'note');
+    return this.request<NoteMemoryLink>({
+      method: 'POST',
+      path: `/notes/${noteId}/memories`,
+      body: params,
+    });
+  }
+
+  async listMemories(
+    noteId: string,
+    params?: PaginationParams
+  ): Promise<NoteMemoryListResult> {
+    validateId(noteId, 'note');
+    return this.request<NoteMemoryListResult>({
+      method: 'GET',
+      path: `/notes/${noteId}/memories`,
+      params: params ? buildParams(params) : undefined,
+    });
+  }
+
+  async unlinkMemory(noteId: string, memoryId: string): Promise<void> {
+    validateId(noteId, 'note');
+    return this.request<void>({
+      method: 'DELETE',
+      path: `/notes/${noteId}/memories/${memoryId}`,
     });
   }
 }
