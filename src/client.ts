@@ -108,6 +108,10 @@ import { Goals } from './resources/goals.js';
 import { SpaceConfigResource } from './resources/space-config.js';
 import { Workflows } from './resources/workflows.js';
 import { Notes } from './resources/notes.js';
+import { Templates } from './resources/templates.js';
+import { Crews } from './resources/crews.js';
+import { Hubs } from './resources/hubs.js';
+import { Files } from './resources/files.js';
 
 /**
  * HTTP request options
@@ -294,6 +298,10 @@ export class Trix {
   public readonly goals: Goals;
   public readonly workflows: Workflows;
   public readonly notes: Notes;
+  public readonly templates: Templates;
+  public readonly crews: Crews;
+  public readonly hubs: Hubs;
+  public readonly files: Files;
   public readonly spaceConfig: SpaceConfigResource;
 
   /**
@@ -384,6 +392,10 @@ export class Trix {
     this.goals = new Goals(this);
     this.workflows = new Workflows(this);
     this.notes = new Notes(this);
+    this.templates = new Templates(this);
+    this.crews = new Crews(this);
+    this.hubs = new Hubs(this);
+    this.files = new Files(this);
     this.spaceConfig = new SpaceConfigResource(this);
   }
 

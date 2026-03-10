@@ -135,6 +135,8 @@ export type {
   Skills,
   Goals,
   SpaceConfigResource,
+  Templates,
+  Crews,
 } from './resources/index.js';
 
 // Re-export testing utilities for convenience

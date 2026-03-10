@@ -27,3 +27,7 @@ export * from './space-config.js';
 export * from './habits.js';
 export * from './workflows.js';
 export * from './notes.js';
+export * from './templates.js';
+export * from './crews.js';
+export * from './hubs.js';
+export * from './files.js';

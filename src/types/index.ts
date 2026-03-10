@@ -371,7 +371,18 @@ export type {
   UpdateTriggerParams,
   RunBotParams,
   ListRunsParams,
+  BuildContextParams,
+  BotContext,
+  BotRunBatchRequest,
+  BotRunBatchResult,
 } from './bot.types.js';
+
+// Bot streaming types
+export type {
+  BotRunStepType,
+  BotRunStep,
+  RunAndWaitOptions,
+} from './bot-stream.types.js';
 
 // Space config types
 export type {
@@ -455,6 +466,46 @@ export type {
   NoteSuggestLinksResult,
 } from './note.types.js';
 
+// Template types
+export type {
+  TemplateVisibility,
+  TemplateCategory,
+  TemplateReview,
+  Template,
+  CreateTemplateParams,
+  UpdateTemplateParams,
+  ListTemplatesParams,
+  BrowseTemplatesParams,
+  InstallTemplateParams,
+  CreateTemplateReviewParams,
+} from './template.types.js';
+
+// Crew types
+export type {
+  CrewStatus,
+  CrewMember,
+  Crew,
+  CreateCrewParams,
+  UpdateCrewParams,
+  ListCrewsParams,
+} from './crew.types.js';
+
+// Hub types
+export type {
+  HubRole,
+  ConversationRole,
+  HubMember,
+  ConversationMember,
+  AddHubMemberParams,
+  UpdateHubMemberParams,
+  AddConversationMemberParams,
+  UpdateConversationMemberParams,
+  HubCustomRole,
+  CreateRoleInput,
+  UpdateRoleInput,
+  ConvRoleOverride,
+} from './hub.types.js';
+
 // Workflow types
 export type {
   WorkflowStatus,
@@ -472,3 +523,14 @@ export type {
   CreateTriggerParams as CreateWorkflowTriggerParams,
   UpdateTriggerParams as UpdateWorkflowTriggerParams,
 } from './workflow.types.js';
+
+// File types (ADR-068)
+export type {
+  ChatFile,
+  FileDownloadInfo,
+  FileQuota,
+  FileListResult,
+  UploadFileParams,
+  UploadFileBase64Params,
+  ListFilesParams,
+} from './file.types.js';

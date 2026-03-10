@@ -166,3 +166,43 @@ export interface ListRunsParams {
   limit?: number;
   offset?: number;
 }
+
+/** Parameters for building bot context from memory search. */
+export interface BuildContextParams {
+  /** Query to search memories for context */
+  query: string;
+  /** Optional session ID for scoping */
+  sessionId?: string;
+  /** Include memory search results (default: true) */
+  includeMemories?: boolean;
+  /** Include related memories (default: false) */
+  includeRelated?: boolean;
+  /** Maximum number of memories to include (default: 20) */
+  limit?: number;
+}
+
+/** Structured context object returned by buildContext. */
+export interface BotContext {
+  /** Original query used */
+  query: string;
+  /** Relevant memories found */
+  memories: Array<{ id: string; content: string; similarity?: number }>;
+  /** Total memories found before limit */
+  totalFound: number;
+  /** Session ID if provided */
+  sessionId?: string;
+}
+
+/** Single request in a batch run. */
+export interface BotRunBatchRequest {
+  botId: string;
+  message: string;
+  context?: Record<string, unknown>;
+}
+
+/** Result of a single batch run item. */
+export interface BotRunBatchResult {
+  botId: string;
+  run?: BotRun;
+  error?: string;
+}
