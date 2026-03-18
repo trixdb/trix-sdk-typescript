@@ -52,12 +52,9 @@ export class Search {
   async similar(memoryId: string, params?: SimilarParams): Promise<SimilarResult> {
     validateId(memoryId, 'memory');
     return this.client.request<SimilarResult>({
-      method: 'POST',
-      path: '/search/similar',
-      body: {
-        memoryId,
-        ...params,
-      },
+      method: 'GET',
+      path: `/search/similar/${memoryId}`,
+      query: params,
     });
   }
 
@@ -158,10 +155,10 @@ export class Search {
    */
   async query(query: string, options?: SearchOptions): Promise<Memory[]> {
     const response = await this.client.request<PaginatedResponse<Memory>>({
-      method: 'POST',
-      path: '/search/query',
-      body: {
-        query,
+      method: 'GET',
+      path: '/search',
+      query: {
+        q: query,
         ...options,
       },
     });
