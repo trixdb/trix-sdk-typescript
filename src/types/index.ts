@@ -524,6 +524,17 @@ export type {
   UpdateTriggerParams as UpdateWorkflowTriggerParams,
 } from './workflow.types.js';
 
+// Agent Preset types
+export type {
+  PresetMemoryStrategy,
+  PresetAutonomyLevel,
+  PresetBudgetPeriod,
+  AgentPreset,
+  CreatePresetParams,
+  UpdatePresetParams,
+  ListPresetsParams,
+} from './preset.types.js';
+
 // File types (ADR-068)
 export type {
   ChatFile,

@@ -137,6 +137,7 @@ export type {
   SpaceConfigResource,
   Templates,
   Crews,
+  Presets,
 } from './resources/index.js';
 
 // Re-export testing utilities for convenience

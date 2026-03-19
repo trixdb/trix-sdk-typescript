@@ -112,6 +112,7 @@ import { Templates } from './resources/templates.js';
 import { Crews } from './resources/crews.js';
 import { Hubs } from './resources/hubs.js';
 import { Files } from './resources/files.js';
+import { Presets } from './resources/presets.js';
 
 /**
  * HTTP request options
@@ -302,6 +303,7 @@ export class Trix {
   public readonly crews: Crews;
   public readonly hubs: Hubs;
   public readonly files: Files;
+  public readonly presets: Presets;
   public readonly spaceConfig: SpaceConfigResource;
 
   /**
@@ -396,6 +398,7 @@ export class Trix {
     this.crews = new Crews(this);
     this.hubs = new Hubs(this);
     this.files = new Files(this);
+    this.presets = new Presets(this);
     this.spaceConfig = new SpaceConfigResource(this);
   }
 
