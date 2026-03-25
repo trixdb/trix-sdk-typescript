@@ -49,18 +49,7 @@ import type {
 } from '../types.js';
 import { BaseResource, buildParams, validateBulkArray } from './base.js';
 import { validateId } from '../utils/security.js';
-
-/**
- * Convert camelCase object keys to snake_case for API requests.
- */
-function toSnakeCase(obj: Record<string, unknown>): Record<string, unknown> {
-  const result: Record<string, unknown> = {};
-  for (const [key, value] of Object.entries(obj)) {
-    const snakeKey = key.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
-    result[snakeKey] = value;
-  }
-  return result;
-}
+import { toSnakeCase } from '../utils/case-conversion.js';
 
 /**
  * Tasks resource for managing task objects.

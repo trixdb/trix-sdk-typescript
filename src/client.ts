@@ -813,6 +813,13 @@ export class Trix {
         return undefined as unknown as T;
       }
 
+      // Guard against oversized responses to prevent resource exhaustion
+      const MAX_RESPONSE_SIZE = 50 * 1024 * 1024; // 50MB
+      const contentLength = response.headers.get('content-length');
+      if (contentLength && parseInt(contentLength, 10) > MAX_RESPONSE_SIZE) {
+        throw new APIError(`Response too large: ${contentLength} bytes`);
+      }
+
       const contentType = response.headers.get('content-type');
       if (contentType?.includes('application/json')) {
         const data = await response.json();

@@ -36,15 +36,7 @@ import type {
 } from '../types.js';
 import { BaseResource, buildParams } from './base.js';
 import { validateId } from '../utils/security.js';
-
-function toSnakeCase(obj: Record<string, unknown>): Record<string, unknown> {
-  const result: Record<string, unknown> = {};
-  for (const [key, value] of Object.entries(obj)) {
-    const snakeKey = key.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
-    result[snakeKey] = value;
-  }
-  return result;
-}
+import { toSnakeCase } from '../utils/case-conversion.js';
 
 export class Habits extends BaseResource {
   async create(params: CreateHabitParams): Promise<Habit> {
