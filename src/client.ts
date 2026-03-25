@@ -18,6 +18,7 @@ import {
 } from './errors.js';
 import {
   validateBaseUrl,
+  validateId,
   getEnvCredential,
   redactSensitiveData,
 } from './utils/security.js';
@@ -408,6 +409,7 @@ export class Trix {
    * @param personaId - The persona ID to use
    */
   setPersona(personaId: string): void {
+    validateId(personaId, 'persona');
     this._personaId = personaId;
   }
 

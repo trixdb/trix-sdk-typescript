@@ -36,6 +36,7 @@ import type {
 } from '../types.js';
 import { BaseResource, buildParams } from './base.js';
 import { validateId } from '../utils/security.js';
+import { ValidationError, TimeoutError } from '../errors.js';
 
 export class Bots extends BaseResource {
   constructor(client: Trix) {
@@ -143,6 +144,7 @@ export class Bots extends BaseResource {
   }
 
   async getRun(botId: string, runId: string): Promise<BotRun> {
+    validateId(runId, 'run');
     return this.request<BotRun>({
       method: 'GET',
       path: `/bots/${encodeURIComponent(botId)}/runs/${runId}`,
@@ -212,7 +214,7 @@ export class Bots extends BaseResource {
   async runBatch(requests: BotRunBatchRequest[]): Promise<BotRunBatchResult[]> {
     if (!requests.length) return [];
     if (requests.length > 50) {
-      throw new Error(`runBatch supports at most 50 requests, got ${requests.length}`);
+      throw new ValidationError(`runBatch supports at most 50 requests, got ${requests.length}`);
     }
     const promises = requests.map(async (req) => {
       try {
@@ -317,7 +319,7 @@ export class Bots extends BaseResource {
       await sleep(Math.min(pollInterval, remaining));
     }
 
-    throw new Error(`Bot run ${runId} timed out after ${timeout}ms`);
+    throw new TimeoutError(`Bot run ${runId} timed out after ${timeout}ms`);
   }
 
   /** @internal */
