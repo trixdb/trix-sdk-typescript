@@ -11,6 +11,7 @@ import type {
 } from '../types.js';
 import { BaseResource, buildParams } from './base.js';
 import { validateId } from '../utils/security.js';
+import { ValidationError } from '../errors.js';
 
 /**
  * Enrichments resource for managing memory enrichments
@@ -71,7 +72,7 @@ export class Enrichments extends BaseResource {
   async get(memoryId: string, type: string): Promise<Enrichment> {
     validateId(memoryId, 'memory');
     if (!type || typeof type !== 'string') {
-      throw new Error('Enrichment type is required');
+      throw new ValidationError('Enrichment type is required');
     }
     return this.request<Enrichment>({
       method: 'GET',
