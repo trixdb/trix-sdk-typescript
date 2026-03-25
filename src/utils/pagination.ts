@@ -88,11 +88,10 @@ export async function* paginateIterator<T, P extends PaginationOptions>(
     if (response.data.length > 0 && duplicatesInPage === response.data.length) {
       consecutiveDuplicatePages++;
       if (consecutiveDuplicatePages >= 3) {
-        console.warn(
+        throw new Error(
           'Pagination stopped: detected 3 consecutive pages of duplicate items. ' +
           'This may indicate an API pagination issue.'
         );
-        break;
       }
     } else {
       consecutiveDuplicatePages = 0;
@@ -109,7 +108,7 @@ export async function* paginateIterator<T, P extends PaginationOptions>(
   }
 
   if (pagesIterated >= maxPages) {
-    console.warn(
+    throw new Error(
       `Pagination limit reached (${maxPages} pages). ` +
       `Use a larger limit parameter or increase maxPages if more results are needed.`
     );

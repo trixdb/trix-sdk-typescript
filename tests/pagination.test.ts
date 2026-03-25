@@ -168,7 +168,7 @@ describe('paginateIterator', () => {
       expect(callCount).toBe(2);
     });
 
-    it('should respect max pages limit', async () => {
+    it('should respect max pages limit and throw', async () => {
       // Create a fetcher that always returns hasMore: true (infinite)
       const fetcher = jest.fn().mockImplementation((params: { page: number }) => {
         return Promise.resolve({
@@ -178,18 +178,18 @@ describe('paginateIterator', () => {
       });
 
       const results: { id: number }[] = [];
-      // Use custom max pages of 5
-      for await (const item of paginateIterator(fetcher, {}, 5)) {
-        results.push(item);
-      }
+      // Use custom max pages of 5 — should throw after exhausting pages
+      await expect(async () => {
+        for await (const item of paginateIterator(fetcher, {}, 5)) {
+          results.push(item);
+        }
+      }).rejects.toThrow('Pagination limit reached');
 
       expect(results).toHaveLength(5);
       expect(fetcher).toHaveBeenCalledTimes(5);
     });
 
-    it('should warn when max pages is reached', async () => {
-      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
-
+    it('should throw error when max pages is reached', async () => {
       const fetcher = jest.fn().mockImplementation((params: { page: number }) => {
         return Promise.resolve({
           data: [{ id: params.page }],
@@ -197,15 +197,11 @@ describe('paginateIterator', () => {
         });
       });
 
-      for await (const _ of paginateIterator(fetcher, {}, 3)) {
-        // consume iterator
-      }
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Pagination limit reached')
-      );
-
-      consoleSpy.mockRestore();
+      await expect(async () => {
+        for await (const _ of paginateIterator(fetcher, {}, 3)) {
+          // consume iterator
+        }
+      }).rejects.toThrow('Pagination limit reached');
     });
 
     it('should use default max pages of 1000', async () => {
