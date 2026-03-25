@@ -204,23 +204,34 @@ export function appendNumberField(
 }
 
 /**
+ * Maximum stream size to prevent resource exhaustion (500MB).
+ */
+export const MAX_STREAM_SIZE = 500 * 1024 * 1024;
+
+/**
  * Convert ReadableStream to ArrayBuffer.
  *
  * @param stream - ReadableStream to convert
  * @returns ArrayBuffer containing all stream data
+ * @throws Error if stream exceeds MAX_STREAM_SIZE
  */
 export async function streamToArrayBuffer(stream: ReadableStream): Promise<ArrayBuffer> {
   const reader = stream.getReader();
   try {
     const chunks: Uint8Array[] = [];
+    let totalLength = 0;
 
     let readResult = await reader.read();
     while (!readResult.done) {
+      totalLength += readResult.value.length;
+      if (totalLength > MAX_STREAM_SIZE) {
+        reader.releaseLock();
+        throw new Error(`Stream exceeds maximum size of ${MAX_STREAM_SIZE} bytes`);
+      }
       chunks.push(readResult.value);
       readResult = await reader.read();
     }
 
-    const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
     const result = new Uint8Array(totalLength);
     let offset = 0;
     for (const chunk of chunks) {

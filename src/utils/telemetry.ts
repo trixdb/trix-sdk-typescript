@@ -185,8 +185,11 @@ class ActiveRequestSpan implements RequestSpan {
           'http.request.body',
           bodyStr.length > 1000 ? bodyStr.substring(0, 1000) + '...' : bodyStr
         );
-      } catch {
-        // Ignore serialization errors
+      } catch (e) {
+        // Log serialization errors at debug level for troubleshooting
+        if (typeof console !== 'undefined') {
+          console.debug?.('[trix-telemetry] Failed to serialize:', e);
+        }
       }
     }
   }
@@ -203,8 +206,11 @@ class ActiveRequestSpan implements RequestSpan {
           'http.response.body',
           bodyStr.length > 1000 ? bodyStr.substring(0, 1000) + '...' : bodyStr
         );
-      } catch {
-        // Ignore serialization errors
+      } catch (e) {
+        // Log serialization errors at debug level for troubleshooting
+        if (typeof console !== 'undefined') {
+          console.debug?.('[trix-telemetry] Failed to serialize:', e);
+        }
       }
     }
   }
