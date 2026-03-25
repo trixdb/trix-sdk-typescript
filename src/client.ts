@@ -7,6 +7,7 @@ import {
   APIError,
   APIVersionMismatchError,
   AuthenticationError,
+  ConflictError,
   NetworkError,
   NotFoundError,
   PermissionError,
@@ -861,6 +862,8 @@ export class Trix {
         throw new PermissionError(message);
       case 404:
         throw new NotFoundError(message);
+      case 409:
+        throw new ConflictError(message, errorData);
       case 422:
         throw new ValidationError(message, errorData.errors as { field: string; message: string; }[] | undefined);
       case 429: {

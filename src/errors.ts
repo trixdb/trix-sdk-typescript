@@ -47,6 +47,17 @@ export class PermissionError extends TrixError {
 }
 
 /**
+ * Error thrown when a conflict occurs (HTTP 409)
+ */
+export class ConflictError extends TrixError {
+  constructor(message: string, public readonly response?: unknown) {
+    super(message);
+    this.name = 'ConflictError';
+    Object.setPrototypeOf(this, ConflictError.prototype);
+  }
+}
+
+/**
  * Error thrown when request validation fails
  */
 export class ValidationError extends TrixError {
