@@ -793,6 +793,7 @@ export class Trix {
       'User-Agent': `trix-typescript-sdk/${SDK_VERSION}`,
       'X-SDK-Version': SDK_VERSION,
       'X-API-Version': API_VERSION,
+      'X-Correlation-Id': Math.random().toString(36).substring(2, 10) + Date.now().toString(36),
       ...(this._personaId ? { 'X-Persona-Id': this._personaId } : {}),
       ...customHeaders,
     };
