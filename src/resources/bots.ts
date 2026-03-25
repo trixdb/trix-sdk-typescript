@@ -190,7 +190,9 @@ export class Bots extends BaseResource {
     const memories = (results.data ?? []).map((m) => ({
       id: m.id,
       content: m.content,
-      similarity: (m as unknown as Record<string, unknown>).similarity as number | undefined,
+      similarity: typeof (m as unknown as Record<string, unknown>).similarity === 'number'
+        ? (m as unknown as Record<string, unknown>).similarity as number
+        : undefined,
     }));
 
     return {
