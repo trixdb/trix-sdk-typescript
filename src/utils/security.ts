@@ -265,9 +265,12 @@ export function validateWebhookUrl(url: string): string {
 function isSensitiveKey(key: string): boolean {
   if (typeof key !== 'string') return false;
   const keyLower = key.toLowerCase().replace(/[_-]/g, '');
-  return Array.from(SENSITIVE_KEYS).some(sensitive =>
-    keyLower.includes(sensitive.toLowerCase().replace(/[_-]/g, ''))
-  );
+  for (const sensitive of SENSITIVE_KEYS) {
+    if (keyLower.includes(sensitive.toLowerCase().replace(/[_-]/g, ''))) {
+      return true;
+    }
+  }
+  return false;
 }
 
 /**
