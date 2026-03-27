@@ -210,3 +210,9 @@ export type {
   ChatFile, FileDownloadInfo, FileQuota, FileListResult,
   UploadFileParams, UploadFileBase64Params, ListFilesParams,
 } from './file.types.js';
+
+export type {
+  CalendarEvent, CalendarEventsResponse, CalendarSyncResponse,
+  CalendarConnection, CalendarConnectionsResponse, Calendar,
+  CalendarListResponse, ListCalendarEventsParams, SyncCalendarToMemoriesParams,
+} from './calendar.types.js';

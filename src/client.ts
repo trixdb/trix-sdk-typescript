@@ -60,6 +60,7 @@ import { Crews } from './resources/crews.js';
 import { Hubs } from './resources/hubs.js';
 import { Files } from './resources/files.js';
 import { Presets } from './resources/presets.js';
+import { CalendarResource } from './resources/calendar.js';
 
 /**
  * Request context passed to interceptors
@@ -165,6 +166,7 @@ export class Trix {
   public readonly hubs: Hubs;
   public readonly files: Files;
   public readonly presets: Presets;
+  public readonly calendar: CalendarResource;
   public readonly spaceConfig: SpaceConfigResource;
 
   /**
@@ -232,6 +234,7 @@ export class Trix {
     this.hubs = new Hubs(this);
     this.files = new Files(this);
     this.presets = new Presets(this);
+    this.calendar = new CalendarResource(this);
     this.spaceConfig = new SpaceConfigResource(this);
   }
 
