@@ -224,7 +224,7 @@ export interface ListCLISessionsParams extends PaginationParams, SortParams<'cre
 /**
  * CLI Sessions paginated response.
  */
-export interface CLISessionsResponse extends PaginatedResponse<CLISession> {}
+export type CLISessionsResponse = PaginatedResponse<CLISession>;
 
 /**
  * CLI Session statistics.

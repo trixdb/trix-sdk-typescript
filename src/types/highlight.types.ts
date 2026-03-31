@@ -48,7 +48,7 @@ export interface UpdateHighlightParams {
 /**
  * Parameters for listing highlights.
  */
-export interface ListHighlightsParams extends Pick<PaginationParams, 'limit' | 'page'> {}
+export type ListHighlightsParams = Pick<PaginationParams, 'limit' | 'page'>;
 
 /**
  * Parameters for extracting highlights.

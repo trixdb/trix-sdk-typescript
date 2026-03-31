@@ -370,7 +370,7 @@ function extractSSEEvents(buffer: string): SSEParseResult {
     try {
       const event = JSON.parse(dataLine.slice(6)) as BotRunStep;
       parsed.push(event);
-    } catch (e) {
+    } catch {
       // Log malformed SSE events for debugging
       if (typeof console !== 'undefined') {
         console.debug?.('[trix-sse] Failed to parse SSE event:', dataLine?.slice(0, 100));

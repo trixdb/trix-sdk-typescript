@@ -131,9 +131,7 @@ export interface GoalContributorUpdateParams {
   canUpdateProgress?: boolean;
 }
 
-export interface ProgressHistoryParams extends PaginationParams {
-  // Inherits limit, offset from PaginationParams
-}
+export type ProgressHistoryParams = PaginationParams;
 
 // ============================================================================
 // Response Types
