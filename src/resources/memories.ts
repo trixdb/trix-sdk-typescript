@@ -44,6 +44,8 @@ import type {
   BatchAutoTagResult,
   SuggestQueriesParams,
   QuerySuggestionsResult,
+  StoreAndOrganizeOptions,
+  StoreAndOrganizeResult,
 } from '../types.js';
 import { BaseResource, buildParams, validateBulkArray, validateIds } from './base.js';
 import { paginateIterator } from '../utils/pagination.js';
@@ -1181,6 +1183,33 @@ export class Memories extends BaseResource {
       method: 'GET',
       path: '/memories/images/suggest-queries',
       params: buildParams(params || {}),
+    });
+  }
+
+  /**
+   * Store a memory and run organization (tagging, clustering, contradiction detection)
+   *
+   * @param content - Memory content to store
+   * @param options - Organization options
+   * @returns Stored memory with organization stage results
+   *
+   * @example
+   * ```typescript
+   * const result = await client.memories.storeAndOrganize(
+   *   'Meeting notes from standup',
+   *   { tags: ['meetings'], detect_contradictions: true }
+   * );
+   * console.log(result.summary);
+   * ```
+   */
+  async storeAndOrganize(
+    content: string,
+    options?: StoreAndOrganizeOptions,
+  ): Promise<StoreAndOrganizeResult> {
+    return this.request<StoreAndOrganizeResult>({
+      method: 'POST',
+      path: '/v1/memories/store-organize',
+      body: { content, ...options },
     });
   }
 }

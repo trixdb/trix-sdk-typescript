@@ -32,3 +32,4 @@ export * from './crews.js';
 export * from './hubs.js';
 export * from './files.js';
 export * from './presets.js';
+export * from './knowledge.js';

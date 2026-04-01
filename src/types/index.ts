@@ -45,6 +45,9 @@ export type {
 
 export type {
   SearchConfig, SearchOptions, SearchByTopicOptions,
+  BatchSearchConfig, BatchSearchResult, StrategyRecommendation,
+  StoreAndOrganizeOptions, StoreAndOrganizeResult,
+  KnowledgeSummaryResult, ToNoteResult,
 } from './search.types.js';
 
 export type {

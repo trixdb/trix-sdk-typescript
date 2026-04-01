@@ -12,6 +12,9 @@ import type {
   Memory,
   SearchOptions,
   PaginatedResponse,
+  BatchSearchConfig,
+  BatchSearchResult,
+  StrategyRecommendation,
 } from '../types.js';
 import { validateId } from '../utils/security.js';
 
@@ -163,5 +166,52 @@ export class Search {
       },
     });
     return response.data;
+  }
+
+  /**
+   * Execute multiple search strategies in a single request
+   *
+   * @param searches - Array of search configurations to execute
+   * @param options - Batch options (e.g. deduplication)
+   * @returns Combined results from all strategies
+   *
+   * @example
+   * ```typescript
+   * const result = await client.search.batchSearch([
+   *   { strategy: 'semantic', query: 'machine learning', limit: 10 },
+   *   { strategy: 'fulltext', query: 'neural networks', limit: 5 },
+   * ]);
+   * console.log(`Found ${result.total_results} results`);
+   * ```
+   */
+  async batchSearch(
+    searches: BatchSearchConfig[],
+    options?: { deduplicate?: boolean },
+  ): Promise<BatchSearchResult> {
+    return this.client.request<BatchSearchResult>({
+      method: 'POST',
+      path: '/v1/search/batch',
+      body: { searches, deduplicate: options?.deduplicate ?? true },
+    });
+  }
+
+  /**
+   * Get a recommended search strategy for a query
+   *
+   * @param query - The search query to analyze
+   * @returns Strategy recommendation with confidence and alternatives
+   *
+   * @example
+   * ```typescript
+   * const rec = await client.search.suggestStrategy('find all notes about AI');
+   * console.log(`Use ${rec.recommended_strategy} (${rec.confidence})`);
+   * ```
+   */
+  async suggestStrategy(query: string): Promise<StrategyRecommendation> {
+    return this.client.request<StrategyRecommendation>({
+      method: 'POST',
+      path: '/v1/search/suggest-strategy',
+      body: { query },
+    });
   }
 }
