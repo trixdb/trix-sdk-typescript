@@ -275,6 +275,42 @@ export class Agent {
       body: { scope_type: 'session', ...params },
     });
   }
+
+  // ==================== ADR-109a — Account-level default preset ====================
+  // Placed here pragmatically; pipeline-presets has no dedicated SDK
+  // resource yet. Thin wrappers over /v1/pipeline-presets/_default.
+
+  /**
+   * Return the account's current default pipeline preset name (null if unset).
+   */
+  async getDefaultPipeline(): Promise<string | null> {
+    const resp = await this.client.request<{ name: string | null }>({
+      method: 'GET',
+      path: '/pipeline-presets/_default',
+    });
+    return resp?.name ?? null;
+  }
+
+  /**
+   * Set the account default pipeline preset. Throws on unknown name.
+   */
+  async setDefaultPipeline(name: string): Promise<{ name: string }> {
+    return this.client.request<{ name: string }>({
+      method: 'POST',
+      path: `/pipeline-presets/${encodeURIComponent(name)}/set-default`,
+      body: {},
+    });
+  }
+
+  /**
+   * Clear the account default pipeline preset.
+   */
+  async clearDefaultPipeline(): Promise<void> {
+    await this.client.request<void>({
+      method: 'DELETE',
+      path: '/pipeline-presets/_default',
+    });
+  }
 }
 
 // ==================== ADR-112 P10 — Trigger types ====================
