@@ -233,4 +233,69 @@ export class Agent {
       body: params,
     });
   }
+
+  // ==================== ADR-112 P10 — Ingestion-pipeline triggers ====================
+
+  /**
+   * Enqueue a session_summary job for the given session.
+   * Returns 202 immediately; worker generates asynchronously.
+   */
+  async summarizeSession(
+    sessionId: string,
+    params?: { pipeline?: string }
+  ): Promise<TriggerJobResponse> {
+    validateId(sessionId, 'session');
+    return this.client.request<TriggerJobResponse>({
+      method: 'POST',
+      path: `/agent/sessions/${sessionId}/summarize`,
+      body: params || {},
+    });
+  }
+
+  /**
+   * Enqueue a cross-session mega-summary generation job.
+   * scope_type defaults to 'account'; pass 'space' for per-space.
+   */
+  async triggerMegaSummary(params: TriggerMegaSummaryParams): Promise<TriggerJobResponse> {
+    return this.client.request<TriggerJobResponse>({
+      method: 'POST',
+      path: '/agent/mega-summary/trigger',
+      body: { scope_type: 'account', ...params },
+    });
+  }
+
+  /**
+   * Enqueue a scoped fact harvest job.
+   * scope_type defaults to 'session'; also supports 'space' and 'window'.
+   */
+  async triggerScopedFacts(params: TriggerScopedFactsParams): Promise<TriggerJobResponse> {
+    return this.client.request<TriggerJobResponse>({
+      method: 'POST',
+      path: '/agent/scoped-facts/harvest',
+      body: { scope_type: 'session', ...params },
+    });
+  }
+}
+
+// ==================== ADR-112 P10 — Trigger types ====================
+
+export interface TriggerJobResponse {
+  scope_id?: string;
+  session_id?: string;
+  scope_type?: string;
+  enqueued: boolean;
+  job_id: string | null;
+  pipeline: string | null;
+}
+
+export interface TriggerMegaSummaryParams {
+  scope_id: string;
+  scope_type?: 'account' | 'space';
+  pipeline?: string;
+}
+
+export interface TriggerScopedFactsParams {
+  scope_id: string;
+  scope_type?: 'session' | 'space' | 'window';
+  pipeline?: string;
 }
