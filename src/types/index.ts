@@ -6,6 +6,7 @@
 export type {
   TrixConfig, PaginatedResponse, PaginationParams, SortParams,
   BulkResult, BaseEntity, BaseEntityWithMetadata, TestResult, JobStatus, Job,
+  PingResult,
 } from './common.types.js';
 
 export type {

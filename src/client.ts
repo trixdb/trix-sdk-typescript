@@ -2,7 +2,7 @@
  * Main Trix client class
  */
 
-import type { TrixConfig } from './types.js';
+import type { TrixConfig, PingResult } from './types.js';
 import { ValidationError } from './errors.js';
 import { validateBaseUrl, validateId, getEnvCredential } from './utils/security.js';
 import type { StreamRetryOptions } from './utils/retry.js';
@@ -315,5 +315,24 @@ export class Trix {
   /** Make a multipart/form-data request (for file uploads). @internal */
   async requestMultipart<T>(options: MultipartRequestOptions): Promise<T> {
     return executeMultipartRequest<T>(this.getRequestConfig(), options);
+  }
+
+  /**
+   * Health-check round-trip against `GET /health` (ADR-143).
+   *
+   * Unauthenticated and side-effect free. Returns the client-measured
+   * round-trip time plus the server's reported version. `ok` is true
+   * iff the server responds with `status === 'ok'`.
+   */
+  async ping(): Promise<PingResult> {
+    const start = performance.now();
+    const body = await this.request<{ status?: string; version?: string }>({
+      method: 'GET',
+      path: '/health',
+    });
+    const latencyMs = Math.round(performance.now() - start);
+    const ok = typeof body === 'object' && body !== null && body.status === 'ok';
+    const version = typeof body === 'object' && body !== null ? body.version : undefined;
+    return { ok, version, latencyMs };
   }
 }

@@ -145,3 +145,20 @@ export interface Job {
   /** When the job completed */
   completedAt?: string;
 }
+
+/**
+ * Result of a health-check ping (ADR-143).
+ *
+ * Returned by {@link Trix.ping}. The server response shape is
+ * `{status, timestamp, uptime, version}`; this envelope adds the
+ * client-measured round-trip time so callers don't need a second
+ * timing measurement.
+ */
+export interface PingResult {
+  /** True when the server reports `status === 'ok'`. */
+  ok: boolean;
+  /** Server version string, when reported. */
+  version?: string;
+  /** Client-measured round-trip time in milliseconds. */
+  latencyMs: number;
+}
