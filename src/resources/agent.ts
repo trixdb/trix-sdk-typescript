@@ -311,6 +311,31 @@ export class Agent {
       path: '/pipeline-presets/_default',
     });
   }
+
+  // ==================== ADR-109a — Space-level default preset ====================
+
+  async getSpaceDefaultPipeline(spaceId: string): Promise<string | null> {
+    const resp = await this.client.request<{ name: string | null }>({
+      method: 'GET',
+      path: `/spaces/${encodeURIComponent(spaceId)}/default-pipeline`,
+    });
+    return resp?.name ?? null;
+  }
+
+  async setSpaceDefaultPipeline(spaceId: string, name: string): Promise<{ name: string }> {
+    return this.client.request<{ name: string }>({
+      method: 'POST',
+      path: `/spaces/${encodeURIComponent(spaceId)}/default-pipeline/${encodeURIComponent(name)}`,
+      body: {},
+    });
+  }
+
+  async clearSpaceDefaultPipeline(spaceId: string): Promise<void> {
+    await this.client.request<void>({
+      method: 'DELETE',
+      path: `/spaces/${encodeURIComponent(spaceId)}/default-pipeline`,
+    });
+  }
 }
 
 // ==================== ADR-112 P10 — Trigger types ====================
