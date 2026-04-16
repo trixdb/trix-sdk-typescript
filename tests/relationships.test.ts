@@ -13,7 +13,7 @@ const RELATIONSHIP = {
   sourceId: 'mem_1',
   targetId: 'mem_2',
   relationshipType: 'supports',
-  strength: 0.8,
+  weight: 0.8,
   createdAt: '2024-01-01T00:00:00Z',
   updatedAt: '2024-01-01T00:00:00Z',
 };
@@ -32,21 +32,21 @@ describe('Relationships', () => {
 
       const result = await relationships.create('mem_1', 'mem_2', {
         relationshipType: 'supports',
-        strength: 0.8,
+        weight: 0.8,
       });
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'POST',
-        path: '/relationships',
+        path: '/relationships/mem_1',
         body: {
-          sourceId: 'mem_1',
-          targetId: 'mem_2',
-          relationshipType: 'supports',
-          strength: 0.8,
+          target_id: 'mem_2',
+          relationship_type: 'supports',
+          weight: 0.8,
+          metadata: undefined,
         },
       });
       expect(result.id).toBe('rel_123');
-      expect(result.strength).toBe(0.8);
+      expect(result.weight).toBe(0.8);
     });
 
     it('should create with metadata', async () => {
@@ -62,11 +62,11 @@ describe('Relationships', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'POST',
-        path: '/relationships',
+        path: '/relationships/mem_1',
         body: {
-          sourceId: 'mem_1',
-          targetId: 'mem_2',
-          relationshipType: 'related_to',
+          target_id: 'mem_2',
+          relationship_type: 'related_to',
+          weight: undefined,
           metadata: { context: 'research' },
         },
       });
@@ -134,19 +134,19 @@ describe('Relationships', () => {
     it('should update a relationship', async () => {
       mockClient.request.mockResolvedValue({
         ...RELATIONSHIP,
-        strength: 0.95,
+        weight: 0.95,
       });
 
       const result = await relationships.update('rel_123', {
-        strength: 0.95,
+        weight: 0.95,
       });
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'PATCH',
         path: '/relationships/rel_123',
-        body: { strength: 0.95 },
+        body: { weight: 0.95 },
       });
-      expect(result.strength).toBe(0.95);
+      expect(result.weight).toBe(0.95);
     });
 
     it('should update with metadata', async () => {
@@ -168,7 +168,7 @@ describe('Relationships', () => {
 
     it('should throw for empty relationship ID', async () => {
       await expect(
-        relationships.update('', { strength: 0.5 })
+        relationships.update('', { weight: 0.5 })
       ).rejects.toThrow();
     });
   });
@@ -194,7 +194,7 @@ describe('Relationships', () => {
     it('should reinforce a relationship', async () => {
       mockClient.request.mockResolvedValue({
         ...RELATIONSHIP,
-        strength: 0.9,
+        weight: 0.9,
       });
 
       const result = await relationships.reinforce('rel_123', {
@@ -206,13 +206,13 @@ describe('Relationships', () => {
         path: '/relationships/rel_123/reinforce',
         body: { amount: 0.1 },
       });
-      expect(result.strength).toBe(0.9);
+      expect(result.weight).toBe(0.9);
     });
 
     it('should reinforce without params', async () => {
       mockClient.request.mockResolvedValue({
         ...RELATIONSHIP,
-        strength: 0.85,
+        weight: 0.85,
       });
 
       await relationships.reinforce('rel_123');
@@ -229,7 +229,7 @@ describe('Relationships', () => {
     it('should weaken a relationship', async () => {
       mockClient.request.mockResolvedValue({
         ...RELATIONSHIP,
-        strength: 0.5,
+        weight: 0.5,
       });
 
       const result = await relationships.weaken('rel_123', {
@@ -241,13 +241,13 @@ describe('Relationships', () => {
         path: '/relationships/rel_123/weaken',
         body: { amount: 0.3 },
       });
-      expect(result.strength).toBe(0.5);
+      expect(result.weight).toBe(0.5);
     });
 
     it('should weaken without params', async () => {
       mockClient.request.mockResolvedValue({
         ...RELATIONSHIP,
-        strength: 0.7,
+        weight: 0.7,
       });
 
       await relationships.weaken('rel_123');

@@ -23,7 +23,7 @@ import { validateId } from '../utils/security.js';
  * ```typescript
  * const rel = await client.relationships.create('mem_1', 'mem_2', {
  *   relationshipType: 'related_to',
- *   strength: 0.8
+ *   weight: 0.8
  * });
  * ```
  */
@@ -31,7 +31,12 @@ export class Relationships {
   constructor(private readonly client: Trix) {}
 
   /**
-   * Create a relationship between two memories
+   * Create a relationship between two memories (ADR-145 wire contract).
+   *
+   * Sends `POST /v1/relationships/:sourceId` with snake_case body fields
+   * that match the REST route. `relationshipType` is serialized as
+   * `relationship_type`; `weight` passes through unchanged; `description`,
+   * `bidirectional`, and `metadata` are forwarded when present.
    *
    * @param sourceId - Source memory ID
    * @param targetId - Target memory ID
@@ -45,7 +50,7 @@ export class Relationships {
    *   'mem_target',
    *   {
    *     relationshipType: 'supports',
-   *     strength: 0.9,
+   *     weight: 0.9,
    *     metadata: { context: 'research' }
    *   }
    * );
@@ -60,11 +65,12 @@ export class Relationships {
     validateId(targetId, 'target memory');
     return this.client.request<Relationship>({
       method: 'POST',
-      path: '/relationships',
+      path: `/relationships/${encodeURIComponent(sourceId)}`,
       body: {
-        sourceId,
-        targetId,
-        ...params,
+        target_id: targetId,
+        relationship_type: params.relationshipType,
+        weight: params.weight,
+        metadata: params.metadata,
       },
     });
   }
@@ -119,7 +125,7 @@ export class Relationships {
    * @example
    * ```typescript
    * const updated = await client.relationships.update('rel_123', {
-   *   strength: 0.95,
+   *   weight: 0.95,
    *   metadata: { verified: true }
    * });
    * ```
@@ -166,7 +172,7 @@ export class Relationships {
    * const reinforced = await client.relationships.reinforce('rel_123', {
    *   amount: 0.1
    * });
-   * console.log(`New strength: ${reinforced.strength}`);
+   * console.log(`New weight: ${reinforced.weight}`);
    * ```
    */
   async reinforce(

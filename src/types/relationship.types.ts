@@ -16,7 +16,7 @@ export interface Relationship extends BaseEntityWithMetadata {
   sourceId: string;
   targetId: string;
   relationshipType: string;
-  strength: number;
+  weight: number;
 }
 
 // ============================================================================
@@ -28,7 +28,7 @@ export interface Relationship extends BaseEntityWithMetadata {
  */
 export interface CreateRelationshipParams {
   relationshipType: string;
-  strength?: number;
+  weight?: number;
   metadata?: Record<string, unknown>;
 }
 
@@ -37,7 +37,7 @@ export interface CreateRelationshipParams {
  */
 export interface UpdateRelationshipParams {
   relationshipType?: string;
-  strength?: number;
+  weight?: number;
   metadata?: Record<string, unknown>;
 }
 

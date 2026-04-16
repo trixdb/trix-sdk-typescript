@@ -84,7 +84,7 @@ export function createMockRelationship(
     sourceId: `mem_${randomId()}`,
     targetId: `mem_${randomId()}`,
     relationshipType: 'related_to',
-    strength: 0.8,
+    weight: 0.8,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     ...overrides,
