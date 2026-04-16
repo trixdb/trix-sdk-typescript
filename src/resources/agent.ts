@@ -336,6 +336,37 @@ export class Agent {
       path: `/spaces/${encodeURIComponent(spaceId)}/default-pipeline`,
     });
   }
+
+  /**
+   * ADR-109a observability (tick 79) — dry-run 3-tier preset resolution.
+   *
+   * Ask the server what preset would apply right now for the given
+   * (space, pipeline) pair, without running a search or chat.
+   *
+   * @returns `{name, source, preset}` — source is `caller`, `space`,
+   *   `account`, or `null` when nothing applies.
+   */
+  async resolvePipeline(params?: {
+    spaceId?: string;
+    pipeline?: string;
+  }): Promise<{
+    name: string | null;
+    source: 'caller' | 'space' | 'account' | null;
+    preset: Record<string, unknown> | null;
+  }> {
+    const query: string[] = [];
+    if (params?.spaceId) {
+      query.push(`space_id=${encodeURIComponent(params.spaceId)}`);
+    }
+    if (params?.pipeline) {
+      query.push(`pipeline=${encodeURIComponent(params.pipeline)}`);
+    }
+    const qs = query.length ? `?${query.join('&')}` : '';
+    return this.client.request({
+      method: 'GET',
+      path: `/pipeline-presets/_resolve${qs}`,
+    });
+  }
 }
 
 // ==================== ADR-112 P10 — Trigger types ====================
