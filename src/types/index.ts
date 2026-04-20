@@ -148,6 +148,12 @@ export type {
 } from './bot-stream.types.js';
 
 export type {
+  AgentMessageRef, AgentUsage, AgentStreamEvent, AgentStreamEventType,
+  AgentExitReason,
+} from './agent-stream.types.js';
+export { isAgentEventOfType, collectStreamText, collectStreamToolResults } from './agent-stream.types.js';
+
+export type {
   SpaceConfigCategory, SpaceConfig, SpaceConfigPatch,
   SpaceConfigValidation, SpaceConfigAuditEvent, SpaceConfigAuditResponse,
 } from './space-config.types.js';
