@@ -61,6 +61,7 @@ import { Hubs } from './resources/hubs.js';
 import { Files } from './resources/files.js';
 import { Presets } from './resources/presets.js';
 import { CalendarResource } from './resources/calendar.js';
+import { GitHubResource } from './resources/github.js';
 import { Knowledge } from './resources/knowledge.js';
 
 /**
@@ -168,6 +169,7 @@ export class Trix {
   public readonly files: Files;
   public readonly presets: Presets;
   public readonly calendar: CalendarResource;
+  public readonly github: GitHubResource;
   public readonly knowledge: Knowledge;
   public readonly spaceConfig: SpaceConfigResource;
 
@@ -237,6 +239,7 @@ export class Trix {
     this.files = new Files(this);
     this.presets = new Presets(this);
     this.calendar = new CalendarResource(this);
+    this.github = new GitHubResource(this);
     this.knowledge = new Knowledge(this);
     this.spaceConfig = new SpaceConfigResource(this);
   }

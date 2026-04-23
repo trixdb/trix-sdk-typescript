@@ -140,6 +140,23 @@ export type {
   Presets,
 } from './resources/index.js';
 
+// GitHub integration (ADR-152)
+export { GitHubResource } from './resources/github.js';
+export type {
+  GitHubConnection,
+  GitHubConnectionsResponse,
+  LinkRepoParams,
+  LinkRepoResponse,
+  ActivityMemory,
+  ActivityResponse,
+  ActivityParams,
+  ChurnFile,
+  ChurnFilesResponse,
+  QualitySummaryResponse,
+  CodeSymbol,
+  SymbolsResponse,
+} from './resources/github.js';
+
 // Re-export testing utilities for convenience
 // Users can also import directly from '@trix/client/testing'
 export {
