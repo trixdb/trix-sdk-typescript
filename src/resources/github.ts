@@ -47,6 +47,12 @@ import type {
   AgentPRResult,
   PRReviewResult,
   ScanCodeResult,
+  CodeSummaryResult,
+  CloneGroupsResult,
+  DeadExportsResult,
+  TestCoverageResult,
+  LoadBearingResult,
+  BugDensityResult,
 } from './github-types.js';
 
 export type {
@@ -106,6 +112,18 @@ export type {
   DepVuln,
   ScanCodeResult,
   ScanCodeSummary,
+  CodeSummaryResult,
+  CloneGroupsResult,
+  DeadExportsResult,
+  TestCoverageResult,
+  LoadBearingResult,
+  BugDensityResult,
+  CloneGroup,
+  CloneInstance,
+  DeadExportFile,
+  TestCoverageFile,
+  LoadBearingFunction,
+  BugDensityFile,
 } from './github-types.js';
 
 // ── Resource ───────────────────────────────────────────────────────────────
@@ -449,5 +467,42 @@ export class GitHubResource extends BaseResource {
   async createPR(projectId: string, opts: { connectionId: string; branchName: string; baseBranch?: string; commitMessage: string; prTitle: string; prBody?: string; changes: Array<{ filePath: string; content: string }> }): Promise<AgentPRResult> {
     validateId(projectId, 'project');
     return this.request<AgentPRResult>({ method: 'POST', path: `/projects/${projectId}/github/create-pr`, body: { connection_id: opts.connectionId, branch_name: opts.branchName, base_branch: opts.baseBranch, commit_message: opts.commitMessage, pr_title: opts.prTitle, pr_body: opts.prBody, changes: opts.changes.map((c) => ({ file_path: c.filePath, content: c.content })) } });
+  }
+
+  /** Combined code health snapshot — quality gate, debt, hotspots, smells, languages in one call. */
+  async getCodeSummary(projectId: string): Promise<CodeSummaryResult> {
+    validateId(projectId, 'project');
+    return this.request<CodeSummaryResult>({ method: 'GET', path: `/projects/${projectId}/github/code-summary` });
+  }
+
+  /** Structural code clone groups — sets of functions with identical normalised structure. */
+  async getCloneGroups(projectId: string): Promise<CloneGroupsResult> {
+    validateId(projectId, 'project');
+    return this.request<CloneGroupsResult>({ method: 'GET', path: `/projects/${projectId}/github/clone-groups` });
+  }
+
+  /** Unused exported symbols in JS/TS files (dead code that can be safely removed). */
+  async getDeadExports(projectId: string): Promise<DeadExportsResult> {
+    validateId(projectId, 'project');
+    return this.request<DeadExportsResult>({ method: 'GET', path: `/projects/${projectId}/github/dead-exports` });
+  }
+
+  /** Test file coverage by naming convention — identifies source files without paired tests. */
+  async getTestCoverage(projectId: string): Promise<TestCoverageResult> {
+    validateId(projectId, 'project');
+    return this.request<TestCoverageResult>({ method: 'GET', path: `/projects/${projectId}/github/test-coverage` });
+  }
+
+  /** Load-bearing functions — high callerCount functions that are risky to change. */
+  async getLoadBearingFunctions(projectId: string, minCallers?: number): Promise<LoadBearingResult> {
+    validateId(projectId, 'project');
+    const qs = minCallers !== undefined ? `?min_callers=${minCallers}` : '';
+    return this.request<LoadBearingResult>({ method: 'GET', path: `/projects/${projectId}/github/load-bearing${qs}` });
+  }
+
+  /** Per-file issue density — open suggestions per 1,000 LOC, ranked by density. */
+  async getBugDensity(projectId: string): Promise<BugDensityResult> {
+    validateId(projectId, 'project');
+    return this.request<BugDensityResult>({ method: 'GET', path: `/projects/${projectId}/github/bug-density` });
   }
 }

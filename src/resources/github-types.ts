@@ -353,3 +353,25 @@ export interface PRFileMetric { path: string; cc: number | null; cogc: number | 
 export interface PRReviewResult { review: { body: string; event: string; url: string | null }; qualityScore: number; signals: unknown[]; smells: unknown[]; securityFindings: SecurityFinding[]; depVulns: DepVuln[]; fileMetrics: PRFileMetric[]; inlineComments: number; filesAnalyzed: number; unsupportedFiles: number; posted: boolean; }
 export interface ScanCodeSummary { secrets: number; security: number; critical: number; high: number; safe: boolean; }
 export interface ScanCodeResult { file_path: string; findings: SecurityFinding[]; summary: ScanCodeSummary; }
+
+// ── Code health analytics (Session 15–16) ────────────────────────────────────
+
+export interface CodeSummaryDebt { totalMinutes: number; totalHours: number; topCategories: Array<{ category: string; count: number; minutes: number }>; }
+export interface CodeSummaryHotspot { file_path: string; repo_full_name: string; language: string | null; hotspot_score: number | null; cyclomatic_complexity: number | null; cognitive_complexity: number | null; complexity_level: string | null; loc: number | null; }
+export interface CodeSummaryResult { qualityGate: QualityGate; debt: CodeSummaryDebt; hotspots: CodeSummaryHotspot[]; openCounts: { critical: number; high: number; total: number }; topSmells: Array<{ kind: string; count: number }>; languages: Array<{ language: string; files: number; loc: number }>; }
+
+export interface CloneInstance { filePath: string; repoFullName: string; fnName: string; startLine: number | null; loc: number | null; language: string | null; }
+export interface CloneGroup { cloneHash: string; instanceCount: number; maxLoc: number | null; instances: CloneInstance[]; }
+export interface CloneGroupsResult { groups: CloneGroup[]; totalGroups: number; }
+
+export interface DeadExportFile { filePath: string; repoFullName: string; language: string | null; deadCount: number; symbols: string[]; }
+export interface DeadExportsResult { files: DeadExportFile[]; totalFiles: number; totalDeadSymbols: number; }
+
+export interface TestCoverageFile { filePath: string; repoFullName: string; language: string | null; hotspotScore: number | null; cyclomaticComplexity: number | null; testFile: string | null; }
+export interface TestCoverageResult { uncovered: TestCoverageFile[]; covered: TestCoverageFile[]; totalFiles: number; uncoveredCount: number; coveredCount: number; coverageRatio: number; }
+
+export interface LoadBearingFunction { filePath: string; repoFullName: string; language: string | null; fnName: string; callerCount: number; cyclomatic: number | null; loc: number | null; startLine: number | null; cloneCount: number; }
+export interface LoadBearingResult { functions: LoadBearingFunction[]; count: number; minCallers: number; }
+
+export interface BugDensityFile { filePath: string; repoFullName: string; language: string | null; loc: number; hotspotScore: number | null; issueCount: number; criticalCount: number; highCount: number; densityPerKloc: number; }
+export interface BugDensityResult { files: BugDensityFile[]; count: number; }
