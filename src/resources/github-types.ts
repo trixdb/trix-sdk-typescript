@@ -400,3 +400,20 @@ export interface LoadBearingResult { functions: LoadBearingFunction[]; count: nu
 
 export interface BugDensityFile { filePath: string; repoFullName: string; language: string | null; loc: number; hotspotScore: number | null; issueCount: number; criticalCount: number; highCount: number; densityPerKloc: number; }
 export interface BugDensityResult { files: BugDensityFile[]; count: number; }
+
+// ── Health Snapshot (one-call agent summary) ──────────────────────────────────
+
+export interface HealthSnapshotRisk { type: string; label: string; }
+
+export interface HealthSnapshotResponse {
+  qualityGate: {
+    passed: boolean | null;
+    avgMaintainabilityIndex: number | null;
+    totalFiles: number;
+    criticalFiles: number;
+  };
+  suggestions: { critical: number; high: number; total: number };
+  velocity: { mergedLast7Days: number; mergedLast30Days: number };
+  openPRs: { total: number; risky: number; avgQualityScore: number | null };
+  topRisks: HealthSnapshotRisk[];
+}

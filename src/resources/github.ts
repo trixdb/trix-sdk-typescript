@@ -54,6 +54,7 @@ import type {
   TestCoverageResult,
   LoadBearingResult,
   BugDensityResult,
+  HealthSnapshotResponse,
 } from './github-types.js';
 
 export type {
@@ -127,7 +128,9 @@ export type {
   TestCoverageFile,
   LoadBearingFunction,
   BugDensityFile,
-} from './github-types.js';
+  HealthSnapshotResponse,
+  HealthSnapshotRisk,
+} from './github-types.js'; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 // ── Resource ───────────────────────────────────────────────────────────────
 
@@ -294,6 +297,21 @@ export class GitHubResource extends BaseResource {
     return this.request<ReleaseReadinessResponse>({
       method: 'GET',
       path: `/projects/${projectId}/github/release-readiness`,
+    });
+  }
+
+  /**
+   * Get a one-call project health snapshot for agents.
+   *
+   * Aggregates code quality gate, PR velocity, open PR risk signals, and
+   * top issues into a single response. Use as the first call when assigned to
+   * a project to understand current state before deciding what to work on.
+   */
+  async getHealthSnapshot(projectId: string): Promise<HealthSnapshotResponse> {
+    validateId(projectId, 'project');
+    return this.request<HealthSnapshotResponse>({
+      method: 'GET',
+      path: `/projects/${projectId}/github/health-snapshot`,
     });
   }
 
