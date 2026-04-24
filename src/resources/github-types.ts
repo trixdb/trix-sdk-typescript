@@ -169,6 +169,8 @@ export interface PRBrief {
   briefContent: string;
   riskFlags: string[];
   qualityScore: number | null;
+  /** AI assistant that authored this PR, or null for human-authored PRs. */
+  agent: 'claude' | 'copilot' | 'cursor' | 'gemini' | null;
   isOpen: boolean;
   hasTests: boolean;
   touchesHotspots: boolean;
