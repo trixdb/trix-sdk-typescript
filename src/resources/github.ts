@@ -46,6 +46,7 @@ import type {
   CqlResult,
   AgentPRResult,
   PRReviewResult,
+  ScanCodeResult,
 } from './github-types.js';
 
 export type {
@@ -103,6 +104,8 @@ export type {
   PRReviewResult,
   SecurityFinding,
   DepVuln,
+  ScanCodeResult,
+  ScanCodeSummary,
 } from './github-types.js';
 
 // ── Resource ───────────────────────────────────────────────────────────────
@@ -434,6 +437,12 @@ export class GitHubResource extends BaseResource {
   async reviewPR(projectId: string, connectionId: string, prNumber: number, opts: { event?: 'COMMENT' | 'APPROVE' | 'REQUEST_CHANGES'; dryRun?: boolean } = {}): Promise<PRReviewResult> {
     validateId(projectId, 'project');
     return this.request<PRReviewResult>({ method: 'POST', path: `/projects/${projectId}/github/review-pr`, body: { connection_id: connectionId, pr_number: prNumber, event: opts.event ?? 'COMMENT', dry_run: opts.dryRun ?? false } });
+  }
+
+  /** Scan arbitrary file content with all SAST + secret scanners (no GitHub auth needed). */
+  async scanCode(projectId: string, filePath: string, content: string): Promise<ScanCodeResult> {
+    validateId(projectId, 'project');
+    return this.request<ScanCodeResult>({ method: 'POST', path: `/projects/${projectId}/github/scan-code`, body: { file_path: filePath, content } });
   }
 
   /** Create a GitHub PR with agent-authored file changes (up to 50 files). */

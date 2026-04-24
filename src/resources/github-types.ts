@@ -344,10 +344,12 @@ export interface DebtCategory { category: string; count: number; minutes: number
 export interface TechnicalDebt { totalMinutes: number; totalHours: number; byCategory: DebtCategory[]; }
 export interface QualityCheck { id: string; label: string; passed: boolean; value: number | null; threshold: number; unit?: string; }
 export interface QualityGate { passed: boolean; checks: QualityCheck[]; }
-export interface CqlQuery { from?: 'files' | 'functions'; where?: Record<string, Record<string, string | number>>; orderBy?: string; orderDir?: 'asc' | 'desc'; limit?: number; }
+export interface CqlQuery { from?: 'files' | 'functions' | 'suggestions'; where?: Record<string, Record<string, string | number>>; orderBy?: string; orderDir?: 'asc' | 'desc'; limit?: number; }
 export interface CqlResult { results: Record<string, unknown>[]; count: number; query: CqlQuery; }
 export interface AgentPRResult { prNumber: number; prUrl: string; branchName: string; sha: string; }
 export interface SecurityFinding { category: string; priority: string; title: string; description: string; file_path: string | null; evidence: Record<string, unknown>; generated_by: string; }
 export interface DepVuln { category: string; priority: 'critical' | 'high' | 'medium' | 'low'; title: string; description: string; file_path: string | null; evidence: { vuln_id: string; package: string; ecosystem: string; cvss: number | null; fix_version: string | null; url: string | null; }; }
 export interface PRFileMetric { path: string; cc: number | null; cogc: number | null; mi: number | null; loc: number | null; testCoverage: { status: string } | null; unusedExports: string[]; }
 export interface PRReviewResult { review: { body: string; event: string; url: string | null }; qualityScore: number; signals: unknown[]; smells: unknown[]; securityFindings: SecurityFinding[]; depVulns: DepVuln[]; fileMetrics: PRFileMetric[]; inlineComments: number; filesAnalyzed: number; unsupportedFiles: number; posted: boolean; }
+export interface ScanCodeSummary { secrets: number; security: number; critical: number; high: number; safe: boolean; }
+export interface ScanCodeResult { file_path: string; findings: SecurityFinding[]; summary: ScanCodeSummary; }
