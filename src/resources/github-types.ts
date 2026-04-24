@@ -76,6 +76,21 @@ export interface ChurnFilesResponse {
   count: number;
 }
 
+export interface FunctionComplexityMetric {
+  name: string;
+  start_line: number;
+  end_line: number;
+  loc: number;
+  cyclomatic: number;
+  cognitive: number;
+  /** Number of files in the scan set that call this function (load-bearing indicator) */
+  caller_count?: number;
+  /** Number of structurally identical functions detected across the codebase */
+  clone_count?: number;
+  clone_hash?: string;
+  clone_partners?: string[];
+}
+
 export interface FileComplexityMetric {
   file_path: string;
   repo_full_name: string;
@@ -86,6 +101,12 @@ export interface FileComplexityMetric {
   hotspot_score?: number;
   complexity_level?: 'ok' | 'warning' | 'critical';
   computed_at?: string;
+  /** Per-function breakdown with CC, CogC, LOC, callerCount, cloneCount */
+  functions?: FunctionComplexityMetric[];
+  /** Exported symbols never imported in the scanned file set (dead code candidates) */
+  unused_exports?: string[];
+  /** Test coverage pairing result by filename convention */
+  test_coverage?: { status: 'covered' | 'uncovered' | 'unknown'; test_file: string | null };
 }
 
 export interface FileComplexityResponse {
