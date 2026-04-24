@@ -40,6 +40,12 @@ import type {
   RepoStatsResponse,
   ReviewStats,
   WeeklyActivityDay,
+  TechnicalDebt,
+  QualityGate,
+  CqlQuery,
+  CqlResult,
+  AgentPRResult,
+  PRReviewResult,
 } from './github-types.js';
 
 export type {
@@ -87,6 +93,14 @@ export type {
   ReviewStats,
   ReviewerStat,
   WeeklyActivityDay,
+  TechnicalDebt,
+  DebtCategory,
+  QualityGate,
+  QualityCheck,
+  CqlQuery,
+  CqlResult,
+  AgentPRResult,
+  PRReviewResult,
 } from './github-types.js';
 
 // ── Resource ───────────────────────────────────────────────────────────────
@@ -394,5 +408,35 @@ export class GitHubResource extends BaseResource {
       method: 'GET',
       path: `/projects/${projectId}/github/activity/weekly`,
     });
+  }
+
+  /** Get technical debt aggregated by category (minutes + hours). */
+  async getCodeDebt(projectId: string): Promise<TechnicalDebt> {
+    validateId(projectId, 'project');
+    return this.request<TechnicalDebt>({ method: 'GET', path: `/projects/${projectId}/github/improvements/debt` });
+  }
+
+  /** Evaluate quality gate thresholds — returns pass/fail with per-check detail. */
+  async getQualityGate(projectId: string): Promise<QualityGate> {
+    validateId(projectId, 'project');
+    return this.request<QualityGate>({ method: 'GET', path: `/projects/${projectId}/github/improvements/quality-gate` });
+  }
+
+  /** Execute a CQL query over code metrics (files or functions). */
+  async queryCode(projectId: string, query: CqlQuery): Promise<CqlResult> {
+    validateId(projectId, 'project');
+    return this.request<CqlResult>({ method: 'POST', path: `/projects/${projectId}/github/query`, body: query });
+  }
+
+  /** Run an agent PR review, posting a structured comment to GitHub. */
+  async reviewPR(projectId: string, connectionId: string, prNumber: number, opts: { event?: 'COMMENT' | 'APPROVE' | 'REQUEST_CHANGES'; dryRun?: boolean } = {}): Promise<PRReviewResult> {
+    validateId(projectId, 'project');
+    return this.request<PRReviewResult>({ method: 'POST', path: `/projects/${projectId}/github/review-pr`, body: { connection_id: connectionId, pr_number: prNumber, event: opts.event ?? 'COMMENT', dry_run: opts.dryRun ?? false } });
+  }
+
+  /** Create a GitHub PR with agent-authored file changes (up to 50 files). */
+  async createPR(projectId: string, opts: { connectionId: string; branchName: string; baseBranch?: string; commitMessage: string; prTitle: string; prBody?: string; changes: Array<{ filePath: string; content: string }> }): Promise<AgentPRResult> {
+    validateId(projectId, 'project');
+    return this.request<AgentPRResult>({ method: 'POST', path: `/projects/${projectId}/github/create-pr`, body: { connection_id: opts.connectionId, branch_name: opts.branchName, base_branch: opts.baseBranch, commit_message: opts.commitMessage, pr_title: opts.prTitle, pr_body: opts.prBody, changes: opts.changes.map((c) => ({ file_path: c.filePath, content: c.content })) } });
   }
 }

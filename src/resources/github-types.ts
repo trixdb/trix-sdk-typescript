@@ -339,3 +339,12 @@ export interface WeeklyActivityDay {
   issues: number;
   total: number;
 }
+
+export interface DebtCategory { category: string; count: number; minutes: number; }
+export interface TechnicalDebt { totalMinutes: number; totalHours: number; byCategory: DebtCategory[]; }
+export interface QualityCheck { id: string; label: string; passed: boolean; value: number | null; threshold: number; unit?: string; }
+export interface QualityGate { passed: boolean; checks: QualityCheck[]; }
+export interface CqlQuery { from?: 'files' | 'functions'; where?: Record<string, Record<string, string | number>>; orderBy?: string; orderDir?: 'asc' | 'desc'; limit?: number; }
+export interface CqlResult { results: Record<string, unknown>[]; count: number; query: CqlQuery; }
+export interface AgentPRResult { prNumber: number; prUrl: string; branchName: string; sha: string; }
+export interface PRReviewResult { review: { body: string; event: string; url: string | null }; signals: unknown[]; smells: unknown[]; filesAnalyzed: number; posted: boolean; }
