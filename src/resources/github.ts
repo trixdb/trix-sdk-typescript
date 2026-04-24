@@ -250,13 +250,21 @@ export class GitHubResource extends BaseResource {
   /** Get PR pre-review briefs with structured risk data and optional quality score. */
   async getPrBriefs(
     projectId: string,
-    opts: { state?: 'open' | 'closed' | 'all'; prNumber?: number; limit?: number } = {},
+    opts: {
+      state?: 'open' | 'closed' | 'all';
+      prNumber?: number;
+      limit?: number;
+      minQualityScore?: number;
+      maxQualityScore?: number;
+    } = {},
   ): Promise<PRBriefsResponse> {
     validateId(projectId, 'project');
     const params = new URLSearchParams();
     if (opts.state) params.set('state', opts.state);
     if (opts.prNumber != null) params.set('pr_number', String(opts.prNumber));
     if (opts.limit != null) params.set('limit', String(opts.limit));
+    if (opts.minQualityScore != null) params.set('min_quality_score', String(opts.minQualityScore));
+    if (opts.maxQualityScore != null) params.set('max_quality_score', String(opts.maxQualityScore));
     const qs = params.toString();
     return this.request<PRBriefsResponse>({
       method: 'GET',
