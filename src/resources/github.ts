@@ -359,4 +359,17 @@ export class GitHubResource extends BaseResource {
       path: `/projects/${projectId}/github/improvements/stats`,
     });
   }
+
+  /** Push a code quality finding to GitHub Issues and mark it in_progress. */
+  async createIssueFromSuggestion(
+    projectId: string,
+    suggestionId: string
+  ): Promise<{ issue: { number: number; url: string; title: string } }> {
+    validateId(projectId, 'project');
+    validateId(suggestionId, 'suggestion');
+    return this.request<{ issue: { number: number; url: string; title: string } }>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/improvements/${suggestionId}/create-issue`,
+    });
+  }
 }

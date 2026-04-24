@@ -229,6 +229,8 @@ export interface CodeImprovementFilters {
   category?: ImprovementCategory;
   priority?: ImprovementPriority;
   status?: ImprovementStatus;
+  /** Filter by file path substring, e.g. "src/auth" returns all findings in that directory. */
+  file_path?: string;
 }
 
 export interface CodeImprovement {
