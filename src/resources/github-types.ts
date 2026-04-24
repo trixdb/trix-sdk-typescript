@@ -294,3 +294,27 @@ export interface RepoStatsResponse {
     };
   };
 }
+
+
+export interface ReviewerStat {
+  reviewer: string;
+  total: number;
+  approvals: number;
+  changesRequested: number;
+}
+
+export interface ReviewStats {
+  totalReviews: number;
+  totalApprovals: number;
+  totalChangesRequested: number;
+  approvalRate: number | null;
+  topReviewers: ReviewerStat[];
+}
+
+export interface WeeklyActivityDay {
+  day: string; // ISO date YYYY-MM-DD
+  commits: number;
+  prs: number;
+  issues: number;
+  total: number;
+}

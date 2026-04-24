@@ -38,6 +38,8 @@ import type {
   ImprovementsHistoryItem,
   ImprovementStatus,
   RepoStatsResponse,
+  ReviewStats,
+  WeeklyActivityDay,
 } from './github-types.js';
 
 export type {
@@ -82,6 +84,9 @@ export type {
   RepoLanguage,
   RepoContributor,
   RepoStatsResponse,
+  ReviewStats,
+  ReviewerStat,
+  WeeklyActivityDay,
 } from './github-types.js';
 
 // ── Resource ───────────────────────────────────────────────────────────────
@@ -370,6 +375,24 @@ export class GitHubResource extends BaseResource {
     return this.request<{ issue: { number: number; url: string; title: string } }>({
       method: 'POST',
       path: `/projects/${projectId}/github/improvements/${suggestionId}/create-issue`,
+    });
+  }
+
+  /** Get PR review analytics: approval rate and top reviewers for the last 30 days. */
+  async getReviewStats(projectId: string): Promise<ReviewStats> {
+    validateId(projectId, 'project');
+    return this.request<ReviewStats>({
+      method: 'GET',
+      path: `/projects/${projectId}/github/review-stats`,
+    });
+  }
+
+  /** Get daily commit/PR/issue counts for the last 52 weeks (activity heatmap data). */
+  async getWeeklyActivity(projectId: string): Promise<WeeklyActivityDay[]> {
+    validateId(projectId, 'project');
+    return this.request<WeeklyActivityDay[]>({
+      method: 'GET',
+      path: `/projects/${projectId}/github/activity/weekly`,
     });
   }
 }
