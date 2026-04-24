@@ -203,6 +203,10 @@ export interface AgentAttributionResponse {
   agent_total: number;
   human_total: number;
   agent_ratio: number;
+  /** Average PR quality score (0-100) per AI tool, keyed by agent name */
+  agent_quality_scores: Record<string, number | null>;
+  /** Average PR quality score (0-100) for human-authored PRs */
+  human_avg_quality: number | null;
 }
 
 export interface LinkedGoal {
