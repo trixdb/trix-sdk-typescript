@@ -46,7 +46,6 @@ import type {
   CqlResult,
   AgentPRResult,
   PRReviewResult,
-  SecurityFinding,
 } from './github-types.js';
 
 export type {
@@ -103,6 +102,7 @@ export type {
   AgentPRResult,
   PRReviewResult,
   SecurityFinding,
+  DepVuln,
 } from './github-types.js';
 
 // ── Resource ───────────────────────────────────────────────────────────────

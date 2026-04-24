@@ -348,4 +348,5 @@ export interface CqlQuery { from?: 'files' | 'functions'; where?: Record<string,
 export interface CqlResult { results: Record<string, unknown>[]; count: number; query: CqlQuery; }
 export interface AgentPRResult { prNumber: number; prUrl: string; branchName: string; sha: string; }
 export interface SecurityFinding { category: string; priority: string; title: string; description: string; file_path: string | null; evidence: Record<string, unknown>; generated_by: string; }
-export interface PRReviewResult { review: { body: string; event: string; url: string | null }; signals: unknown[]; smells: unknown[]; securityFindings: SecurityFinding[]; filesAnalyzed: number; posted: boolean; }
+export interface DepVuln { category: string; priority: 'critical' | 'high' | 'medium' | 'low'; title: string; description: string; file_path: string | null; evidence: { vuln_id: string; package: string; ecosystem: string; cvss: number | null; fix_version: string | null; url: string | null; }; }
+export interface PRReviewResult { review: { body: string; event: string; url: string | null }; signals: unknown[]; smells: unknown[]; securityFindings: SecurityFinding[]; depVulns: DepVuln[]; inlineComments: number; filesAnalyzed: number; unsupportedFiles: number; posted: boolean; }
