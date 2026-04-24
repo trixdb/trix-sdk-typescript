@@ -163,6 +163,7 @@ export interface FlaggedPRsResponse {
 export interface PRBrief {
   id: string;
   prNumber: number | null;
+  prUrl: string | null;
   repo: string | null;
   title: string;
   briefContent: string;
