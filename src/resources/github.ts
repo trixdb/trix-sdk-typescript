@@ -23,6 +23,7 @@ import type {
   SymbolsResponse,
   VelocityResponse,
   FlaggedPRsResponse,
+  PRBriefsResponse,
   CycleTimeResponse,
   AgentAttributionResponse,
   GoalProgressResponse,
@@ -74,6 +75,8 @@ export type {
   VelocityResponse,
   FlaggedPR,
   FlaggedPRsResponse,
+  PRBrief,
+  PRBriefsResponse,
   CycleTimeResponse,
   AgentAttributionResponse,
   LinkedGoal,
@@ -238,6 +241,23 @@ export class GitHubResource extends BaseResource {
     return this.request<FlaggedPRsResponse>({
       method: 'GET',
       path: `/projects/${projectId}/github/flagged-prs`,
+    });
+  }
+
+  /** Get PR pre-review briefs with structured risk data and optional quality score. */
+  async getPrBriefs(
+    projectId: string,
+    opts: { state?: 'open' | 'closed' | 'all'; prNumber?: number; limit?: number } = {},
+  ): Promise<PRBriefsResponse> {
+    validateId(projectId, 'project');
+    const params = new URLSearchParams();
+    if (opts.state) params.set('state', opts.state);
+    if (opts.prNumber != null) params.set('pr_number', String(opts.prNumber));
+    if (opts.limit != null) params.set('limit', String(opts.limit));
+    const qs = params.toString();
+    return this.request<PRBriefsResponse>({
+      method: 'GET',
+      path: `/projects/${projectId}/github/pr-briefs${qs ? `?${qs}` : ''}`,
     });
   }
 

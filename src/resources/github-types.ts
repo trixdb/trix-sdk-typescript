@@ -160,6 +160,30 @@ export interface FlaggedPRsResponse {
   prs: FlaggedPR[];
 }
 
+export interface PRBrief {
+  id: string;
+  prNumber: number | null;
+  repo: string | null;
+  title: string;
+  briefContent: string;
+  riskFlags: string[];
+  qualityScore: number | null;
+  isOpen: boolean;
+  hasTests: boolean;
+  touchesHotspots: boolean;
+  touchesLoadBearing: boolean;
+  touchesClones: boolean;
+  scopeCreep: boolean;
+  semanticDrift: boolean;
+  createdAt: string;
+}
+
+export interface PRBriefsResponse {
+  briefs: PRBrief[];
+  total: number;
+  state: 'open' | 'closed' | 'all';
+}
+
 export interface CycleTimeResponse {
   avg_cycle_days_last_30: number | null;
   avg_cycle_days_30_60: number | null;
