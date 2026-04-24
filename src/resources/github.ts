@@ -256,6 +256,7 @@ export class GitHubResource extends BaseResource {
       limit?: number;
       minQualityScore?: number;
       maxQualityScore?: number;
+      agent?: 'claude' | 'copilot' | 'cursor' | 'gemini';
     } = {},
   ): Promise<PRBriefsResponse> {
     validateId(projectId, 'project');
@@ -265,6 +266,7 @@ export class GitHubResource extends BaseResource {
     if (opts.limit != null) params.set('limit', String(opts.limit));
     if (opts.minQualityScore != null) params.set('min_quality_score', String(opts.minQualityScore));
     if (opts.maxQualityScore != null) params.set('max_quality_score', String(opts.maxQualityScore));
+    if (opts.agent) params.set('agent', opts.agent);
     const qs = params.toString();
     return this.request<PRBriefsResponse>({
       method: 'GET',
