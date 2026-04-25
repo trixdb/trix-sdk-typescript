@@ -436,6 +436,7 @@ export type CqlFromMode =
   | 'clones'
   | 'metrics'
   | 'coverage'
+  | 'tech_debt'
   | 'summary'
   | 'history';
 
