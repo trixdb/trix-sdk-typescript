@@ -953,6 +953,46 @@ export interface IssueFlowResult {
   lookbackDays: number;
 }
 
+// ── Test Gap Analysis (ADR-152 Phase 4) ──────────────────────────────────────
+
+export interface TestGapPR {
+  prNumber: string;
+  title: string;
+  url: string;
+  author: string;
+  repo: string;
+  agent: string | null;
+  createdAt: string;
+}
+
+export interface TestGapAuthor {
+  author: string;
+  totalPRs: number;
+  noTestsCount: number;
+  hasTestsCount: number;
+  noTestsPct: number;
+}
+
+export interface TestGapWeek {
+  week: string;
+  total: number;
+  noTestsCount: number;
+  noTestsPct: number;
+}
+
+export interface TestGapResult {
+  summary: {
+    totalBriefs: number;
+    noTestsCount: number;
+    hasTestsCount: number;
+    noTestsPct: number;
+  };
+  topGaps: TestGapPR[];
+  byAuthor: TestGapAuthor[];
+  weeklyTrend: TestGapWeek[];
+  lookbackDays: number;
+}
+
 // ── PR–Task Alignment ─────────────────────────────────────────────────────────
 
 export type AlignmentSignal = 'aligned' | 'partial' | 'drifted';

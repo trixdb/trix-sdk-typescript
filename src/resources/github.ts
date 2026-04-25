@@ -84,6 +84,7 @@ import type {
   ScopeCreepResult,
   AssigneeCycleTimeResult,
   PRTaskAlignmentResult,
+  TestGapResult,
 } from './github-types.js';
 
 export type {
@@ -221,6 +222,10 @@ export type {
   AlignmentEntry,
   PRTaskAlignmentSummary,
   PRTaskAlignmentResult,
+  TestGapPR,
+  TestGapAuthor,
+  TestGapWeek,
+  TestGapResult,
 } from './github-types.js'; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 // ── Resource ───────────────────────────────────────────────────────────────
@@ -866,6 +871,15 @@ export class GitHubResource extends BaseResource {
     return this.request<PRTaskAlignmentResult>({
       method: 'GET',
       path: `/projects/${projectId}/github/pr-task-alignment?days=${days}`,
+    });
+  }
+
+  /** Test coverage gap — PRs merged without test changes, by author and week. */
+  async getTestGap(projectId: string, days = 90): Promise<TestGapResult> {
+    validateId(projectId, 'project');
+    return this.request<TestGapResult>({
+      method: 'GET',
+      path: `/projects/${projectId}/github/test-gap?days=${days}`,
     });
   }
 }

@@ -189,6 +189,10 @@ export type {
   PRTaskAlignmentResult,
   AlignmentEntry,
   AlignmentSignal,
+  TestGapResult,
+  TestGapPR,
+  TestGapAuthor,
+  TestGapWeek,
 } from './resources/github.js';
 
 // Re-export testing utilities for convenience
