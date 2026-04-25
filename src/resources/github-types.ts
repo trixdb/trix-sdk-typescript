@@ -431,6 +431,22 @@ export interface LoadBearingResult { functions: LoadBearingFunction[]; count: nu
 export interface BugDensityFile { filePath: string; repoFullName: string; language: string | null; loc: number; hotspotScore: number | null; issueCount: number; criticalCount: number; highCount: number; densityPerKloc: number; }
 export interface BugDensityResult { files: BugDensityFile[]; count: number; }
 
+// ── Issue Cycle Time (Phase 4: Estimation Accuracy) ──────────────────────────
+
+export interface CycleTimeByLabel {
+  label: string;
+  issueCount: number;
+  avgDays: number;
+  medianDays: number;
+  minDays: number;
+  maxDays: number;
+}
+
+export interface IssueCycleTimeResult {
+  byLabel: CycleTimeByLabel[];
+  lookbackDays: number;
+}
+
 // ── Health Snapshot (one-call agent summary) ──────────────────────────────────
 
 export interface HealthSnapshotRisk { type: string; label: string; }

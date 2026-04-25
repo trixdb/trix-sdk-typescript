@@ -74,6 +74,7 @@ import type {
   WeekOverWeekResult,
   IssueTriageResult,
   IssueFlowResult,
+  IssueCycleTimeResult,
 } from './github-types.js';
 
 export type {
@@ -736,5 +737,9 @@ export class GitHubResource extends BaseResource {
   async getIssueFlow(projectId: string, days = 30): Promise<IssueFlowResult> {
     validateId(projectId, 'project');
     return this.request<IssueFlowResult>({ method: 'GET', path: `/projects/${projectId}/github/issue-flow?days=${days}` });
+  }
+
+  async getIssueCycleTime(projectId: string, days = 90): Promise<IssueCycleTimeResult> {
+    return this.client.get(`/v1/projects/${projectId}/github/issue-cycle-time?days=${days}`);
   }
 }
