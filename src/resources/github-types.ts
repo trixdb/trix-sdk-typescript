@@ -1165,3 +1165,56 @@ export interface ReviewDepthResult {
   reviewers: ReviewerDepthStat[];
   lookbackDays: number;
 }
+
+export interface PRCodeReviewSmell {
+  kind?: string;
+  severity?: string;
+  filePath?: string;
+  line?: number;
+  message?: string;
+  file?: string;
+}
+
+export interface PRCodeReviewSecurityFinding {
+  title?: string;
+  description?: string;
+  file_path?: string;
+  line?: number;
+  file?: string;
+}
+
+export interface PRCodeReviewFindings {
+  smells: PRCodeReviewSmell[];
+  security: PRCodeReviewSecurityFinding[];
+  secrets: unknown[];
+}
+
+export interface PRCodeReviewComplexityDelta {
+  file: string;
+  function: string;
+  ccDelta: number;
+  locDelta: number;
+}
+
+export interface PRCodeReviewResult {
+  pr: {
+    number: number;
+    title: string;
+    url: string;
+    author?: string;
+    additions: number;
+    deletions: number;
+    changedFiles: number;
+  };
+  qualityScore: number;
+  grade: 'A' | 'B' | 'C' | 'D' | 'F';
+  findings: PRCodeReviewFindings;
+  structuralDiff: unknown[];
+  complexityDeltas: PRCodeReviewComplexityDelta[];
+  analyzedFiles: number;
+  skippedFiles: number;
+  formatted?: {
+    body: string;
+    event: 'APPROVE' | 'COMMENT' | 'REQUEST_CHANGES';
+  };
+}

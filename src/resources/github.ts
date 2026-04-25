@@ -90,6 +90,7 @@ import type {
   BusFactorResult,
   ReviewNetworkResult,
   ReviewDepthResult,
+  PRCodeReviewResult,
 } from './github-types.js';
 
 export type {
@@ -250,6 +251,7 @@ export type {
   ReviewDepthSummary,
   ReviewerDepthStat,
   ReviewDepthResult,
+  PRCodeReviewResult,
 } from './github-types.js'; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 // ── Resource ───────────────────────────────────────────────────────────────
@@ -949,6 +951,20 @@ export class GitHubResource extends BaseResource {
     return this.request<ReviewDepthResult>({
       method: 'GET',
       path: `/projects/${projectId}/github/review-depth?days=${days}`,
+    });
+  }
+
+  /** AST-level PR code review — quality score (0-100), grade (A-F), smells, security findings. */
+  async reviewPRCode(
+    projectId: string,
+    prNumber: number,
+    options: { repoFullName?: string; format?: boolean } = {},
+  ): Promise<PRCodeReviewResult> {
+    validateId(projectId, 'project');
+    return this.request<PRCodeReviewResult>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/pr-review`,
+      body: { prNumber, ...options },
     });
   }
 }
