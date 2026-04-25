@@ -462,6 +462,20 @@ export interface IssueThroughputResult {
   lookbackWeeks: number;
 }
 
+// ── Issue Resolver Leaderboard (Phase 4) ─────────────────────────────────────
+
+export interface IssueResolver {
+  login: string;
+  closedCount: number;
+  pct: number;
+}
+
+export interface IssueResolversResult {
+  resolvers: IssueResolver[];
+  totalClosed: number;
+  lookbackDays: number;
+}
+
 // ── Health Snapshot (one-call agent summary) ──────────────────────────────────
 
 export interface HealthSnapshotRisk { type: string; label: string; }
@@ -715,11 +729,13 @@ export interface MilestoneStat {
   closedCount: number;
   totalCount: number;
   progressPct: number;
+  predictedDate?: string | null;
 }
 
 export interface MilestonesResult {
   milestones: MilestoneStat[];
   totalMilestones: number;
+  weeklyCloseRate?: number;
 }
 
 

@@ -76,6 +76,7 @@ import type {
   IssueFlowResult,
   IssueCycleTimeResult,
   IssueThroughputResult,
+  IssueResolversResult,
 } from './github-types.js';
 
 export type {
@@ -188,6 +189,8 @@ export type {
   IssueCycleTimeResult,
   IssueThroughputWeek,
   IssueThroughputResult,
+  IssueResolver,
+  IssueResolversResult,
 } from './github-types.js'; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 // ── Resource ───────────────────────────────────────────────────────────────
@@ -756,6 +759,18 @@ export class GitHubResource extends BaseResource {
     return this.request<IssueThroughputResult>({
       method: 'GET',
       path: `/projects/${projectId}/github/issue-throughput?weeks=${weeks}`,
+    });
+  }
+
+  /**
+   * Issue resolver leaderboard — top contributors by closed issue count.
+   * @param days Lookback window in days (default 30; range: 7-90)
+   */
+  async getIssueResolvers(projectId: string, days = 30): Promise<IssueResolversResult> {
+    validateId(projectId, 'project');
+    return this.request<IssueResolversResult>({
+      method: 'GET',
+      path: `/projects/${projectId}/github/issue-resolvers?days=${days}`,
     });
   }
 }
