@@ -439,7 +439,8 @@ export type CqlFromMode =
   | 'tech_debt'
   | 'symbols'
   | 'summary'
-  | 'history';
+  | 'history'
+  | 'file_report';
 
 export interface CqlQuery {
   from?: CqlFromMode;
