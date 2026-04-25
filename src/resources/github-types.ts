@@ -469,6 +469,7 @@ export interface ContributorQualityStat {
   avgQuality: number | null;
   withTestsCount: number;
   testCoveragePct: number;
+  avgMergeDays: number | null;
   lastActiveAt: string | null;
 }
 
