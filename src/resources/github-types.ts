@@ -503,3 +503,19 @@ export interface PrSizeDistributionResult {
   distribution: PRSizeBucket[];
   total: number;
 }
+
+export interface ReviewAuthorStat {
+  author: string;
+  reviewedCount: number;
+  avgHours: number | null;
+  within24hCount: number;
+  within24hPct: number;
+}
+
+export interface ReviewTurnaroundResult {
+  avgHours: number | null;
+  reviewedWithin24hPct: number;
+  totalReviewed: number;
+  unreviewedCount: number;
+  authorStats: ReviewAuthorStat[];
+}

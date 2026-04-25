@@ -59,6 +59,7 @@ import type {
   ContributorQualityResult,
   PrAgingResult,
   PrSizeDistributionResult,
+  ReviewTurnaroundResult,
   HealthSnapshotResponse,
   PRQualityWeek,
 } from './github-types.js';
@@ -135,6 +136,7 @@ export type {
   ContributorQualityStat,
   PrAgingResult,
   PrSizeDistributionResult,
+  ReviewTurnaroundResult,
   OpenPRAging,
   BranchInfo,
   CloneGroup,
@@ -601,6 +603,12 @@ export class GitHubResource extends BaseResource {
   async getPrSizeDistribution(projectId: string): Promise<PrSizeDistributionResult> {
     validateId(projectId, 'project');
     return this.request<PrSizeDistributionResult>({ method: 'GET', path: `/projects/${projectId}/github/pr-size-distribution` });
+  }
+
+  /** Review turnaround — avg hours from PR open to first review + per-author breakdown. */
+  async getReviewTurnaround(projectId: string): Promise<ReviewTurnaroundResult> {
+    validateId(projectId, 'project');
+    return this.request<ReviewTurnaroundResult>({ method: 'GET', path: `/projects/${projectId}/github/review-turnaround` });
   }
 
   /**
