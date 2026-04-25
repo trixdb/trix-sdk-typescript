@@ -631,6 +631,21 @@ export interface ReviewCoverageResult {
   byAuthor: AuthorReviewCoverage[];
 }
 
+// ── Commit Leaders ────────────────────────────────────────────────────────
+
+export interface CommitLeader {
+  author: string;
+  commitCount: number;
+  activeDays: number;
+  repos: number;
+}
+
+export interface CommitLeadersResult {
+  leaders: CommitLeader[];
+  totalCommits: number;
+  lookbackDays: number;
+}
+
 // ── Issue Assignee Workload ────────────────────────────────────────────────
 
 export interface AssigneeStat {

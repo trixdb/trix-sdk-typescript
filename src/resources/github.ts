@@ -66,6 +66,7 @@ import type {
   IssueBacklogResult,
   ReviewCoverageResult,
   IssueAssigneesResult,
+  CommitLeadersResult,
   MilestonesResult,
   HealthSnapshotResponse,
   PRQualityWeek,
@@ -155,6 +156,8 @@ export type {
   AuthorReviewCoverage,
   IssueAssigneesResult,
   AssigneeStat,
+  CommitLeadersResult,
+  CommitLeader,
   MilestonesResult,
   MilestoneStat,
   OpenPRAging,
@@ -659,6 +662,12 @@ export class GitHubResource extends BaseResource {
   async getReviewCoverage(projectId: string): Promise<ReviewCoverageResult> {
     validateId(projectId, 'project');
     return this.request<ReviewCoverageResult>({ method: 'GET', path: `/projects/${projectId}/github/review-coverage` });
+  }
+
+  /** Commit leaders — top contributors by commit count over the last N days (7/30/90). */
+  async getCommitLeaders(projectId: string, days = 30): Promise<CommitLeadersResult> {
+    validateId(projectId, 'project');
+    return this.request<CommitLeadersResult>({ method: 'GET', path: `/projects/${projectId}/github/commit-leaders?days=${days}` });
   }
 
   /** Issue assignee workload — open issue counts per contributor, sorted most overloaded first. */
