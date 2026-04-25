@@ -444,7 +444,12 @@ export type CqlFromMode =
   | 'worst_functions'
   | 'trend'
   | 'import_cycles'
-  | 'security_hotspots';
+  | 'security_hotspots'
+  | 'action_plan'
+  | 'custom_rules'
+  | 'contributors'
+  | 'test_quality'
+  | 'dependencies';
 
 export interface CqlQuery {
   from?: CqlFromMode;
@@ -456,6 +461,14 @@ export interface CqlQuery {
   pattern?: string;
   patterns?: string[];
   risk?: 'high' | 'medium' | 'all';
+  /** Sub-mode for contributors: "summary" | "files" | "silos"; for custom_rules: "rules" | "findings" */
+  mode?: string;
+  /** Lookback days for contributors and history modes */
+  days?: number;
+  /** Minimum cyclomatic complexity for test_quality mode */
+  min_complexity?: number;
+  /** Ecosystem filter for dependencies mode: "npm" | "pip" | "go" | "cargo" | "rubygems" | "maven" */
+  ecosystem?: string;
 }
 export interface CqlResult { results: Record<string, unknown>[]; count: number; query: CqlQuery; }
 export interface AgentPRResult { prNumber: number; prUrl: string; branchName: string; sha: string; }
