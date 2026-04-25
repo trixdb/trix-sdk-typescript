@@ -485,10 +485,12 @@ export interface OpenPRAging {
   url: string | null;
   repo: string | null;
   headBranch: string | null;
+  requestedReviewers: string[];
   openedAt: string | null;
   lastUpdatedAt: string | null;
   ageDays: number;
   isStale: boolean;
+  hasReview: boolean;
 }
 
 export interface PrAgingResult { prs: OpenPRAging[]; count: number; staleDays: number; }
