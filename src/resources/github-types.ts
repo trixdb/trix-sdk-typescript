@@ -1682,3 +1682,113 @@ export interface ChangeImpactResult {
   review_priority: string[];
   summary: string;
 }
+
+// ── explain_code ──────────────────────────────────────────────────────────────
+
+export interface ExplainCodeParams {
+  repo_full_name: string;
+  file_path: string;
+  function_name: string;
+  ref?: string;
+}
+
+export interface CodeExplanation {
+  purpose: string;
+  inputs: string[];
+  outputs: string;
+  key_logic: string[];
+  edge_cases: string[];
+  potential_issues: string[];
+  complexity_notes: string;
+}
+
+export interface ExplainCodeResult {
+  file_path: string;
+  function_name: string;
+  language: string;
+  ref: string;
+  cyclomatic_complexity: number | null;
+  explanation: CodeExplanation;
+  code_snippet: string;
+}
+
+// ── suggest_refactoring ───────────────────────────────────────────────────────
+
+export type RefactoringGoal =
+  | 'reduce_complexity'
+  | 'extract_helpers'
+  | 'improve_readability'
+  | 'fix_smell'
+  | 'improve_performance';
+
+export interface SuggestRefactoringParams {
+  repo_full_name: string;
+  file_path: string;
+  function_name: string;
+  ref?: string;
+  goals?: RefactoringGoal[];
+  context?: string;
+}
+
+export interface RefactoringSuggestion {
+  refactored_code: string;
+  helpers_needed: string[];
+  changes_summary: string;
+  estimated_cc_reduction: number | null;
+  rationale: string;
+  risks: string[];
+}
+
+export interface SuggestRefactoringResult {
+  file_path: string;
+  function_name: string;
+  language: string;
+  ref: string;
+  original_metrics: { cyclomatic: number | null; cognitive: number | null; loc: number | null };
+  original_start_line: number;
+  goals_applied: RefactoringGoal[];
+  suggestion: RefactoringSuggestion;
+  fix_pr_hint: {
+    file_path: string;
+    start_line: number;
+    end_line: number;
+    replacement: string;
+    description: string;
+  };
+}
+
+// ── build_ast_query ───────────────────────────────────────────────────────────
+
+export type AstQueryLanguage =
+  | 'javascript'
+  | 'typescript'
+  | 'python'
+  | 'go'
+  | 'rust'
+  | 'java'
+  | 'ruby'
+  | 'kotlin';
+
+export interface BuildAstQueryParams {
+  description: string;
+  language?: AstQueryLanguage;
+  example_code?: string;
+  file_path_filter?: string;
+}
+
+export interface BuildAstQueryResult {
+  description: string;
+  language: AstQueryLanguage;
+  pattern: string;
+  capture_name: string;
+  explanation: string;
+  caveats: string[];
+  example_matches: string[];
+  cql_payload: {
+    from: 'ast_pattern';
+    pattern: string;
+    language: AstQueryLanguage;
+    where?: Record<string, unknown>;
+  };
+  usage_hint: string;
+}

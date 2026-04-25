@@ -113,6 +113,12 @@ import type {
   CreateFixPRResult,
   ReviewDepsResult,
   ChangeImpactResult,
+  ExplainCodeParams,
+  ExplainCodeResult,
+  SuggestRefactoringParams,
+  SuggestRefactoringResult,
+  BuildAstQueryParams,
+  BuildAstQueryResult,
 } from './github-types.js';
 
 export type {
@@ -302,6 +308,12 @@ export type {
   DependencyVulnerability,
   ChangeImpactFile,
   SemanticDiffResult,
+  ExplainCodeParams,
+  ExplainCodeResult,
+  SuggestRefactoringParams,
+  SuggestRefactoringResult,
+  BuildAstQueryParams,
+  BuildAstQueryResult,
 } from './github-types.js'; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 // ── Resource ───────────────────────────────────────────────────────────────
@@ -1216,6 +1228,42 @@ export class GitHubResource extends BaseResource {
       method: 'POST',
       path: `/projects/${projectId}/github/change-impact`,
       body: { pr_number: prNumber, repo_full_name: repoFullName, ...options },
+    });
+  }
+
+  /** Explain a specific function using tree-sitter extraction and LLM analysis. */
+  async explainCode(projectId: string, params: ExplainCodeParams): Promise<ExplainCodeResult> {
+    validateId(projectId, 'project');
+    return this.request<ExplainCodeResult>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/explain-code`,
+      body: params,
+    });
+  }
+
+  /** Suggest goal-directed LLM refactoring for a function. */
+  async suggestRefactoring(
+    projectId: string,
+    params: SuggestRefactoringParams,
+  ): Promise<SuggestRefactoringResult> {
+    validateId(projectId, 'project');
+    return this.request<SuggestRefactoringResult>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/suggest-refactoring`,
+      body: params,
+    });
+  }
+
+  /** Convert a natural language code pattern description into a tree-sitter S-expression query. */
+  async buildAstQuery(
+    projectId: string,
+    params: BuildAstQueryParams,
+  ): Promise<BuildAstQueryResult> {
+    validateId(projectId, 'project');
+    return this.request<BuildAstQueryResult>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/build-ast-query`,
+      body: params,
     });
   }
 }
