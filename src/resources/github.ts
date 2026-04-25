@@ -104,6 +104,15 @@ import type {
   CreateCustomRuleParams,
   UpdateCustomRuleParams,
   CustomRuleTestResult,
+  ConventionsResult,
+  GenerateTestsParams,
+  GenerateTestsResult,
+  PostReviewFindingsParams,
+  PostReviewFindingsResult,
+  CreateFixPRParams,
+  CreateFixPRResult,
+  ReviewDepsResult,
+  ChangeImpactResult,
 } from './github-types.js';
 
 export type {
@@ -279,6 +288,20 @@ export type {
   CreateCustomRuleParams,
   UpdateCustomRuleParams,
   CustomRuleTestResult,
+  ConventionsResult,
+  GenerateTestsParams,
+  GenerateTestsResult,
+  ReviewFinding,
+  PostReviewFindingsParams,
+  PostReviewFindingsResult,
+  FixSpec,
+  CreateFixPRParams,
+  CreateFixPRResult,
+  ReviewDepsResult,
+  ChangeImpactResult,
+  DependencyVulnerability,
+  ChangeImpactFile,
+  SemanticDiffResult,
 } from './github-types.js'; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 // ── Resource ───────────────────────────────────────────────────────────────
@@ -1124,6 +1147,75 @@ export class GitHubResource extends BaseResource {
     return this.request<CustomRuleTestResult>({
       method: 'POST',
       path: `/projects/${projectId}/github/custom-rules/${ruleId}/test`,
+    });
+  }
+
+  /** Detect project coding conventions from indexed symbol and metrics data. */
+  async detectConventions(projectId: string): Promise<ConventionsResult> {
+    validateId(projectId, 'project');
+    return this.request<ConventionsResult>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/conventions`,
+      body: {},
+    });
+  }
+
+  /** Generate LLM-powered tests for a file using tree-sitter function extraction. */
+  async generateTests(projectId: string, params: GenerateTestsParams): Promise<GenerateTestsResult> {
+    validateId(projectId, 'project');
+    return this.request<GenerateTestsResult>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/generate-tests`,
+      body: params,
+    });
+  }
+
+  /** Post LLM findings from agentReviewPR as a real GitHub PR review with inline comments. */
+  async postReviewFindings(projectId: string, params: PostReviewFindingsParams): Promise<PostReviewFindingsResult> {
+    validateId(projectId, 'project');
+    return this.request<PostReviewFindingsResult>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/post-findings`,
+      body: params,
+    });
+  }
+
+  /** Create a PR that auto-applies line-range fixes to repository files. */
+  async createFixPR(projectId: string, params: CreateFixPRParams): Promise<CreateFixPRResult> {
+    validateId(projectId, 'project');
+    return this.request<CreateFixPRResult>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/fix-pr`,
+      body: params,
+    });
+  }
+
+  /** Audit PR dependency changes for CVEs via npm advisory and OSV APIs. */
+  async reviewDependencyChanges(
+    projectId: string,
+    prNumber: number,
+    repoFullName: string,
+  ): Promise<ReviewDepsResult> {
+    validateId(projectId, 'project');
+    return this.request<ReviewDepsResult>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/review-deps`,
+      body: { pr_number: prNumber, repo_full_name: repoFullName },
+    });
+  }
+
+  /** Analyze blast radius of PR changes via semantic diff, hotspot scores, and caller counts. */
+  async analyzeChangeImpact(
+    projectId: string,
+    prNumber: number,
+    repoFullName: string,
+    options: { max_files?: number } = {},
+  ): Promise<ChangeImpactResult> {
+    validateId(projectId, 'project');
+    return this.request<ChangeImpactResult>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/change-impact`,
+      body: { pr_number: prNumber, repo_full_name: repoFullName, ...options },
     });
   }
 }

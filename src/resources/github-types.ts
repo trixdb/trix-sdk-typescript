@@ -1515,3 +1515,170 @@ export interface CustomRuleTestResult {
   totalMatches: number;
   hits: CustomRuleTestHit[];
 }
+
+// ── detect_conventions ────────────────────────────────────────────────────────
+
+export interface ConventionsResult {
+  languages: Array<{ language: string; file_count: number }>;
+  naming: Record<string, Array<{ name: string; count: number; pct: number }>>;
+  functionSize: {
+    medianLoc: number;
+    p90Loc: number;
+    avgLoc: number;
+    totalFunctions: number;
+  } | null;
+  testPatterns: {
+    placement: 'collocated' | 'separate_directory';
+    directories: string[];
+    suffixPatterns: string[];
+    testFileCount: number;
+  } | null;
+  complexityProfile: {
+    medianCc: number;
+    p90Cc: number;
+    avgCc: number;
+  } | null;
+  insights: string[];
+  dataPoints: number;
+}
+
+// ── generate_tests ────────────────────────────────────────────────────────────
+
+export interface GenerateTestsParams {
+  repo_full_name: string;
+  file_path: string;
+  ref?: string;
+  test_placement?: 'collocated' | 'separate_directory';
+  framework?: string;
+}
+
+export interface GenerateTestsResult {
+  test_file_path: string;
+  test_code: string;
+  language: string;
+  framework: string;
+  function_count: number;
+  functions: string[];
+}
+
+// ── post_review_findings ──────────────────────────────────────────────────────
+
+export interface ReviewFinding {
+  file_path?: string;
+  line?: number;
+  severity?: 'critical' | 'high' | 'medium' | 'low';
+  title?: string;
+  description?: string;
+  fix_code?: string | null;
+}
+
+export interface PostReviewFindingsParams {
+  pr_number: number;
+  repo_full_name: string;
+  findings?: ReviewFinding[];
+  grade?: string;
+  quality_score?: number;
+  gate_verdict?: 'PASS' | 'WARN' | 'BLOCK';
+  overall_comment?: string;
+  dry_run?: boolean;
+}
+
+export interface PostReviewFindingsResult {
+  review_url?: string;
+  review_id?: number;
+  event: 'REQUEST_CHANGES' | 'APPROVE' | 'COMMENT';
+  inline_comments: number;
+  unmapped_findings: number;
+  dryRun?: boolean;
+  wouldPost?: { body: string; event: string; inlineComments: number };
+}
+
+// ── create_fix_pr ─────────────────────────────────────────────────────────────
+
+export interface FixSpec {
+  file_path: string;
+  start_line: number;
+  end_line: number;
+  replacement: string;
+  description?: string;
+}
+
+export interface CreateFixPRParams {
+  repo_full_name: string;
+  base_branch?: string;
+  branch?: string;
+  pr_title?: string;
+  fixes: FixSpec[];
+}
+
+export interface CreateFixPRResult {
+  pr_url: string;
+  pr_number: number;
+  branch: string;
+  files_patched: number;
+  fixes_applied: number;
+}
+
+// ── review_dependency_changes ─────────────────────────────────────────────────
+
+export interface DependencyVulnerability {
+  package: string;
+  severity: 'critical' | 'high' | 'medium' | 'low';
+  title: string;
+  description: string;
+  manifest: string;
+  cve_id: string | null;
+  cvss: number | null;
+  fix_available: boolean;
+  fix_version: string | null;
+  ecosystem: string | null;
+}
+
+export interface ReviewDepsResult {
+  manifests_changed: Array<{
+    manifest: string;
+    ecosystem: string;
+    added: string[];
+    bumped: string[];
+  }>;
+  vulnerabilities: DependencyVulnerability[];
+  risk_level: 'none' | 'low' | 'medium' | 'high' | 'critical';
+  summary: string;
+}
+
+// ── analyze_change_impact ─────────────────────────────────────────────────────
+
+export interface SemanticDiffResult {
+  supported: boolean;
+  added_functions: string[];
+  removed_functions: string[];
+  modified_functions: Array<{
+    name: string;
+    cc_delta: number;
+    head_cc: number;
+    loc_delta: number;
+  }>;
+}
+
+export interface ChangeImpactFile {
+  file_path: string;
+  status: string;
+  additions: number;
+  deletions: number;
+  risk: 'critical' | 'high' | 'medium' | 'low';
+  caller_count: number;
+  hotspot_score: number | null;
+  complexity_level: string | null;
+  cyclomatic_complexity: number | null;
+  semantic_diff: SemanticDiffResult | null;
+  review_focus: string[];
+}
+
+export interface ChangeImpactResult {
+  overall_risk: 'critical' | 'high' | 'medium' | 'low';
+  files_analyzed: number;
+  high_risk_files: number;
+  files: ChangeImpactFile[];
+  review_priority: string[];
+  summary: string;
+}
