@@ -449,7 +449,8 @@ export type CqlFromMode =
   | 'custom_rules'
   | 'contributors'
   | 'test_quality'
-  | 'dependencies';
+  | 'dependencies'
+  | 'refactor_candidates';
 
 export interface CqlQuery {
   from?: CqlFromMode;
