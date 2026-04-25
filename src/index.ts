@@ -186,6 +186,9 @@ export type {
   RepoLanguage,
   RepoContributor,
   RepoStatsResponse,
+  PRTaskAlignmentResult,
+  AlignmentEntry,
+  AlignmentSignal,
 } from './resources/github.js';
 
 // Re-export testing utilities for convenience

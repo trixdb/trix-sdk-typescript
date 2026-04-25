@@ -952,3 +952,33 @@ export interface IssueFlowResult {
   netFlow: number;
   lookbackDays: number;
 }
+
+// ── PR–Task Alignment ─────────────────────────────────────────────────────────
+
+export type AlignmentSignal = 'aligned' | 'partial' | 'drifted';
+
+export interface AlignmentEntry {
+  prNumber: string;
+  prTitle: string;
+  prUrl: string;
+  author: string;
+  issueNumber: string;
+  issueTitle: string;
+  similarity: number;
+  signal: AlignmentSignal;
+}
+
+export interface PRTaskAlignmentSummary {
+  analyzed: number;
+  alignedCount: number;
+  partialCount: number;
+  driftedCount: number;
+  uncheckedCount: number;
+}
+
+export interface PRTaskAlignmentResult {
+  summary: PRTaskAlignmentSummary;
+  drifted: AlignmentEntry[];
+  partial: AlignmentEntry[];
+  lookbackDays: number;
+}
