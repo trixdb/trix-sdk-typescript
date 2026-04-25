@@ -519,3 +519,24 @@ export interface ReviewTurnaroundResult {
   unreviewedCount: number;
   authorStats: ReviewAuthorStat[];
 }
+
+export type WorkItemPriority = 'critical' | 'high' | 'medium' | 'low';
+export type WorkItemType =
+  | 'code-suggestion'
+  | 'unreviewed-pr'
+  | 'risky-pr'
+  | 'stale-branch'
+  | 'uncovered-hotspot';
+
+export interface WorkQueueItem {
+  type: WorkItemType;
+  priority: WorkItemPriority;
+  title: string;
+  detail: string;
+  url: string | null;
+}
+
+export interface WorkQueueResult {
+  items: WorkQueueItem[];
+  count: number;
+}

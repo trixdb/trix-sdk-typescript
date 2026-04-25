@@ -60,6 +60,7 @@ import type {
   PrAgingResult,
   PrSizeDistributionResult,
   ReviewTurnaroundResult,
+  WorkQueueResult,
   HealthSnapshotResponse,
   PRQualityWeek,
 } from './github-types.js';
@@ -137,6 +138,7 @@ export type {
   PrAgingResult,
   PrSizeDistributionResult,
   ReviewTurnaroundResult,
+  WorkQueueResult,
   OpenPRAging,
   BranchInfo,
   CloneGroup,
@@ -609,6 +611,12 @@ export class GitHubResource extends BaseResource {
   async getReviewTurnaround(projectId: string): Promise<ReviewTurnaroundResult> {
     validateId(projectId, 'project');
     return this.request<ReviewTurnaroundResult>({ method: 'GET', path: `/projects/${projectId}/github/review-turnaround` });
+  }
+
+  /** Prioritized work queue — synthesizes all GitHub signals into action items. */
+  async getWorkQueue(projectId: string): Promise<WorkQueueResult> {
+    validateId(projectId, 'project');
+    return this.request<WorkQueueResult>({ method: 'GET', path: `/projects/${projectId}/github/work-queue` });
   }
 
   /**
