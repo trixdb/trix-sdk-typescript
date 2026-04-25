@@ -440,7 +440,8 @@ export type CqlFromMode =
   | 'symbols'
   | 'summary'
   | 'history'
-  | 'file_report';
+  | 'file_report'
+  | 'worst_functions';
 
 export interface CqlQuery {
   from?: CqlFromMode;
