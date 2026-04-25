@@ -119,6 +119,7 @@ import type {
   SuggestRefactoringResult,
   BuildAstQueryParams,
   BuildAstQueryResult,
+  ArchitectureReviewResult,
 } from './github-types.js';
 
 export type {
