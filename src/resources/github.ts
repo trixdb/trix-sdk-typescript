@@ -62,6 +62,7 @@ import type {
   ReviewTurnaroundResult,
   WorkQueueResult,
   ReviewerWorkloadResult,
+  ApprovedPRsResult,
   HealthSnapshotResponse,
   PRQualityWeek,
 } from './github-types.js';
@@ -141,6 +142,8 @@ export type {
   ReviewTurnaroundResult,
   WorkQueueResult,
   ReviewerWorkloadResult,
+  ApprovedPRsResult,
+  ApprovedPR,
   OpenPRAging,
   BranchInfo,
   CloneGroup,
@@ -625,6 +628,12 @@ export class GitHubResource extends BaseResource {
   async getReviewerWorkload(projectId: string): Promise<ReviewerWorkloadResult> {
     validateId(projectId, 'project');
     return this.request<ReviewerWorkloadResult>({ method: 'GET', path: `/projects/${projectId}/github/reviewer-workload` });
+  }
+
+  /** Approved-but-not-merged PRs — open PRs with ≥1 approval, ready to ship. */
+  async getApprovedPRs(projectId: string): Promise<ApprovedPRsResult> {
+    validateId(projectId, 'project');
+    return this.request<ApprovedPRsResult>({ method: 'GET', path: `/projects/${projectId}/github/approved-prs` });
   }
 
   /**

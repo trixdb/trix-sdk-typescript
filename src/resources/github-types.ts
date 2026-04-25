@@ -568,3 +568,20 @@ export interface ReviewerWorkloadResult {
   reviewers: ReviewerWorkloadStat[];
   count: number;
 }
+
+export interface ApprovedPR {
+  prNumber: number | null;
+  title: string | null;
+  author: string | null;
+  url: string | null;
+  repo: string | null;
+  ageDays: number;
+  approvalCount: number;
+  approvers: string[];
+  hasChangesRequested: boolean;
+}
+
+export interface ApprovedPRsResult {
+  prs: ApprovedPR[];
+  count: number;
+}
