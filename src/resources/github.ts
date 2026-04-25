@@ -77,8 +77,9 @@ import type {
   IssueCycleTimeResult,
   IssueThroughputResult,
   IssueResolversResult,
-  CycleTimeTrendWeek,
   CycleTimeTrendResult,
+  PrMergeTimeResult,
+  ContributorMomentumResult,
 } from './github-types.js';
 
 export type {
@@ -195,6 +196,11 @@ export type {
   IssueResolversResult,
   CycleTimeTrendWeek,
   CycleTimeTrendResult,
+  MergeTimeBucket,
+  MergeTimeAuthor,
+  PrMergeTimeResult,
+  ContributorMomentum,
+  ContributorMomentumResult,
 } from './github-types.js'; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 // ── Resource ───────────────────────────────────────────────────────────────
@@ -751,7 +757,11 @@ export class GitHubResource extends BaseResource {
   }
 
   async getIssueCycleTime(projectId: string, days = 90): Promise<IssueCycleTimeResult> {
-    return this.client.get(`/v1/projects/${projectId}/github/issue-cycle-time?days=${days}`);
+    validateId(projectId, 'project');
+    return this.request<IssueCycleTimeResult>({
+      method: 'GET',
+      path: `/projects/${projectId}/github/issue-cycle-time?days=${days}`,
+    });
   }
 
   /**
@@ -787,6 +797,22 @@ export class GitHubResource extends BaseResource {
     return this.request<CycleTimeTrendResult>({
       method: 'GET',
       path: `/projects/${projectId}/github/cycle-time-trend?weeks=${weeks}`,
+    });
+  }
+
+  async getPrMergeTime(projectId: string, days = 90): Promise<PrMergeTimeResult> {
+    validateId(projectId, 'project');
+    return this.request<PrMergeTimeResult>({
+      method: 'GET',
+      path: `/projects/${projectId}/github/pr-merge-time?days=${days}`,
+    });
+  }
+
+  async getContributorMomentum(projectId: string, days = 28): Promise<ContributorMomentumResult> {
+    validateId(projectId, 'project');
+    return this.request<ContributorMomentumResult>({
+      method: 'GET',
+      path: `/projects/${projectId}/github/contributor-momentum?days=${days}`,
     });
   }
 }

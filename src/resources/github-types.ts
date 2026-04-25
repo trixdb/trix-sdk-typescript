@@ -491,6 +491,43 @@ export interface CycleTimeTrendResult {
   lookbackWeeks: number;
 }
 
+export interface MergeTimeBucket {
+  label: string;
+  key: string;
+  count: number;
+}
+
+export interface MergeTimeAuthor {
+  author: string;
+  prCount: number;
+  avgHours: number | null;
+}
+
+export interface PrMergeTimeResult {
+  p25: number | null;
+  p50: number | null;
+  p75: number | null;
+  p95: number | null;
+  avgHours: number | null;
+  totalMerged: number;
+  lookbackDays: number;
+  distribution: MergeTimeBucket[];
+  authorStats: MergeTimeAuthor[];
+}
+
+export interface ContributorMomentum {
+  author: string;
+  recentCommits: number;
+  previousCommits: number;
+  pctChange: number | null;
+  trend: 'accelerating' | 'stable' | 'fading';
+}
+
+export interface ContributorMomentumResult {
+  contributors: ContributorMomentum[];
+  periodDays: number;
+}
+
 // ── Health Snapshot (one-call agent summary) ──────────────────────────────────
 
 export interface HealthSnapshotRisk { type: string; label: string; }
