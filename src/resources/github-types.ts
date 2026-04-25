@@ -1792,3 +1792,29 @@ export interface BuildAstQueryResult {
   };
   usage_hint: string;
 }
+
+// ── architecture_review ───────────────────────────────────────────────────────
+
+export interface ArchitectureConcern {
+  type: 'layer_violation' | 'coupling' | 'god_module' | 'abstraction_mismatch' | 'dependency_direction' | 'shotgun_surgery' | 'feature_envy' | 'other';
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  title: string;
+  description: string;
+  affected_files: string[];
+  recommendation: string;
+}
+
+export interface ArchitectureReviewResult {
+  pr_number: number;
+  repo_full_name: string;
+  base: string | null;
+  head: string | null;
+  files_changed: number;
+  severity: 'none' | 'low' | 'medium' | 'high' | 'critical';
+  concerns: ArchitectureConcern[];
+  positive_observations: string[];
+  overall_assessment: string;
+  concern_count: number;
+  critical_count: number;
+  high_count: number;
+}

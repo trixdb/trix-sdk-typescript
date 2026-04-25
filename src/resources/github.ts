@@ -318,6 +318,8 @@ export type {
   BuildAstQueryParams,
   BuildAstQueryResult,
   AstQueryLanguage,
+  ArchitectureConcern,
+  ArchitectureReviewResult,
 } from './github-types.js'; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 // ── Resource ───────────────────────────────────────────────────────────────
@@ -1268,6 +1270,20 @@ export class GitHubResource extends BaseResource {
       method: 'POST',
       path: `/projects/${projectId}/github/build-ast-query`,
       body: params,
+    });
+  }
+
+  /** Holistic LLM architectural review — layer violations, coupling, god modules, and more. */
+  async architectureReview(
+    projectId: string,
+    prNumber: number,
+    repoFullName: string,
+  ): Promise<ArchitectureReviewResult> {
+    validateId(projectId, 'project');
+    return this.request<ArchitectureReviewResult>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/architecture-review`,
+      body: { pr_number: prNumber, repo_full_name: repoFullName },
     });
   }
 }

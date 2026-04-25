@@ -227,6 +227,8 @@ export type {
   BuildAstQueryParams,
   BuildAstQueryResult,
   AstQueryLanguage,
+  ArchitectureConcern,
+  ArchitectureReviewResult,
 } from './resources/github.js';
 
 // Re-export testing utilities for convenience
