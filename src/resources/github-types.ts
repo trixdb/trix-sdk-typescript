@@ -1084,3 +1084,38 @@ export interface PRTaskAlignmentResult {
   partial: AlignmentEntry[];
   lookbackDays: number;
 }
+
+// ── Bus Factor / Knowledge Concentration Risk (ADR-152) ───────────────────────
+
+export interface BusFactorAtRiskFile {
+  filePath: string;
+  repo: string;
+  owner: string;
+  ownerPct: number;
+  totalCommits: number;
+  uniqueAuthors: number;
+  hotspotScore: number;
+  loc: number;
+}
+
+export interface BusFactorContributor {
+  contributor: string;
+  dominatedRepos: string[];
+  avgDominancePct: number;
+  totalCommits: number;
+}
+
+export interface BusFactorSummary {
+  totalRepos: number;
+  atRiskRepos: number;
+  singleAuthorRepos: number;
+  avgAuthorsPerRepo: number;
+  threshold: number;
+}
+
+export interface BusFactorResult {
+  summary: BusFactorSummary;
+  atRisk: BusFactorAtRiskFile[];
+  byContributor: BusFactorContributor[];
+  lookbackDays: number;
+}

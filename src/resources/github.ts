@@ -87,6 +87,7 @@ import type {
   TestGapResult,
   DORAResult,
   AIvsHumanResult,
+  BusFactorResult,
 } from './github-types.js';
 
 export type {
@@ -237,6 +238,10 @@ export type {
   AIvsHumanWeek,
   AIvsHumanTopPR,
   AIvsHumanResult,
+  BusFactorAtRiskFile,
+  BusFactorContributor,
+  BusFactorSummary,
+  BusFactorResult,
 } from './github-types.js'; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 // ── Resource ───────────────────────────────────────────────────────────────
@@ -909,6 +914,15 @@ export class GitHubResource extends BaseResource {
     return this.request<AIvsHumanResult>({
       method: 'GET',
       path: `/projects/${projectId}/github/ai-vs-human-quality?days=${days}`,
+    });
+  }
+
+  /** Identify knowledge concentration risk — repos and files dominated by a single contributor. */
+  async getBusFactor(projectId: string, days = 90): Promise<BusFactorResult> {
+    validateId(projectId, 'project');
+    return this.request<BusFactorResult>({
+      method: 'GET',
+      path: `/projects/${projectId}/github/bus-factor?days=${days}`,
     });
   }
 }

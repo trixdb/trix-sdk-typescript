@@ -202,6 +202,10 @@ export type {
   AIvsHumanWeek,
   AIvsHumanTopPR,
   AIvsHumanResult,
+  BusFactorAtRiskFile,
+  BusFactorContributor,
+  BusFactorSummary,
+  BusFactorResult,
 } from './resources/github.js';
 
 // Re-export testing utilities for convenience
