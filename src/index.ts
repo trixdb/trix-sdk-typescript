@@ -193,6 +193,11 @@ export type {
   TestGapPR,
   TestGapAuthor,
   TestGapWeek,
+  DORAResult,
+  DORArating,
+  DORADeployFreqWeek,
+  DORALeadTimeWeek,
+  DORAcfrWeek,
 } from './resources/github.js';
 
 // Re-export testing utilities for convenience

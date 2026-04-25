@@ -85,6 +85,7 @@ import type {
   AssigneeCycleTimeResult,
   PRTaskAlignmentResult,
   TestGapResult,
+  DORAResult,
 } from './github-types.js';
 
 export type {
@@ -226,6 +227,11 @@ export type {
   TestGapAuthor,
   TestGapWeek,
   TestGapResult,
+  DORADeployFreqWeek,
+  DORALeadTimeWeek,
+  DORAcfrWeek,
+  DORArating,
+  DORAResult,
 } from './github-types.js'; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 // ── Resource ───────────────────────────────────────────────────────────────
@@ -880,6 +886,15 @@ export class GitHubResource extends BaseResource {
     return this.request<TestGapResult>({
       method: 'GET',
       path: `/projects/${projectId}/github/test-gap?days=${days}`,
+    });
+  }
+
+  /** DORA engineering excellence metrics — deploy frequency, lead time, CFR, MTTR. */
+  async getDORAMetrics(projectId: string, days = 90): Promise<DORAResult> {
+    validateId(projectId, 'project');
+    return this.request<DORAResult>({
+      method: 'GET',
+      path: `/projects/${projectId}/github/dora-metrics?days=${days}`,
     });
   }
 }

@@ -993,6 +993,27 @@ export interface TestGapResult {
   lookbackDays: number;
 }
 
+// ── DORA Metrics (ADR-152 Phase 4 extension) ──────────────────────────────────
+
+export type DORArating = 'elite' | 'high' | 'medium' | 'low';
+
+export interface DORADeployFreqWeek { week: string; merges: number; }
+export interface DORALeadTimeWeek { week: string; avgHours: number | null; }
+export interface DORAcfrWeek { week: string; total: number; failures: number; pct: number; }
+
+export interface DORAResult {
+  deploymentFrequency: { perDay: number; perWeek: number; totalMerges: number; rating: DORArating };
+  leadTime: { medianHours: number | null; avgHours: number | null; sampleSize: number; rating: DORArating | null };
+  changeFailureRate: { pct: number; failureMerges: number; totalMerges: number; rating: DORArating };
+  mttr: { medianHours: number | null; sampleSize: number; rating: DORArating | null };
+  weeklyTrend: {
+    deployFreq: DORADeployFreqWeek[];
+    leadTime: DORALeadTimeWeek[];
+    changeFailureRate: DORAcfrWeek[];
+  };
+  lookbackDays: number;
+}
+
 // ── PR–Task Alignment ─────────────────────────────────────────────────────────
 
 export type AlignmentSignal = 'aligned' | 'partial' | 'drifted';
