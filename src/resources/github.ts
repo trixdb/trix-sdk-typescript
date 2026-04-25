@@ -61,6 +61,7 @@ import type {
   PrSizeDistributionResult,
   ReviewTurnaroundResult,
   WorkQueueResult,
+  ReviewerWorkloadResult,
   HealthSnapshotResponse,
   PRQualityWeek,
 } from './github-types.js';
@@ -139,6 +140,7 @@ export type {
   PrSizeDistributionResult,
   ReviewTurnaroundResult,
   WorkQueueResult,
+  ReviewerWorkloadResult,
   OpenPRAging,
   BranchInfo,
   CloneGroup,
@@ -617,6 +619,12 @@ export class GitHubResource extends BaseResource {
   async getWorkQueue(projectId: string): Promise<WorkQueueResult> {
     validateId(projectId, 'project');
     return this.request<WorkQueueResult>({ method: 'GET', path: `/projects/${projectId}/github/work-queue` });
+  }
+
+  /** Reviewer workload — pending review queue and historical speed per reviewer. */
+  async getReviewerWorkload(projectId: string): Promise<ReviewerWorkloadResult> {
+    validateId(projectId, 'project');
+    return this.request<ReviewerWorkloadResult>({ method: 'GET', path: `/projects/${projectId}/github/reviewer-workload` });
   }
 
   /**

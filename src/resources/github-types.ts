@@ -547,3 +547,24 @@ export interface WorkQueueResult {
   items: WorkQueueItem[];
   count: number;
 }
+
+export interface ReviewerPendingPR {
+  prNumber: number | null;
+  title: string | null;
+  url: string | null;
+}
+
+export interface ReviewerWorkloadStat {
+  reviewer: string;
+  pendingCount: number;
+  avgPendingAgeHours: number | null;
+  pendingPrs: ReviewerPendingPR[];
+  totalReviews: number;
+  approvals: number;
+  avgResponseHours: number | null;
+}
+
+export interface ReviewerWorkloadResult {
+  reviewers: ReviewerWorkloadStat[];
+  count: number;
+}
