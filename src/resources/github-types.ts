@@ -1381,3 +1381,54 @@ export interface PreFlightPRResult {
   summary: { filesChecked: number; secrets: number; security: number; smells: number; design: number };
   files: Array<{ file_path: string; language: string; secrets: number; security: number; smells: number; design: number; cyclomatic: number }>;
 }
+
+export type ActionItemType = 'security' | 'performance' | 'refactor' | 'test_coverage' | 'dependency' | 'maintenance';
+export type ActionItemPriority = 'critical' | 'high' | 'medium' | 'low';
+
+export interface ActionItem {
+  type: ActionItemType;
+  priority: ActionItemPriority;
+  title: string;
+  detail: string;
+  file_path: string | null;
+  line: number | null;
+  score: number;
+  metadata: Record<string, unknown>;
+}
+
+export interface ActionPlanResult {
+  results: ActionItem[];
+  count: number;
+  breakdown: {
+    security: number;
+    performance: number;
+    refactor: number;
+    test_coverage: number;
+    dependency: number;
+    maintenance: number;
+  };
+}
+
+export interface TechDebtFindings {
+  critical: number;
+  high: number;
+  medium: number;
+  low: number;
+}
+
+export interface TechDebtCategory {
+  category: string;
+  count: number;
+  fileCount: number;
+  findings: TechDebtFindings;
+  totalMinutes: number;
+  debtLabel: string;
+}
+
+export interface TechDebtResult {
+  results: TechDebtCategory[];
+  count: number;
+  totalDebtMinutes: number;
+  totalDebtLabel: string;
+  grade: 'A' | 'B' | 'C' | 'D' | 'F';
+}

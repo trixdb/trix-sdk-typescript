@@ -97,6 +97,8 @@ import type {
   PRCodeReviewResult,
   SubmitPRReviewResult,
   QualityGateResult,
+  ActionPlanResult,
+  TechDebtResult,
 } from './github-types.js';
 
 export type {
@@ -265,6 +267,8 @@ export type {
   PRCodeReviewResult,
   SubmitPRReviewResult,
   QualityGateResult,
+  ActionPlanResult,
+  TechDebtResult,
 } from './github-types.js'; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 // ── Resource ───────────────────────────────────────────────────────────────
@@ -1042,6 +1046,24 @@ export class GitHubResource extends BaseResource {
       method: 'POST',
       path: `/projects/${projectId}/github/pr-quality-gate`,
       body: { prNumber, ...options },
+    });
+  }
+
+  /** Ranked code improvement action plan — SAST findings, worst functions, uncovered hotspots. */
+  async getActionPlan(projectId: string): Promise<ActionPlanResult> {
+    validateId(projectId, 'project');
+    return this.request<ActionPlanResult>({
+      method: 'GET',
+      path: `/projects/${projectId}/github/action-plan`,
+    });
+  }
+
+  /** SonarQube-style technical debt breakdown by category with remediation estimate and grade. */
+  async getTechDebt(projectId: string): Promise<TechDebtResult> {
+    validateId(projectId, 'project');
+    return this.request<TechDebtResult>({
+      method: 'GET',
+      path: `/projects/${projectId}/github/tech-debt`,
     });
   }
 }
