@@ -446,7 +446,7 @@ export type CqlFromMode =
 
 export interface CqlQuery {
   from?: CqlFromMode;
-  where?: Record<string, Record<string, string | number>>;
+  where?: Record<string, Record<string, string | number | (string | number)[]>>;
   orderBy?: string;
   orderDir?: 'asc' | 'desc';
   limit?: number;
