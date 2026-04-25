@@ -71,6 +71,7 @@ import type {
   MilestonesResult,
   HealthSnapshotResponse,
   PRQualityWeek,
+  WeekOverWeekResult,
 } from './github-types.js';
 
 export type {
@@ -174,6 +175,8 @@ export type {
   HealthSnapshotResponse,
   HealthSnapshotRisk,
   PRQualityWeek,
+  WeekStat,
+  WeekOverWeekResult,
 } from './github-types.js'; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 // ── Resource ───────────────────────────────────────────────────────────────
@@ -699,5 +702,15 @@ export class GitHubResource extends BaseResource {
   async getPrQualityTrend(projectId: string): Promise<PRQualityWeek[]> {
     validateId(projectId, 'project');
     return this.request<PRQualityWeek[]>({ method: 'GET', path: `/projects/${projectId}/github/pr-quality-trend` });
+  }
+
+  /**
+   * Week-over-week velocity comparison — PRs merged, issues closed, and commits
+   * in the current 7-day window vs the previous 7-day window.
+   * Each metric includes this-week count, last-week count, delta, and trend direction.
+   */
+  async getWeekOverWeek(projectId: string): Promise<WeekOverWeekResult> {
+    validateId(projectId, 'project');
+    return this.request<WeekOverWeekResult>({ method: 'GET', path: `/projects/${projectId}/github/week-over-week` });
   }
 }

@@ -689,3 +689,20 @@ export interface MilestonesResult {
   milestones: MilestoneStat[];
   totalMilestones: number;
 }
+
+
+// ── Week-over-Week Velocity ───────────────────────────────────────────────────
+
+export interface WeekStat {
+  label: string;
+  thisWeek: number;
+  lastWeek: number;
+  delta: number;
+  trend: 'up' | 'down' | 'flat';
+}
+
+export interface WeekOverWeekResult {
+  prs: WeekStat;
+  issues: WeekStat;
+  commits: WeekStat;
+}
