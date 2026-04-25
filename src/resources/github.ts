@@ -81,6 +81,7 @@ import type {
   PrMergeTimeResult,
   ContributorMomentumResult,
   AgentAuditResult,
+  ScopeCreepResult,
 } from './github-types.js';
 
 export type {
@@ -205,6 +206,11 @@ export type {
   AgentBreakdown,
   AgentWeeklyTrend,
   AgentAuditResult,
+  ScopeCreepSummary,
+  ScopeCreepPR,
+  ScopeCreepAuthor,
+  ScopeCreepWeek,
+  ScopeCreepResult,
 } from './github-types.js'; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 // ── Resource ───────────────────────────────────────────────────────────────
@@ -825,6 +831,14 @@ export class GitHubResource extends BaseResource {
     return this.request<AgentAuditResult>({
       method: 'GET',
       path: `/projects/${projectId}/github/agent-audit?days=${days}`,
+    });
+  }
+
+  async getScopeCreep(projectId: string, days = 90): Promise<ScopeCreepResult> {
+    validateId(projectId, 'project');
+    return this.request<ScopeCreepResult>({
+      method: 'GET',
+      path: `/projects/${projectId}/github/scope-creep?days=${days}`,
     });
   }
 }

@@ -552,6 +552,48 @@ export interface AgentAuditResult {
   weeklyTrend: AgentWeeklyTrend[];
 }
 
+export interface ScopeCreepSummary {
+  totalPrs: number;
+  scopeCreepCount: number;
+  largeCount: number;
+  flaggedCount: number;
+  flaggedPct: number;
+}
+
+export interface ScopeCreepPR {
+  title: string;
+  author: string;
+  url: string;
+  repo: string;
+  changedFiles: number;
+  additions: number;
+  deletions: number;
+  severity: 'scope_creep' | 'large';
+  createdAt: string;
+}
+
+export interface ScopeCreepAuthor {
+  author: string;
+  totalPrs: number;
+  scopeCreepCount: number;
+  largeCount: number;
+  avgFiles: number;
+}
+
+export interface ScopeCreepWeek {
+  week: string;
+  scopeCreepCount: number;
+  largeCount: number;
+}
+
+export interface ScopeCreepResult {
+  summary: ScopeCreepSummary;
+  lookbackDays: number;
+  topPrs: ScopeCreepPR[];
+  byAuthor: ScopeCreepAuthor[];
+  weeklyTrend: ScopeCreepWeek[];
+}
+
 // ── Health Snapshot (one-call agent summary) ──────────────────────────────────
 
 export interface HealthSnapshotRisk { type: string; label: string; }
