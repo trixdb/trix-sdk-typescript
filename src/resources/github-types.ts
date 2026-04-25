@@ -1330,11 +1330,22 @@ export interface CodeComplexitySummary {
   avgCyclomatic: string | null;
 }
 
+export interface DesignFinding {
+  category: string;
+  priority: 'critical' | 'high' | 'medium' | 'low';
+  title: string;
+  description: string;
+  file_path: string;
+  evidence: Record<string, unknown>;
+  generated_by: string;
+}
+
 export interface AnalyzeCodeComplexityResult {
   file_path: string;
   language: string;
   metrics: CodeComplexityMetrics;
   functions: FunctionComplexityMetric[];
   smells: CodeSmellItem[];
-  summary: CodeComplexitySummary;
+  design: DesignFinding[];
+  summary: CodeComplexitySummary & { designIssues: number };
 }
