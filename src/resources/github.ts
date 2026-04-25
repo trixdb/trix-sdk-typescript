@@ -65,6 +65,7 @@ import type {
   ApprovedPRsResult,
   IssueBacklogResult,
   ReviewCoverageResult,
+  IssueAssigneesResult,
   MilestonesResult,
   HealthSnapshotResponse,
   PRQualityWeek,
@@ -152,6 +153,8 @@ export type {
   BacklogIssue,
   ReviewCoverageResult,
   AuthorReviewCoverage,
+  IssueAssigneesResult,
+  AssigneeStat,
   MilestonesResult,
   MilestoneStat,
   OpenPRAging,
@@ -656,6 +659,12 @@ export class GitHubResource extends BaseResource {
   async getReviewCoverage(projectId: string): Promise<ReviewCoverageResult> {
     validateId(projectId, 'project');
     return this.request<ReviewCoverageResult>({ method: 'GET', path: `/projects/${projectId}/github/review-coverage` });
+  }
+
+  /** Issue assignee workload — open issue counts per contributor, sorted most overloaded first. */
+  async getIssueAssignees(projectId: string): Promise<IssueAssigneesResult> {
+    validateId(projectId, 'project');
+    return this.request<IssueAssigneesResult>({ method: 'GET', path: `/projects/${projectId}/github/issue-assignees` });
   }
 
   /** Milestone progress — open/closed issue counts per GitHub milestone, ordered least-complete first. */

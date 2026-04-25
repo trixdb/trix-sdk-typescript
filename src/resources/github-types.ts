@@ -631,6 +631,20 @@ export interface ReviewCoverageResult {
   byAuthor: AuthorReviewCoverage[];
 }
 
+// ── Issue Assignee Workload ────────────────────────────────────────────────
+
+export interface AssigneeStat {
+  assignee: string;
+  openCount: number;
+  oldestDays: number;
+  avgDays: number;
+}
+
+export interface IssueAssigneesResult {
+  assignees: AssigneeStat[];
+  totalAssignees: number;
+}
+
 // ── Milestone Progress ─────────────────────────────────────────────────────
 
 export interface MilestoneStat {
