@@ -449,6 +449,8 @@ export interface HealthSnapshotResponse {
   prQualityTrend: { direction: 'improving' | 'stable' | 'declining' | null; currentAvg: number | null; weekDelta: number | null };
   reviewTurnaround: { avgHours: number | null; unreviewedCount: number };
   urgentItems: { critical: number; urgentTotal: number };
+  issueBacklog?: { totalOpen: number; unassignedCount: number };
+  reviewCoverage?: { totalMerged: number; coveragePct: number | null; lookbackDays: number };
 }
 
 // ── Active Branches ───────────────────────────────────────────────────────────
