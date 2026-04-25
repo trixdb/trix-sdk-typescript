@@ -155,6 +155,7 @@ export type {
   QualityCheck,
   CqlQuery,
   CqlResult,
+  CqlFromMode,
   AgentPRResult,
   PRReviewResult,
   SecurityFinding,

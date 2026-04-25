@@ -425,7 +425,31 @@ export interface PRQualityWeek {
   /** Number of PRs with a quality score that week. */
   pr_count: number;
 }
-export interface CqlQuery { from?: 'files' | 'functions' | 'suggestions'; where?: Record<string, Record<string, string | number>>; orderBy?: string; orderDir?: 'asc' | 'desc'; limit?: number; }
+export type CqlFromMode =
+  | 'files'
+  | 'functions'
+  | 'suggestions'
+  | 'ast_pattern'
+  | 'hotspots'
+  | 'patterns'
+  | 'dead_code'
+  | 'clones'
+  | 'metrics'
+  | 'coverage'
+  | 'summary'
+  | 'history';
+
+export interface CqlQuery {
+  from?: CqlFromMode;
+  where?: Record<string, Record<string, string | number>>;
+  orderBy?: string;
+  orderDir?: 'asc' | 'desc';
+  limit?: number;
+  language?: string;
+  pattern?: string;
+  patterns?: string[];
+  risk?: 'high' | 'medium' | 'all';
+}
 export interface CqlResult { results: Record<string, unknown>[]; count: number; query: CqlQuery; }
 export interface AgentPRResult { prNumber: number; prUrl: string; branchName: string; sha: string; }
 export interface SecurityFinding { category: string; priority: string; title: string; description: string; file_path: string | null; evidence: Record<string, unknown>; generated_by: string; }
