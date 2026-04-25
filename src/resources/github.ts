@@ -82,6 +82,7 @@ import type {
   ContributorMomentumResult,
   AgentAuditResult,
   ScopeCreepResult,
+  AssigneeCycleTimeResult,
 } from './github-types.js';
 
 export type {
@@ -211,6 +212,8 @@ export type {
   ScopeCreepAuthor,
   ScopeCreepWeek,
   ScopeCreepResult,
+  AssigneeStatItem,
+  AssigneeCycleTimeResult,
 } from './github-types.js'; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 // ── Resource ───────────────────────────────────────────────────────────────
@@ -839,6 +842,14 @@ export class GitHubResource extends BaseResource {
     return this.request<ScopeCreepResult>({
       method: 'GET',
       path: `/projects/${projectId}/github/scope-creep?days=${days}`,
+    });
+  }
+
+  async getAssigneeCycleTime(projectId: string, days = 90): Promise<AssigneeCycleTimeResult> {
+    validateId(projectId, 'project');
+    return this.request<AssigneeCycleTimeResult>({
+      method: 'GET',
+      path: `/projects/${projectId}/github/assignee-cycle-time?days=${days}`,
     });
   }
 }

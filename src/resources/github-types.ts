@@ -594,6 +594,21 @@ export interface ScopeCreepResult {
   weeklyTrend: ScopeCreepWeek[];
 }
 
+export interface AssigneeStatItem {
+  assignee: string;
+  closedCount: number;
+  avgDays: number | null;
+  prevAvgDays: number | null;
+  trend: 'faster' | 'stable' | 'slower';
+  pctChange: number | null;
+}
+
+export interface AssigneeCycleTimeResult {
+  assignees: AssigneeStatItem[];
+  teamAvgDays: number | null;
+  lookbackDays: number;
+}
+
 // ── Health Snapshot (one-call agent summary) ──────────────────────────────────
 
 export interface HealthSnapshotRisk { type: string; label: string; }
