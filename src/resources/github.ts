@@ -77,6 +77,8 @@ import type {
   IssueCycleTimeResult,
   IssueThroughputResult,
   IssueResolversResult,
+  CycleTimeTrendWeek,
+  CycleTimeTrendResult,
 } from './github-types.js';
 
 export type {
@@ -191,6 +193,8 @@ export type {
   IssueThroughputResult,
   IssueResolver,
   IssueResolversResult,
+  CycleTimeTrendWeek,
+  CycleTimeTrendResult,
 } from './github-types.js'; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 // ── Resource ───────────────────────────────────────────────────────────────
@@ -771,6 +775,18 @@ export class GitHubResource extends BaseResource {
     return this.request<IssueResolversResult>({
       method: 'GET',
       path: `/projects/${projectId}/github/issue-resolvers?days=${days}`,
+    });
+  }
+
+  /**
+   * Weekly average issue cycle time trend — are we getting faster or slower?
+   * @param weeks Lookback window in weeks (default 8; range: 2-26)
+   */
+  async getCycleTimeTrend(projectId: string, weeks = 8): Promise<CycleTimeTrendResult> {
+    validateId(projectId, 'project');
+    return this.request<CycleTimeTrendResult>({
+      method: 'GET',
+      path: `/projects/${projectId}/github/cycle-time-trend?weeks=${weeks}`,
     });
   }
 }

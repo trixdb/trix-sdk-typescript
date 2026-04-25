@@ -476,6 +476,21 @@ export interface IssueResolversResult {
   lookbackDays: number;
 }
 
+// ── Cycle Time Trend (Phase 4: Estimation Accuracy Tracker) ──────────────────
+
+export interface CycleTimeTrendWeek {
+  weekStart: string;
+  avgDays: number | null;
+  issueCount: number;
+}
+
+export interface CycleTimeTrendResult {
+  weeks: CycleTimeTrendWeek[];
+  trend: 'improving' | 'stable' | 'declining';
+  overallAvgDays: number | null;
+  lookbackWeeks: number;
+}
+
 // ── Health Snapshot (one-call agent summary) ──────────────────────────────────
 
 export interface HealthSnapshotRisk { type: string; label: string; }
