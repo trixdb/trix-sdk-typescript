@@ -238,24 +238,50 @@ export interface GoalProgressHistoryResponse {
   history: GoalProgressEvent[];
 }
 
-export interface ReleaseReadinessSignals {
-  open_prs: number;
-  blocking_tasks: number;
-  goal_completion_pct: number;
-  scope_creep_prs: number;
+export interface ReleaseReadinessBlocker {
+  issueNumber: string;
+  title: string;
+  url: string;
+  author: string;
+  labels: string[];
+  ageDays: number;
 }
 
-export interface ReleaseReadinessDetails {
-  open_prs: Array<{ title?: string; url?: string; author?: string; number?: number }>;
-  blocking_tasks: Array<{ title: string; priority: number }>;
-  scope_creep_prs: Array<{ title?: string; url?: string; changedFiles?: number }>;
+export interface ReleaseReadinessUnreviewedPR {
+  prNumber: string;
+  title: string;
+  url: string;
+  author: string;
+  ageDays: number;
+  requestedReviewers: string[];
+}
+
+export interface ReleaseReadinessStalePR {
+  prNumber: string;
+  title: string;
+  url: string;
+  author: string;
+  ageDays: number;
+}
+
+export interface ReleaseReadinessHotspot {
+  filePath: string;
+  repo: string;
+  hotspotScore: number;
 }
 
 export interface ReleaseReadinessResponse {
-  score: number;
-  ready: boolean;
-  signals: ReleaseReadinessSignals;
-  details: ReleaseReadinessDetails;
+  readinessScore: number;
+  openIssues: { count: number; blockerCount: number; blockers: ReleaseReadinessBlocker[] };
+  openPRs: {
+    count: number;
+    unreviewedCount: number;
+    staleCount: number;
+    unreviewed: ReleaseReadinessUnreviewedPR[];
+    stalePRs: ReleaseReadinessStalePR[];
+  };
+  recentMerges: { count: number };
+  topHotspots: ReleaseReadinessHotspot[];
 }
 
 export interface ScanRepoResponse {
