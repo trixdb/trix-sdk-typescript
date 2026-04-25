@@ -512,6 +512,8 @@ export interface HealthSnapshotResponse {
   issueBacklog?: { totalOpen: number; unassignedCount: number };
   reviewCoverage?: { totalMerged: number; coveragePct: number | null; lookbackDays: number };
   issueFlow?: { openedLast7d: number; closedLast7d: number; netFlow7d: number };
+  issueThroughput?: { avgPerWeek: number; trend: 'improving' | 'stable' | 'declining' } | null;
+  slowestCycleLabel?: { label: string; avgDays: number } | null;
 }
 
 // ── Active Branches ───────────────────────────────────────────────────────────
