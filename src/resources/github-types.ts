@@ -725,3 +725,21 @@ export interface IssueTriageResult {
   count: number;
   lookbackDays: number;
 }
+
+
+// ── Issue Flow ────────────────────────────────────────────────────────────────
+
+export interface IssueFlowDay {
+  day: string;
+  opened: number;
+  closed: number;
+  net: number;
+}
+
+export interface IssueFlowResult {
+  data: IssueFlowDay[];
+  totalOpened: number;
+  totalClosed: number;
+  netFlow: number;
+  lookbackDays: number;
+}

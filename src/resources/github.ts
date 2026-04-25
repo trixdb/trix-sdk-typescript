@@ -73,6 +73,7 @@ import type {
   PRQualityWeek,
   WeekOverWeekResult,
   IssueTriageResult,
+  IssueFlowResult,
 } from './github-types.js';
 
 export type {
@@ -180,6 +181,8 @@ export type {
   WeekOverWeekResult,
   TriageIssue,
   IssueTriageResult,
+  IssueFlowDay,
+  IssueFlowResult,
 } from './github-types.js'; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 // ── Resource ───────────────────────────────────────────────────────────────
@@ -724,5 +727,14 @@ export class GitHubResource extends BaseResource {
   async getIssueTriage(projectId: string, days = 7): Promise<IssueTriageResult> {
     validateId(projectId, 'project');
     return this.request<IssueTriageResult>({ method: 'GET', path: `/projects/${projectId}/github/issue-triage?days=${days}` });
+  }
+
+  /**
+   * Daily issue open/close flow — backlog burn-down visibility.
+   * @param days Lookback window in days (default 30; options: 7-90)
+   */
+  async getIssueFlow(projectId: string, days = 30): Promise<IssueFlowResult> {
+    validateId(projectId, 'project');
+    return this.request<IssueFlowResult>({ method: 'GET', path: `/projects/${projectId}/github/issue-flow?days=${days}` });
   }
 }
