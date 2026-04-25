@@ -55,6 +55,7 @@ import type {
   LoadBearingResult,
   BugDensityResult,
   HealthSnapshotResponse,
+  PRQualityWeek,
 } from './github-types.js';
 
 export type {
@@ -130,6 +131,7 @@ export type {
   BugDensityFile,
   HealthSnapshotResponse,
   HealthSnapshotRisk,
+  PRQualityWeek,
 } from './github-types.js'; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 // ── Resource ───────────────────────────────────────────────────────────────
@@ -552,5 +554,15 @@ export class GitHubResource extends BaseResource {
   async getBugDensity(projectId: string): Promise<BugDensityResult> {
     validateId(projectId, 'project');
     return this.request<BugDensityResult>({ method: 'GET', path: `/projects/${projectId}/github/bug-density` });
+  }
+
+  /**
+   * Weekly PR quality score trend — 12-week rolling average from PR brief memories.
+   * Returns one data point per week that had at least one reviewed PR.
+   * Use this to track whether AI-assisted or human PRs are improving over time.
+   */
+  async getPrQualityTrend(projectId: string): Promise<PRQualityWeek[]> {
+    validateId(projectId, 'project');
+    return this.request<PRQualityWeek[]>({ method: 'GET', path: `/projects/${projectId}/github/pr-quality-trend` });
   }
 }

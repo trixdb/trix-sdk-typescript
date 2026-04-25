@@ -375,6 +375,15 @@ export interface DebtCategory { category: string; count: number; minutes: number
 export interface TechnicalDebt { totalMinutes: number; totalHours: number; byCategory: DebtCategory[]; }
 export interface QualityCheck { id: string; label: string; passed: boolean; value: number | null; threshold: number; unit?: string; }
 export interface QualityGate { passed: boolean; checks: QualityCheck[]; score: number; }
+
+export interface PRQualityWeek {
+  /** ISO date (YYYY-MM-DD) for the Monday of this week. */
+  week_start: string;
+  /** Average PR quality score (0-100) for all reviewed PRs that week. */
+  avg_quality: number;
+  /** Number of PRs with a quality score that week. */
+  pr_count: number;
+}
 export interface CqlQuery { from?: 'files' | 'functions' | 'suggestions'; where?: Record<string, Record<string, string | number>>; orderBy?: string; orderDir?: 'asc' | 'desc'; limit?: number; }
 export interface CqlResult { results: Record<string, unknown>[]; count: number; query: CqlQuery; }
 export interface AgentPRResult { prNumber: number; prUrl: string; branchName: string; sha: string; }
