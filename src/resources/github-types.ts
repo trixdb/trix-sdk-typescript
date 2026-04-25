@@ -1218,3 +1218,34 @@ export interface PRCodeReviewResult {
     event: 'APPROVE' | 'COMMENT' | 'REQUEST_CHANGES';
   };
 }
+
+export interface SubmitPRReviewResult {
+  reviewId?: number;
+  reviewUrl?: string;
+  event: 'APPROVE' | 'COMMENT' | 'REQUEST_CHANGES';
+  grade: 'A' | 'B' | 'C' | 'D' | 'F';
+  qualityScore: number;
+  analyzedFiles: number;
+  inlineComments: number;
+  dryRun?: boolean;
+}
+
+export interface QualityGateCondition {
+  label: string;
+  actual: unknown;
+  limit: unknown;
+  passed: boolean;
+  mode: string;
+}
+
+export interface QualityGateResult {
+  passed: boolean;
+  status: 'PASSED' | 'FAILED';
+  grade: 'A' | 'B' | 'C' | 'D' | 'F';
+  qualityScore: number;
+  conditions: QualityGateCondition[];
+  blockers: QualityGateCondition[];
+  prNumber?: number;
+  repo?: string;
+  analyzedFiles?: number;
+}

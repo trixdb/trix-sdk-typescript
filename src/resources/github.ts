@@ -91,6 +91,8 @@ import type {
   ReviewNetworkResult,
   ReviewDepthResult,
   PRCodeReviewResult,
+  SubmitPRReviewResult,
+  QualityGateResult,
 } from './github-types.js';
 
 export type {
@@ -252,6 +254,8 @@ export type {
   ReviewerDepthStat,
   ReviewDepthResult,
   PRCodeReviewResult,
+  SubmitPRReviewResult,
+  QualityGateResult,
 } from './github-types.js'; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 // ── Resource ───────────────────────────────────────────────────────────────
@@ -964,6 +968,38 @@ export class GitHubResource extends BaseResource {
     return this.request<PRCodeReviewResult>({
       method: 'POST',
       path: `/projects/${projectId}/github/pr-review`,
+      body: { prNumber, ...options },
+    });
+  }
+
+  /** Post AST-level PR review with inline comments directly to GitHub. */
+  async submitPRReview(
+    projectId: string,
+    prNumber: number,
+    options: { repoFullName?: string; dryRun?: boolean } = {},
+  ): Promise<SubmitPRReviewResult> {
+    validateId(projectId, 'project');
+    return this.request<SubmitPRReviewResult>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/pr-submit-review`,
+      body: { prNumber, ...options },
+    });
+  }
+
+  /** Evaluate a PR against a quality gate — returns PASSED/FAILED with condition breakdown. */
+  async checkPRQualityGate(
+    projectId: string,
+    prNumber: number,
+    options: {
+      repoFullName?: string;
+      gate?: 'strict' | 'standard' | 'relaxed' | Record<string, unknown>;
+      postStatus?: boolean;
+    } = {},
+  ): Promise<QualityGateResult> {
+    validateId(projectId, 'project');
+    return this.request<QualityGateResult>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/pr-quality-gate`,
       body: { prNumber, ...options },
     });
   }
