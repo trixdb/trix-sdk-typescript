@@ -447,6 +447,21 @@ export interface IssueCycleTimeResult {
   lookbackDays: number;
 }
 
+// ── Issue Throughput (Phase 4: Delivery Throughput Tracker) ──────────────────
+
+export interface IssueThroughputWeek {
+  weekStart: string;
+  closedCount: number;
+  openedCount: number;
+}
+
+export interface IssueThroughputResult {
+  weeks: IssueThroughputWeek[];
+  avgClosedPerWeek: number;
+  trend: 'improving' | 'stable' | 'declining';
+  lookbackWeeks: number;
+}
+
 // ── Health Snapshot (one-call agent summary) ──────────────────────────────────
 
 export interface HealthSnapshotRisk { type: string; label: string; }

@@ -75,6 +75,7 @@ import type {
   IssueTriageResult,
   IssueFlowResult,
   IssueCycleTimeResult,
+  IssueThroughputResult,
 } from './github-types.js';
 
 export type {
@@ -184,6 +185,9 @@ export type {
   IssueTriageResult,
   IssueFlowDay,
   IssueFlowResult,
+  IssueCycleTimeResult,
+  IssueThroughputWeek,
+  IssueThroughputResult,
 } from './github-types.js'; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 // ── Resource ───────────────────────────────────────────────────────────────
@@ -741,5 +745,17 @@ export class GitHubResource extends BaseResource {
 
   async getIssueCycleTime(projectId: string, days = 90): Promise<IssueCycleTimeResult> {
     return this.client.get(`/v1/projects/${projectId}/github/issue-cycle-time?days=${days}`);
+  }
+
+  /**
+   * Weekly closed issue throughput — delivery trend over last N weeks.
+   * @param weeks Lookback window in weeks (default 8; range: 2-26)
+   */
+  async getIssueThroughput(projectId: string, weeks = 8): Promise<IssueThroughputResult> {
+    validateId(projectId, 'project');
+    return this.request<IssueThroughputResult>({
+      method: 'GET',
+      path: `/projects/${projectId}/github/issue-throughput?weeks=${weeks}`,
+    });
   }
 }
