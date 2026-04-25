@@ -209,6 +209,9 @@ export type {
   ReviewEdge,
   ReviewContributor,
   ReviewNetworkResult,
+  ReviewDepthSummary,
+  ReviewerDepthStat,
+  ReviewDepthResult,
 } from './resources/github.js';
 
 // Re-export testing utilities for convenience

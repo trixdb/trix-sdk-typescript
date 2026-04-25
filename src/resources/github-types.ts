@@ -1141,3 +1141,27 @@ export interface ReviewNetworkResult {
   contributors: ReviewContributor[];
   lookbackDays: number;
 }
+
+export interface ReviewDepthSummary {
+  totalReviews: number;
+  totalReviewers: number;
+  avgScrutinyRate: number;
+  rubberstampCount: number;
+  rigorousCount: number;
+}
+
+export interface ReviewerDepthStat {
+  reviewer: string;
+  totalReviews: number;
+  approvals: number;
+  changesRequested: number;
+  commentsOnly: number;
+  scrutinyRate: number;
+  uniquePrs: number;
+}
+
+export interface ReviewDepthResult {
+  summary: ReviewDepthSummary;
+  reviewers: ReviewerDepthStat[];
+  lookbackDays: number;
+}

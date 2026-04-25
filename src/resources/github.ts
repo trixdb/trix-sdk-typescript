@@ -89,6 +89,7 @@ import type {
   AIvsHumanResult,
   BusFactorResult,
   ReviewNetworkResult,
+  ReviewDepthResult,
 } from './github-types.js';
 
 export type {
@@ -246,6 +247,9 @@ export type {
   ReviewEdge,
   ReviewContributor,
   ReviewNetworkResult,
+  ReviewDepthSummary,
+  ReviewerDepthStat,
+  ReviewDepthResult,
 } from './github-types.js'; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 // ── Resource ───────────────────────────────────────────────────────────────
@@ -936,6 +940,15 @@ export class GitHubResource extends BaseResource {
     return this.request<ReviewNetworkResult>({
       method: 'GET',
       path: `/projects/${projectId}/github/review-network?days=${days}`,
+    });
+  }
+
+  /** Reviewer thoroughness analytics — scrutiny rate, rubber-stamp vs rigorous reviewers. */
+  async getReviewDepth(projectId: string, days = 90): Promise<ReviewDepthResult> {
+    validateId(projectId, 'project');
+    return this.request<ReviewDepthResult>({
+      method: 'GET',
+      path: `/projects/${projectId}/github/review-depth?days=${days}`,
     });
   }
 }
