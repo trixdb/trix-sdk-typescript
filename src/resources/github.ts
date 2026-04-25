@@ -88,6 +88,7 @@ import type {
   DORAResult,
   AIvsHumanResult,
   BusFactorResult,
+  ReviewNetworkResult,
 } from './github-types.js';
 
 export type {
@@ -242,6 +243,9 @@ export type {
   BusFactorContributor,
   BusFactorSummary,
   BusFactorResult,
+  ReviewEdge,
+  ReviewContributor,
+  ReviewNetworkResult,
 } from './github-types.js'; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 // ── Resource ───────────────────────────────────────────────────────────────
@@ -923,6 +927,15 @@ export class GitHubResource extends BaseResource {
     return this.request<BusFactorResult>({
       method: 'GET',
       path: `/projects/${projectId}/github/bus-factor?days=${days}`,
+    });
+  }
+
+  /** Map team code review collaboration — who reviews whose code, silo detection. */
+  async getReviewNetwork(projectId: string, days = 90): Promise<ReviewNetworkResult> {
+    validateId(projectId, 'project');
+    return this.request<ReviewNetworkResult>({
+      method: 'GET',
+      path: `/projects/${projectId}/github/review-network?days=${days}`,
     });
   }
 }

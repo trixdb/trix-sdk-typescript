@@ -1119,3 +1119,25 @@ export interface BusFactorResult {
   byContributor: BusFactorContributor[];
   lookbackDays: number;
 }
+
+// ── Review Collaboration Network (ADR-152) ────────────────────────────────────
+
+export interface ReviewEdge {
+  reviewer: string;
+  author: string;
+  reviewCount: number;
+}
+
+export interface ReviewContributor {
+  name: string;
+  reviewsGiven: number;
+  reviewsReceived: number;
+  uniqueAuthors: number;
+  uniqueReviewers: number;
+}
+
+export interface ReviewNetworkResult {
+  edges: ReviewEdge[];
+  contributors: ReviewContributor[];
+  lookbackDays: number;
+}

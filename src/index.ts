@@ -206,6 +206,9 @@ export type {
   BusFactorContributor,
   BusFactorSummary,
   BusFactorResult,
+  ReviewEdge,
+  ReviewContributor,
+  ReviewNetworkResult,
 } from './resources/github.js';
 
 // Re-export testing utilities for convenience
