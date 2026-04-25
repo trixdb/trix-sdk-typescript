@@ -1432,3 +1432,72 @@ export interface TechDebtResult {
   totalDebtLabel: string;
   grade: 'A' | 'B' | 'C' | 'D' | 'F';
 }
+
+// ── Custom Rules ───────────────────────────────────────────────────────────
+
+export type CustomRuleLanguage = 'javascript' | 'typescript' | 'python' | 'go' | 'rust' | 'java' | 'csharp' | 'ruby' | 'kotlin' | 'swift';
+export type CustomRuleSeverity = 'critical' | 'high' | 'medium' | 'low';
+export type CustomRuleCategory = 'security' | 'performance' | 'refactor' | 'maintenance' | 'dependency';
+
+export interface CustomRule {
+  id: string;
+  project_id: string;
+  name: string;
+  description: string;
+  language: CustomRuleLanguage;
+  tree_sitter_query: string;
+  severity: CustomRuleSeverity;
+  category: CustomRuleCategory;
+  message_template: string;
+  enabled: boolean;
+  run_count: number;
+  last_match_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CustomRulesResponse {
+  results: CustomRule[];
+  count: number;
+}
+
+export interface CreateCustomRuleParams {
+  name: string;
+  language: CustomRuleLanguage;
+  tree_sitter_query: string;
+  severity: CustomRuleSeverity;
+  category: CustomRuleCategory;
+  description?: string;
+  message_template?: string;
+  enabled?: boolean;
+}
+
+export interface UpdateCustomRuleParams {
+  name?: string;
+  language?: CustomRuleLanguage;
+  tree_sitter_query?: string;
+  severity?: CustomRuleSeverity;
+  category?: CustomRuleCategory;
+  description?: string;
+  message_template?: string;
+  enabled?: boolean;
+}
+
+export interface CustomRuleMatch {
+  text: string;
+  line: number;
+  captureName: string;
+}
+
+export interface CustomRuleTestHit {
+  file_path: string;
+  matches: CustomRuleMatch[];
+}
+
+export interface CustomRuleTestResult {
+  rule: { id: string; name: string; severity: string };
+  filesScanned: number;
+  matchingFiles: number;
+  totalMatches: number;
+  hits: CustomRuleTestHit[];
+}

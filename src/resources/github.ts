@@ -99,6 +99,11 @@ import type {
   QualityGateResult,
   ActionPlanResult,
   TechDebtResult,
+  CustomRule,
+  CustomRulesResponse,
+  CreateCustomRuleParams,
+  UpdateCustomRuleParams,
+  CustomRuleTestResult,
 } from './github-types.js';
 
 export type {
@@ -269,6 +274,11 @@ export type {
   QualityGateResult,
   ActionPlanResult,
   TechDebtResult,
+  CustomRule,
+  CustomRulesResponse,
+  CreateCustomRuleParams,
+  UpdateCustomRuleParams,
+  CustomRuleTestResult,
 } from './github-types.js'; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 // ── Resource ───────────────────────────────────────────────────────────────
@@ -1064,6 +1074,56 @@ export class GitHubResource extends BaseResource {
     return this.request<TechDebtResult>({
       method: 'GET',
       path: `/projects/${projectId}/github/tech-debt`,
+    });
+  }
+
+  /** List all user-defined tree-sitter SAST rules for a project. */
+  async listCustomRules(projectId: string): Promise<CustomRulesResponse> {
+    validateId(projectId, 'project');
+    return this.request<CustomRulesResponse>({
+      method: 'GET',
+      path: `/projects/${projectId}/github/custom-rules`,
+    });
+  }
+
+  /** Create a user-defined tree-sitter SAST rule. */
+  async createCustomRule(projectId: string, params: CreateCustomRuleParams): Promise<CustomRule> {
+    validateId(projectId, 'project');
+    return this.request<CustomRule>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/custom-rules`,
+      body: params,
+    });
+  }
+
+  /** Update fields on an existing custom rule. */
+  async updateCustomRule(projectId: string, ruleId: string, params: UpdateCustomRuleParams): Promise<CustomRule> {
+    validateId(projectId, 'project');
+    validateId(ruleId, 'rule');
+    return this.request<CustomRule>({
+      method: 'PATCH',
+      path: `/projects/${projectId}/github/custom-rules/${ruleId}`,
+      body: params,
+    });
+  }
+
+  /** Delete a custom rule permanently. */
+  async deleteCustomRule(projectId: string, ruleId: string): Promise<void> {
+    validateId(projectId, 'project');
+    validateId(ruleId, 'rule');
+    return this.request<void>({
+      method: 'DELETE',
+      path: `/projects/${projectId}/github/custom-rules/${ruleId}`,
+    });
+  }
+
+  /** Run a custom rule against the top hotspot files and return matches. */
+  async testCustomRule(projectId: string, ruleId: string): Promise<CustomRuleTestResult> {
+    validateId(projectId, 'project');
+    validateId(ruleId, 'rule');
+    return this.request<CustomRuleTestResult>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/custom-rules/${ruleId}/test`,
     });
   }
 }
