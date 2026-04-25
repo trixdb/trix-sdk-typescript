@@ -1350,3 +1350,28 @@ export interface AnalyzeCodeComplexityResult {
   design: DesignFinding[];
   summary: CodeComplexitySummary & { designIssues: number };
 }
+
+export interface PreFlightBlocker {
+  type: string;
+  file: string;
+  message: string;
+  count: number;
+  findings?: Array<{ title: string; line?: number }>;
+}
+
+export interface PreFlightWarning {
+  type: string;
+  file: string;
+  message: string;
+  count: number;
+  issues?: string[];
+}
+
+export interface PreFlightPRResult {
+  verdict: 'PASS' | 'WARN' | 'BLOCK';
+  safe: boolean;
+  blockers: PreFlightBlocker[];
+  warnings: PreFlightWarning[];
+  summary: { filesChecked: number; secrets: number; security: number; smells: number; design: number };
+  files: Array<{ file_path: string; language: string; secrets: number; security: number; smells: number; design: number; cyclomatic: number }>;
+}

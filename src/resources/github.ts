@@ -52,6 +52,7 @@ import type {
   BatchScanFileInput,
   BatchScanCodeResult,
   AnalyzeCodeComplexityResult,
+  PreFlightPRResult,
   CodeSummaryResult,
   CloneGroupsResult,
   DeadExportsResult,
@@ -165,6 +166,7 @@ export type {
   BatchScanFileInput,
   BatchScanCodeResult,
   AnalyzeCodeComplexityResult,
+  PreFlightPRResult,
   CodeSummaryResult,
   CloneGroupsResult,
   DeadExportsResult,
@@ -657,6 +659,19 @@ export class GitHubResource extends BaseResource {
   async batchScanCode(projectId: string, files: BatchScanFileInput[]): Promise<BatchScanCodeResult> {
     validateId(projectId, 'project');
     return this.request<BatchScanCodeResult>({ method: 'POST', path: `/projects/${projectId}/github/batch-scan-code`, body: { files } });
+  }
+
+  /** Pre-flight quality gate: SAST+secrets+complexity+design check before creating a PR. */
+  async preFlightPR(
+    projectId: string,
+    changes: Array<{ filePath: string; content: string }>,
+  ): Promise<PreFlightPRResult> {
+    validateId(projectId, 'project');
+    return this.request<PreFlightPRResult>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/pre-flight-pr`,
+      body: { changes: changes.map((c) => ({ file_path: c.filePath, content: c.content })) },
+    });
   }
 
   /** Compute per-function cyclomatic + cognitive complexity and code smells for arbitrary source. */
