@@ -611,3 +611,20 @@ export interface IssueBacklogResult {
   labelDistribution: IssueLabelCount[];
   oldestIssues: BacklogIssue[];
 }
+
+export interface AuthorReviewCoverage {
+  author: string;
+  mergedCount: number;
+  reviewedCount: number;
+  unreviewedCount: number;
+  coveragePct: number;
+}
+
+export interface ReviewCoverageResult {
+  totalMerged: number;
+  reviewedCount: number;
+  unreviewedCount: number;
+  coveragePct: number | null;
+  lookbackDays: number;
+  byAuthor: AuthorReviewCoverage[];
+}

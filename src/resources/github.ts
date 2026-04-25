@@ -64,6 +64,7 @@ import type {
   ReviewerWorkloadResult,
   ApprovedPRsResult,
   IssueBacklogResult,
+  ReviewCoverageResult,
   HealthSnapshotResponse,
   PRQualityWeek,
 } from './github-types.js';
@@ -148,6 +149,8 @@ export type {
   IssueBacklogResult,
   IssueLabelCount,
   BacklogIssue,
+  ReviewCoverageResult,
+  AuthorReviewCoverage,
   OpenPRAging,
   BranchInfo,
   CloneGroup,
@@ -644,6 +647,12 @@ export class GitHubResource extends BaseResource {
   async getIssueBacklog(projectId: string): Promise<IssueBacklogResult> {
     validateId(projectId, 'project');
     return this.request<IssueBacklogResult>({ method: 'GET', path: `/projects/${projectId}/github/issue-backlog` });
+  }
+
+  /** PR review coverage — % of merged PRs (last 90d) that received at least one review, by author. */
+  async getReviewCoverage(projectId: string): Promise<ReviewCoverageResult> {
+    validateId(projectId, 'project');
+    return this.request<ReviewCoverageResult>({ method: 'GET', path: `/projects/${projectId}/github/review-coverage` });
   }
 
   /**
