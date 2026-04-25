@@ -446,6 +446,9 @@ export interface HealthSnapshotResponse {
   velocity: { mergedLast7Days: number; mergedLast30Days: number };
   openPRs: { total: number; risky: number; avgQualityScore: number | null };
   topRisks: HealthSnapshotRisk[];
+  prQualityTrend: { direction: 'improving' | 'stable' | 'declining' | null; currentAvg: number | null; weekDelta: number | null };
+  reviewTurnaround: { avgHours: number | null; unreviewedCount: number };
+  urgentItems: { critical: number; urgentTotal: number };
 }
 
 // ── Active Branches ───────────────────────────────────────────────────────────
