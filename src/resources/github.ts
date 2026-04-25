@@ -63,6 +63,7 @@ import type {
   WorkQueueResult,
   ReviewerWorkloadResult,
   ApprovedPRsResult,
+  IssueBacklogResult,
   HealthSnapshotResponse,
   PRQualityWeek,
 } from './github-types.js';
@@ -144,6 +145,9 @@ export type {
   ReviewerWorkloadResult,
   ApprovedPRsResult,
   ApprovedPR,
+  IssueBacklogResult,
+  IssueLabelCount,
+  BacklogIssue,
   OpenPRAging,
   BranchInfo,
   CloneGroup,
@@ -634,6 +638,12 @@ export class GitHubResource extends BaseResource {
   async getApprovedPRs(projectId: string): Promise<ApprovedPRsResult> {
     validateId(projectId, 'project');
     return this.request<ApprovedPRsResult>({ method: 'GET', path: `/projects/${projectId}/github/approved-prs` });
+  }
+
+  /** Issue backlog health — unassigned/unlabeled counts, label distribution, oldest issues. */
+  async getIssueBacklog(projectId: string): Promise<IssueBacklogResult> {
+    validateId(projectId, 'project');
+    return this.request<IssueBacklogResult>({ method: 'GET', path: `/projects/${projectId}/github/issue-backlog` });
   }
 
   /**

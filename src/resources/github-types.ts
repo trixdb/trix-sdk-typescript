@@ -585,3 +585,29 @@ export interface ApprovedPRsResult {
   prs: ApprovedPR[];
   count: number;
 }
+
+export interface IssueLabelCount {
+  label: string;
+  count: number;
+}
+
+export interface BacklogIssue {
+  issueNumber: number | null;
+  title: string;
+  author: string | null;
+  url: string | null;
+  assignees: string[];
+  labels: string[];
+  milestone: string | null;
+  ageDays: number;
+}
+
+export interface IssueBacklogResult {
+  totalOpen: number;
+  unassignedCount: number;
+  unlabeledCount: number;
+  oldestAgeDays: number;
+  avgAgeDays: number;
+  labelDistribution: IssueLabelCount[];
+  oldestIssues: BacklogIssue[];
+}
