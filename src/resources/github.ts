@@ -55,6 +55,7 @@ import type {
   TestCoverageResult,
   LoadBearingResult,
   BugDensityResult,
+  ActiveBranchesResult,
   HealthSnapshotResponse,
   PRQualityWeek,
 } from './github-types.js';
@@ -126,6 +127,8 @@ export type {
   TestCoverageResult,
   LoadBearingResult,
   BugDensityResult,
+  ActiveBranchesResult,
+  BranchInfo,
   CloneGroup,
   CloneInstance,
   DeadExportFile,
@@ -566,6 +569,12 @@ export class GitHubResource extends BaseResource {
   async getBugDensity(projectId: string): Promise<BugDensityResult> {
     validateId(projectId, 'project');
     return this.request<BugDensityResult>({ method: 'GET', path: `/projects/${projectId}/github/bug-density` });
+  }
+
+  /** Active branches derived from commit memories with staleness detection (>14 days without commits). */
+  async getActiveBranches(projectId: string): Promise<ActiveBranchesResult> {
+    validateId(projectId, 'project');
+    return this.request<ActiveBranchesResult>({ method: 'GET', path: `/projects/${projectId}/github/branches` });
   }
 
   /**

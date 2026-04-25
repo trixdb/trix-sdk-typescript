@@ -447,3 +447,18 @@ export interface HealthSnapshotResponse {
   openPRs: { total: number; risky: number; avgQualityScore: number | null };
   topRisks: HealthSnapshotRisk[];
 }
+
+// ── Active Branches ───────────────────────────────────────────────────────────
+
+export interface BranchInfo {
+  name: string;
+  repoFullName: string | null;
+  lastCommitAt: string | null;
+  commitCount: number;
+  openPrNumber: number | null;
+  openPrUrl: string | null;
+  isDefault: boolean;
+  isStale: boolean;
+}
+
+export interface ActiveBranchesResult { branches: BranchInfo[]; count: number; }
