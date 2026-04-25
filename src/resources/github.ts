@@ -56,6 +56,7 @@ import type {
   LoadBearingResult,
   BugDensityResult,
   ActiveBranchesResult,
+  ContributorQualityResult,
   HealthSnapshotResponse,
   PRQualityWeek,
 } from './github-types.js';
@@ -128,6 +129,8 @@ export type {
   LoadBearingResult,
   BugDensityResult,
   ActiveBranchesResult,
+  ContributorQualityResult,
+  ContributorQualityStat,
   BranchInfo,
   CloneGroup,
   CloneInstance,
@@ -575,6 +578,12 @@ export class GitHubResource extends BaseResource {
   async getActiveBranches(projectId: string): Promise<ActiveBranchesResult> {
     validateId(projectId, 'project');
     return this.request<ActiveBranchesResult>({ method: 'GET', path: `/projects/${projectId}/github/branches` });
+  }
+
+  /** Per-contributor PR quality stats — avg score, test coverage %, PR count, last-active date. */
+  async getContributorQuality(projectId: string): Promise<ContributorQualityResult> {
+    validateId(projectId, 'project');
+    return this.request<ContributorQualityResult>({ method: 'GET', path: `/projects/${projectId}/github/contributor-quality` });
   }
 
   /**

@@ -462,3 +462,14 @@ export interface BranchInfo {
 }
 
 export interface ActiveBranchesResult { branches: BranchInfo[]; count: number; }
+
+export interface ContributorQualityStat {
+  author: string;
+  prCount: number;
+  avgQuality: number | null;
+  withTestsCount: number;
+  testCoveragePct: number;
+  lastActiveAt: string | null;
+}
+
+export interface ContributorQualityResult { contributors: ContributorQualityStat[]; count: number; }
