@@ -474,3 +474,18 @@ export interface ContributorQualityStat {
 }
 
 export interface ContributorQualityResult { contributors: ContributorQualityStat[]; count: number; }
+
+export interface OpenPRAging {
+  prNumber: number | null;
+  title: string | null;
+  author: string | null;
+  url: string | null;
+  repo: string | null;
+  headBranch: string | null;
+  openedAt: string | null;
+  lastUpdatedAt: string | null;
+  ageDays: number;
+  isStale: boolean;
+}
+
+export interface PrAgingResult { prs: OpenPRAging[]; count: number; staleDays: number; }

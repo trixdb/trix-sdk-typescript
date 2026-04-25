@@ -57,6 +57,7 @@ import type {
   BugDensityResult,
   ActiveBranchesResult,
   ContributorQualityResult,
+  PrAgingResult,
   HealthSnapshotResponse,
   PRQualityWeek,
 } from './github-types.js';
@@ -131,6 +132,8 @@ export type {
   ActiveBranchesResult,
   ContributorQualityResult,
   ContributorQualityStat,
+  PrAgingResult,
+  OpenPRAging,
   BranchInfo,
   CloneGroup,
   CloneInstance,
@@ -584,6 +587,12 @@ export class GitHubResource extends BaseResource {
   async getContributorQuality(projectId: string): Promise<ContributorQualityResult> {
     validateId(projectId, 'project');
     return this.request<ContributorQualityResult>({ method: 'GET', path: `/projects/${projectId}/github/contributor-quality` });
+  }
+
+  /** Open PRs sorted oldest-first with ageDays + isStale flag (>7 days without update). */
+  async getPrAging(projectId: string): Promise<PrAgingResult> {
+    validateId(projectId, 'project');
+    return this.request<PrAgingResult>({ method: 'GET', path: `/projects/${projectId}/github/pr-aging` });
   }
 
   /**
