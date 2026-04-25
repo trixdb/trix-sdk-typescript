@@ -706,3 +706,22 @@ export interface WeekOverWeekResult {
   issues: WeekStat;
   commits: WeekStat;
 }
+
+
+// ── Issue Triage ──────────────────────────────────────────────────────────────
+
+export interface TriageIssue {
+  issueNumber: string;
+  title: string;
+  url: string | null;
+  repo: string | null;
+  author: string | null;
+  ageHours: number;
+  missing: ('labels' | 'assignee' | 'milestone')[];
+}
+
+export interface IssueTriageResult {
+  issues: TriageIssue[];
+  count: number;
+  lookbackDays: number;
+}

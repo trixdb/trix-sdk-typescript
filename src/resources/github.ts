@@ -72,6 +72,7 @@ import type {
   HealthSnapshotResponse,
   PRQualityWeek,
   WeekOverWeekResult,
+  IssueTriageResult,
 } from './github-types.js';
 
 export type {
@@ -177,6 +178,8 @@ export type {
   PRQualityWeek,
   WeekStat,
   WeekOverWeekResult,
+  TriageIssue,
+  IssueTriageResult,
 } from './github-types.js'; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 // ── Resource ───────────────────────────────────────────────────────────────
@@ -712,5 +715,14 @@ export class GitHubResource extends BaseResource {
   async getWeekOverWeek(projectId: string): Promise<WeekOverWeekResult> {
     validateId(projectId, 'project');
     return this.request<WeekOverWeekResult>({ method: 'GET', path: `/projects/${projectId}/github/week-over-week` });
+  }
+
+  /**
+   * Issue triage — recently-opened issues missing labels, assignee, or milestone.
+   * @param days Lookback window in days (default 7; options: 7, 14, 30)
+   */
+  async getIssueTriage(projectId: string, days = 7): Promise<IssueTriageResult> {
+    validateId(projectId, 'project');
+    return this.request<IssueTriageResult>({ method: 'GET', path: `/projects/${projectId}/github/issue-triage?days=${days}` });
   }
 }
