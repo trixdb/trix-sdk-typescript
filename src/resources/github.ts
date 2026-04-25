@@ -27,6 +27,7 @@ import type {
   CycleTimeResponse,
   AgentAttributionResponse,
   GoalProgressResponse,
+  GoalProgressHistoryResponse,
   ReleaseReadinessResponse,
   ScanRepoResponse,
   GenerateNarrativeResponse,
@@ -83,6 +84,8 @@ export type {
   AgentAttributionResponse,
   LinkedGoal,
   GoalProgressResponse,
+  GoalProgressHistoryResponse,
+  GoalProgressEvent,
   ReleaseReadinessSignals,
   ReleaseReadinessDetails,
   ReleaseReadinessResponse,
@@ -300,6 +303,15 @@ export class GitHubResource extends BaseResource {
     return this.request<GoalProgressResponse>({
       method: 'GET',
       path: `/projects/${projectId}/github/goal-progress`,
+    });
+  }
+
+  /** Get chronological feed of GitHub-driven goal progress events. */
+  async getGoalProgressHistory(projectId: string, limit = 20): Promise<GoalProgressHistoryResponse> {
+    validateId(projectId, 'project');
+    return this.request<GoalProgressHistoryResponse>({
+      method: 'GET',
+      path: `/projects/${projectId}/github/goal-progress-history?limit=${limit}`,
     });
   }
 

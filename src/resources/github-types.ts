@@ -223,6 +223,21 @@ export interface GoalProgressResponse {
   goals: LinkedGoal[];
 }
 
+export interface GoalProgressEvent {
+  id: string;
+  goal_id: string;
+  goal_title: string;
+  goal_status: string;
+  previous_progress: number;
+  new_progress: number;
+  note: string | null;
+  created_at: string;
+}
+
+export interface GoalProgressHistoryResponse {
+  history: GoalProgressEvent[];
+}
+
 export interface ReleaseReadinessSignals {
   open_prs: number;
   blocking_tasks: number;
