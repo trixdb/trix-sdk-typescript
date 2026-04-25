@@ -451,6 +451,7 @@ export interface HealthSnapshotResponse {
   urgentItems: { critical: number; urgentTotal: number };
   issueBacklog?: { totalOpen: number; unassignedCount: number };
   reviewCoverage?: { totalMerged: number; coveragePct: number | null; lookbackDays: number };
+  issueFlow?: { openedLast7d: number; closedLast7d: number; netFlow7d: number };
 }
 
 // ── Active Branches ───────────────────────────────────────────────────────────
