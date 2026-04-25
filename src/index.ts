@@ -198,6 +198,10 @@ export type {
   DORADeployFreqWeek,
   DORALeadTimeWeek,
   DORAcfrWeek,
+  AIvsHumanByAgent,
+  AIvsHumanWeek,
+  AIvsHumanTopPR,
+  AIvsHumanResult,
 } from './resources/github.js';
 
 // Re-export testing utilities for convenience

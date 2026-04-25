@@ -86,6 +86,7 @@ import type {
   PRTaskAlignmentResult,
   TestGapResult,
   DORAResult,
+  AIvsHumanResult,
 } from './github-types.js';
 
 export type {
@@ -232,6 +233,10 @@ export type {
   DORAcfrWeek,
   DORArating,
   DORAResult,
+  AIvsHumanByAgent,
+  AIvsHumanWeek,
+  AIvsHumanTopPR,
+  AIvsHumanResult,
 } from './github-types.js'; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 // ── Resource ───────────────────────────────────────────────────────────────
@@ -895,6 +900,15 @@ export class GitHubResource extends BaseResource {
     return this.request<DORAResult>({
       method: 'GET',
       path: `/projects/${projectId}/github/dora-metrics?days=${days}`,
+    });
+  }
+
+  /** Compare PR quality scores between AI-authored and human-authored PRs. */
+  async getAIvsHumanQuality(projectId: string, days = 90): Promise<AIvsHumanResult> {
+    validateId(projectId, 'project');
+    return this.request<AIvsHumanResult>({
+      method: 'GET',
+      path: `/projects/${projectId}/github/ai-vs-human-quality?days=${days}`,
     });
   }
 }

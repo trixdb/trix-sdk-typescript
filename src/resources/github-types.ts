@@ -1014,6 +1014,47 @@ export interface DORAResult {
   lookbackDays: number;
 }
 
+// ── AI vs Human Code Quality (ADR-152 Phase 4 Extension) ──────────────────────
+
+export interface AIvsHumanByAgent {
+  agent: string;
+  avgScore: number;
+  prCount: number;
+  topScore: number;
+}
+
+export interface AIvsHumanWeek {
+  week: string;
+  aiAvg: number | null;
+  humanAvg: number | null;
+  aiCount: number;
+  humanCount: number;
+}
+
+export interface AIvsHumanTopPR {
+  prNumber: string;
+  title: string;
+  url: string;
+  author: string;
+  agent: string;
+  qualityScore: number;
+  createdAt: string;
+}
+
+export interface AIvsHumanResult {
+  summary: {
+    aiAvgScore: number | null;
+    humanAvgScore: number | null;
+    scoreDelta: number | null;
+    aiPrCount: number;
+    humanPrCount: number;
+  };
+  byAgent: AIvsHumanByAgent[];
+  weeklyTrend: AIvsHumanWeek[];
+  topAIPRs: AIvsHumanTopPR[];
+  lookbackDays: number;
+}
+
 // ── PR–Task Alignment ─────────────────────────────────────────────────────────
 
 export type AlignmentSignal = 'aligned' | 'partial' | 'drifted';
