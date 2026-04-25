@@ -474,6 +474,8 @@ export interface ContributorQualityStat {
   testCoveragePct: number;
   avgMergeDays: number | null;
   lastActiveAt: string | null;
+  reviewsGiven: number;
+  approvals: number;
 }
 
 export interface ContributorQualityResult { contributors: ContributorQualityStat[]; count: number; }
