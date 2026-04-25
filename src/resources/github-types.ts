@@ -489,3 +489,17 @@ export interface OpenPRAging {
 }
 
 export interface PrAgingResult { prs: OpenPRAging[]; count: number; staleDays: number; }
+
+export interface PRSizeBucket {
+  size: string;
+  key: string;
+  count: number;
+  pct: number;
+  avg_quality: number | null;
+  test_coverage_pct: number;
+}
+
+export interface PrSizeDistributionResult {
+  distribution: PRSizeBucket[];
+  total: number;
+}

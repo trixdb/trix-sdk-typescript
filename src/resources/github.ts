@@ -58,6 +58,7 @@ import type {
   ActiveBranchesResult,
   ContributorQualityResult,
   PrAgingResult,
+  PrSizeDistributionResult,
   HealthSnapshotResponse,
   PRQualityWeek,
 } from './github-types.js';
@@ -133,6 +134,7 @@ export type {
   ContributorQualityResult,
   ContributorQualityStat,
   PrAgingResult,
+  PrSizeDistributionResult,
   OpenPRAging,
   BranchInfo,
   CloneGroup,
@@ -593,6 +595,12 @@ export class GitHubResource extends BaseResource {
   async getPrAging(projectId: string): Promise<PrAgingResult> {
     validateId(projectId, 'project');
     return this.request<PrAgingResult>({ method: 'GET', path: `/projects/${projectId}/github/pr-aging` });
+  }
+
+  /** PR size distribution (Small/Medium/Large/Extra-large) with per-bucket quality + test coverage. */
+  async getPrSizeDistribution(projectId: string): Promise<PrSizeDistributionResult> {
+    validateId(projectId, 'project');
+    return this.request<PrSizeDistributionResult>({ method: 'GET', path: `/projects/${projectId}/github/pr-size-distribution` });
   }
 
   /**
