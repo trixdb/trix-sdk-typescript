@@ -67,6 +67,7 @@ import type {
   ReviewCoverageResult,
   IssueAssigneesResult,
   CommitLeadersResult,
+  LabelVelocityResult,
   MilestonesResult,
   HealthSnapshotResponse,
   PRQualityWeek,
@@ -158,6 +159,8 @@ export type {
   AssigneeStat,
   CommitLeadersResult,
   CommitLeader,
+  LabelVelocityResult,
+  LabelVelocity,
   MilestonesResult,
   MilestoneStat,
   OpenPRAging,
@@ -662,6 +665,12 @@ export class GitHubResource extends BaseResource {
   async getReviewCoverage(projectId: string): Promise<ReviewCoverageResult> {
     validateId(projectId, 'project');
     return this.request<ReviewCoverageResult>({ method: 'GET', path: `/projects/${projectId}/github/review-coverage` });
+  }
+
+  /** Issue label velocity — opened vs closed per label over last N days. Worst-accumulating first. */
+  async getLabelVelocity(projectId: string, days = 30): Promise<LabelVelocityResult> {
+    validateId(projectId, 'project');
+    return this.request<LabelVelocityResult>({ method: 'GET', path: `/projects/${projectId}/github/label-velocity?days=${days}` });
   }
 
   /** Commit leaders — top contributors by commit count over the last N days (7/30/90). */

@@ -631,6 +631,21 @@ export interface ReviewCoverageResult {
   byAuthor: AuthorReviewCoverage[];
 }
 
+// ── Label Velocity ────────────────────────────────────────────────────────
+
+export interface LabelVelocity {
+  label: string;
+  openedCount: number;
+  closedCount: number;
+  totalCount: number;
+  netFlow: number;
+}
+
+export interface LabelVelocityResult {
+  labels: LabelVelocity[];
+  lookbackDays: number;
+}
+
 // ── Commit Leaders ────────────────────────────────────────────────────────
 
 export interface CommitLeader {
