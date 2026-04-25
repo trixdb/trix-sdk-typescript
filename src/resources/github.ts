@@ -80,6 +80,7 @@ import type {
   CycleTimeTrendResult,
   PrMergeTimeResult,
   ContributorMomentumResult,
+  AgentAuditResult,
 } from './github-types.js';
 
 export type {
@@ -201,6 +202,9 @@ export type {
   PrMergeTimeResult,
   ContributorMomentum,
   ContributorMomentumResult,
+  AgentBreakdown,
+  AgentWeeklyTrend,
+  AgentAuditResult,
 } from './github-types.js'; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 // ── Resource ───────────────────────────────────────────────────────────────
@@ -813,6 +817,14 @@ export class GitHubResource extends BaseResource {
     return this.request<ContributorMomentumResult>({
       method: 'GET',
       path: `/projects/${projectId}/github/contributor-momentum?days=${days}`,
+    });
+  }
+
+  async getAgentAuditTrail(projectId: string, days = 90): Promise<AgentAuditResult> {
+    validateId(projectId, 'project');
+    return this.request<AgentAuditResult>({
+      method: 'GET',
+      path: `/projects/${projectId}/github/agent-audit?days=${days}`,
     });
   }
 }

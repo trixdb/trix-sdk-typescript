@@ -528,6 +528,30 @@ export interface ContributorMomentumResult {
   periodDays: number;
 }
 
+export interface AgentBreakdown {
+  agent: string;
+  tag: string;
+  label: string;
+  count: number;
+  pct: number;
+}
+
+export interface AgentWeeklyTrend {
+  week: string;
+  total: number;
+  agentCount: number;
+  agentPct: number;
+}
+
+export interface AgentAuditResult {
+  totalPrs: number;
+  agentPrs: number;
+  agentPct: number;
+  lookbackDays: number;
+  byAgent: AgentBreakdown[];
+  weeklyTrend: AgentWeeklyTrend[];
+}
+
 // ── Health Snapshot (one-call agent summary) ──────────────────────────────────
 
 export interface HealthSnapshotRisk { type: string; label: string; }
