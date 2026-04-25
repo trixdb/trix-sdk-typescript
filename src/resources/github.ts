@@ -65,6 +65,7 @@ import type {
   ApprovedPRsResult,
   IssueBacklogResult,
   ReviewCoverageResult,
+  MilestonesResult,
   HealthSnapshotResponse,
   PRQualityWeek,
 } from './github-types.js';
@@ -151,6 +152,8 @@ export type {
   BacklogIssue,
   ReviewCoverageResult,
   AuthorReviewCoverage,
+  MilestonesResult,
+  MilestoneStat,
   OpenPRAging,
   BranchInfo,
   CloneGroup,
@@ -653,6 +656,12 @@ export class GitHubResource extends BaseResource {
   async getReviewCoverage(projectId: string): Promise<ReviewCoverageResult> {
     validateId(projectId, 'project');
     return this.request<ReviewCoverageResult>({ method: 'GET', path: `/projects/${projectId}/github/review-coverage` });
+  }
+
+  /** Milestone progress — open/closed issue counts per GitHub milestone, ordered least-complete first. */
+  async getMilestones(projectId: string): Promise<MilestonesResult> {
+    validateId(projectId, 'project');
+    return this.request<MilestonesResult>({ method: 'GET', path: `/projects/${projectId}/github/milestones` });
   }
 
   /**

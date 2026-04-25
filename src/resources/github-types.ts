@@ -630,3 +630,18 @@ export interface ReviewCoverageResult {
   lookbackDays: number;
   byAuthor: AuthorReviewCoverage[];
 }
+
+// ── Milestone Progress ─────────────────────────────────────────────────────
+
+export interface MilestoneStat {
+  name: string;
+  openCount: number;
+  closedCount: number;
+  totalCount: number;
+  progressPct: number;
+}
+
+export interface MilestonesResult {
+  milestones: MilestoneStat[];
+  totalMilestones: number;
+}
