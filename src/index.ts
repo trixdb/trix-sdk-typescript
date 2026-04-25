@@ -212,6 +212,21 @@ export type {
   ReviewDepthSummary,
   ReviewerDepthStat,
   ReviewDepthResult,
+  ReviewDepsResult,
+  DependencyVulnerability,
+  ChangeImpactResult,
+  ChangeImpactFile,
+  SemanticDiffResult,
+  ExplainCodeParams,
+  ExplainCodeResult,
+  CodeExplanation,
+  SuggestRefactoringParams,
+  SuggestRefactoringResult,
+  RefactoringSuggestion,
+  RefactoringGoal,
+  BuildAstQueryParams,
+  BuildAstQueryResult,
+  AstQueryLanguage,
 } from './resources/github.js';
 
 // Re-export testing utilities for convenience

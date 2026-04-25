@@ -310,10 +310,14 @@ export type {
   SemanticDiffResult,
   ExplainCodeParams,
   ExplainCodeResult,
+  CodeExplanation,
   SuggestRefactoringParams,
   SuggestRefactoringResult,
+  RefactoringSuggestion,
+  RefactoringGoal,
   BuildAstQueryParams,
   BuildAstQueryResult,
+  AstQueryLanguage,
 } from './github-types.js'; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 // ── Resource ───────────────────────────────────────────────────────────────
