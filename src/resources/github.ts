@@ -49,6 +49,9 @@ import type {
   AgentPRResult,
   PRReviewResult,
   ScanCodeResult,
+  BatchScanFileInput,
+  BatchScanCodeResult,
+  AnalyzeCodeComplexityResult,
   CodeSummaryResult,
   CloneGroupsResult,
   DeadExportsResult,
@@ -158,6 +161,9 @@ export type {
   DepVuln,
   ScanCodeResult,
   ScanCodeSummary,
+  BatchScanFileInput,
+  BatchScanCodeResult,
+  AnalyzeCodeComplexityResult,
   CodeSummaryResult,
   CloneGroupsResult,
   DeadExportsResult,
@@ -644,6 +650,25 @@ export class GitHubResource extends BaseResource {
   async scanCode(projectId: string, filePath: string, content: string): Promise<ScanCodeResult> {
     validateId(projectId, 'project');
     return this.request<ScanCodeResult>({ method: 'POST', path: `/projects/${projectId}/github/scan-code`, body: { file_path: filePath, content } });
+  }
+
+  /** Batch SAST + secret scan up to 20 files — ideal pre-flight check before creating a PR. */
+  async batchScanCode(projectId: string, files: BatchScanFileInput[]): Promise<BatchScanCodeResult> {
+    validateId(projectId, 'project');
+    return this.request<BatchScanCodeResult>({ method: 'POST', path: `/projects/${projectId}/github/batch-scan-code`, body: { files } });
+  }
+
+  /** Compute per-function cyclomatic + cognitive complexity and code smells for arbitrary source. */
+  async analyzeCodeComplexity(
+    projectId: string,
+    opts: { filePath: string; content: string; language?: string },
+  ): Promise<AnalyzeCodeComplexityResult> {
+    validateId(projectId, 'project');
+    return this.request<AnalyzeCodeComplexityResult>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/analyze-complexity`,
+      body: { file_path: opts.filePath, content: opts.content, language: opts.language },
+    });
   }
 
   /** Create a GitHub PR with agent-authored file changes (up to 50 files). */

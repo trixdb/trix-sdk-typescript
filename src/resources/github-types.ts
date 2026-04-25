@@ -1249,3 +1249,68 @@ export interface QualityGateResult {
   repo?: string;
   analyzedFiles?: number;
 }
+
+// ── Batch Scan Code ────────────────────────────────────────────────────────
+
+export interface BatchScanFileInput {
+  file_path: string;
+  content: string;
+}
+
+export interface BatchScanFileSummary {
+  secrets: number;
+  security: number;
+  critical: number;
+  high: number;
+  filesScanned: number;
+  safe: boolean;
+  grade: 'A' | 'B' | 'C' | 'F';
+}
+
+export interface BatchScanFileResult {
+  file_path: string;
+  findings: SecurityFinding[];
+  secrets: number;
+  security: number;
+  critical: number;
+  high: number;
+}
+
+export interface BatchScanCodeResult {
+  files: BatchScanFileResult[];
+  summary: BatchScanFileSummary;
+}
+
+// ── Analyze Code Complexity ────────────────────────────────────────────────
+
+export interface CodeComplexityMetrics {
+  cyclomatic: number;
+  cognitive: number;
+  loc: number;
+  supported: boolean;
+}
+
+export interface CodeSmellItem {
+  type: string;
+  severity: 'critical' | 'high' | 'medium' | 'low';
+  message: string;
+  line?: number;
+  function?: string;
+}
+
+export interface CodeComplexitySummary {
+  functionCount: number;
+  smellCount: number;
+  critical: number;
+  high: number;
+  avgCyclomatic: string | null;
+}
+
+export interface AnalyzeCodeComplexityResult {
+  file_path: string;
+  language: string;
+  metrics: CodeComplexityMetrics;
+  functions: FunctionComplexityMetric[];
+  smells: CodeSmellItem[];
+  summary: CodeComplexitySummary;
+}
