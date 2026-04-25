@@ -437,6 +437,7 @@ export type CqlFromMode =
   | 'metrics'
   | 'coverage'
   | 'tech_debt'
+  | 'symbols'
   | 'summary'
   | 'history';
 
