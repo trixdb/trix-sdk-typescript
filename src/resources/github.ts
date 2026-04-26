@@ -120,6 +120,10 @@ import type {
   BuildAstQueryParams,
   BuildAstQueryResult,
   ArchitectureReviewResult,
+  BatchFindingMark,
+  BatchMarkFindingsResult,
+  SuggestReviewersResult,
+  RefactorCandidatesResult,
 } from './github-types.js';
 
 export type {
@@ -321,6 +325,13 @@ export type {
   AstQueryLanguage,
   ArchitectureConcern,
   ArchitectureReviewResult,
+  BatchFindingMark,
+  BatchMarkFindingsResult,
+  FindingStatus,
+  ReviewerSuggestion,
+  SuggestReviewersResult,
+  RefactorCandidate,
+  RefactorCandidatesResult,
 } from './github-types.js'; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 // ── Resource ───────────────────────────────────────────────────────────────
@@ -715,6 +726,77 @@ export class GitHubResource extends BaseResource {
   async batchScanCode(projectId: string, files: BatchScanFileInput[]): Promise<BatchScanCodeResult> {
     validateId(projectId, 'project');
     return this.request<BatchScanCodeResult>({ method: 'POST', path: `/projects/${projectId}/github/batch-scan-code`, body: { files } });
+  }
+
+  /** Scan a raw git diff patch for security/quality issues on new/added lines only. No GitHub OAuth needed. */
+  async scanDiff(
+    projectId: string,
+    files: Array<{ file_path: string; patch?: string; full_content?: string }>,
+    gate?: 'strict' | 'standard' | 'relaxed',
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/scan-diff`,
+      body: { files, ...(gate ? { gate } : {}) },
+    });
+  }
+
+  /** Batch auto-fix: generate fix patches for multiple SAST findings. Ready for create_fix_pr. */
+  async batchAutoFix(
+    projectId: string,
+    findingIds: string[],
+    format?: 'replacements' | 'summary',
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/batch-auto-fix`,
+      body: { finding_ids: findingIds, ...(format ? { format } : {}) },
+    });
+  }
+
+  /** Get the stored quality gate profile for a project. Returns preset + active thresholds. */
+  async getQualityProfile(projectId: string): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    return this.request<Record<string, unknown>>({
+      method: 'GET',
+      path: `/projects/${projectId}/github/quality-profile`,
+    });
+  }
+
+  /** Save per-project quality gate thresholds (strict / standard / relaxed / custom). */
+  async setQualityProfile(
+    projectId: string,
+    preset: 'strict' | 'standard' | 'relaxed' | 'custom',
+    conditions?: Record<string, unknown>,
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    return this.request<Record<string, unknown>>({
+      method: 'PUT',
+      path: `/projects/${projectId}/github/quality-profile`,
+      body: { preset_name: preset, ...(conditions ? { conditions } : {}) },
+    });
+  }
+
+  /** Update lifecycle status of a SAST finding (false_positive / confirmed / resolved / reopened). */
+  async updateFindingStatus(
+    projectId: string,
+    suggestionId: string,
+    status: 'open' | 'in_progress' | 'dismissed' | 'resolved' | 'false_positive' | 'confirmed',
+    opts?: { fpReason?: string; lifecycleNote?: string },
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    validateId(suggestionId, 'suggestion');
+    return this.request<Record<string, unknown>>({
+      method: 'PATCH',
+      path: `/projects/${projectId}/github/improvements/${suggestionId}`,
+      body: {
+        status,
+        ...(opts?.fpReason ? { fp_reason: opts.fpReason } : {}),
+        ...(opts?.lifecycleNote ? { lifecycle_note: opts.lifecycleNote } : {}),
+      },
+    });
   }
 
   /** Pre-flight quality gate: SAST+secrets+complexity+design check before creating a PR. */
@@ -1286,5 +1368,276 @@ export class GitHubResource extends BaseResource {
       path: `/projects/${projectId}/github/architecture-review`,
       body: { pr_number: prNumber, repo_full_name: repoFullName },
     });
+  }
+
+  /**
+   * Suggest reviewers for a PR based on commit-level file ownership.
+   * Returns contributors ranked by expertise_score across the touched files.
+   */
+  async suggestReviewers(
+    projectId: string,
+    options: { filePaths?: string[]; days?: number; limit?: number } = {},
+  ): Promise<SuggestReviewersResult> {
+    validateId(projectId, 'project');
+    const { filePaths, days = 90, limit = 5 } = options;
+    const query: Record<string, unknown> = { from: 'code_ownership', days, limit };
+    if (filePaths?.length) query.where = { file_paths: filePaths };
+    return this.request<SuggestReviewersResult>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query`,
+      body: query,
+    });
+  }
+
+  /**
+   * Return files ranked by refactor ROI score:
+   * Score = CC×2 + CogC×1.5 + smells×10 + open-issues×5 + hotspot×0.5
+   */
+  async getRefactorCandidates(
+    projectId: string,
+    options: { language?: string; limit?: number } = {},
+  ): Promise<RefactorCandidatesResult> {
+    validateId(projectId, 'project');
+    const { language, limit = 15 } = options;
+    const query: Record<string, unknown> = { from: 'refactor_candidates', limit };
+    if (language) query.language = language;
+    return this.request<RefactorCandidatesResult>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query`,
+      body: query,
+    });
+  }
+
+  /** One-call CQL PR review using stored metrics (pr_impact + smells + MI). No live analysis needed. */
+  async deepPRReview(
+    projectId: string,
+    prNumber: number,
+    options: { repoFullName?: string; limitFiles?: number; includeInlineSmells?: boolean } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { repoFullName, limitFiles = 30, includeInlineSmells = true } = options;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/deep-pr-review`,
+      body: { prNumber, repoFullName, limitFiles, includeInlineSmells },
+    });
+  }
+
+  /** Most comprehensive one-call PR review — 4 CQL signals: pr_impact + smells + MI + coverage gap. */
+  async orchestratePRReview(
+    projectId: string,
+    prNumber: number,
+    options: { repoFullName?: string; limitFiles?: number; includeInlineSmells?: boolean } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { repoFullName, limitFiles = 30, includeInlineSmells = true } = options;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/orchestrate-pr-review`,
+      body: { prNumber, repoFullName, limitFiles, includeInlineSmells },
+    });
+  }
+
+  /** Generate a professional PR description using LLM + CQL metrics. */
+  async generatePRDescription(
+    projectId: string,
+    options: {
+      filePaths?: string[];
+      prNumber?: number;
+      repoFullName?: string;
+      commitMessages?: string[];
+      prTitle?: string;
+    },
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    if (!options.filePaths?.length && !options.prNumber) {
+      throw new Error('Either filePaths or prNumber is required');
+    }
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/generate-pr-description`,
+      body: {
+        filePaths: options.filePaths,
+        prNumber: options.prNumber,
+        repoFullName: options.repoFullName,
+        commitMessages: options.commitMessages,
+        prTitle: options.prTitle,
+      },
+    });
+  }
+
+  /** Generate GitHub Actions CI workflow YAML files for Trix quality gates. */
+  async generateCIWorkflow(
+    projectId: string,
+    options: {
+      type?: 'full' | 'pr_review' | 'scan' | 'quality_gate';
+      gate?: 'standard' | 'strict' | 'relaxed';
+      mainBranch?: string;
+      postInlineComments?: boolean;
+      blockOnFail?: boolean;
+    } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/generate-ci-workflow`,
+      body: {
+        type: options.type ?? 'full',
+        gate: options.gate ?? 'standard',
+        mainBranch: options.mainBranch ?? 'main',
+        postInlineComments: options.postInlineComments ?? true,
+        blockOnFail: options.blockOnFail ?? true,
+      },
+    });
+  }
+
+  /** Risk-weighted test coverage gap — ranks untested files by gap_risk = CC × hotspot × (no test). */
+  async getTestCoverageGap(
+    projectId: string,
+    options: { mode?: 'files' | 'summary' | 'modules'; minCC?: number; language?: string; limit?: number } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { mode = 'files', minCC = 1, language, limit = 25 } = options;
+    const query: Record<string, unknown> = { from: 'test_coverage_gap', mode, min_cc: minCC, limit };
+    if (language) query.language = language;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query`,
+      body: query,
+    });
+  }
+
+  /** Pre-change risk assessment: CC + MI + hotspot + debt + coverage gap → CRITICAL/HIGH/MEDIUM/LOW. */
+  async getChangeRisk(
+    projectId: string,
+    filePaths: string[],
+    options: { includeActions?: boolean } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query`,
+      body: { from: 'change_risk', file_paths: filePaths, include_actions: options.includeActions ?? true },
+    });
+  }
+
+  /** Directory-level complexity aggregation — SonarQube-style module quality view. */
+  async getModuleComplexity(
+    projectId: string,
+    options: {
+      mode?: 'summary' | 'drill_down';
+      depth?: number;
+      module?: string;
+      sortBy?: string;
+      language?: string;
+      limit?: number;
+    } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { mode = 'summary', depth = 1, module, sortBy = 'module_score', language, limit = 20 } = options;
+    const query: Record<string, unknown> = { from: 'module_complexity', mode, depth, sort_by: sortBy, limit };
+    if (module) query.module = module;
+    if (language) query.language = language;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query`,
+      body: query,
+    });
+  }
+
+  /**
+   * Multi-dimensional hall of shame — files failing on multiple quality dimensions simultaneously.
+   * Each dimension scores 1 point: high_cc, low_mi, high_hotspot, high_debt, no_test, large_file.
+   * A file is toxic when toxicity_score >= min_score (default 3 out of 6).
+   *
+   * mode: 'files' (ranked) | 'summary' (bucket counts + worst_5)
+   */
+  async getToxicFiles(
+    projectId: string,
+    options: {
+      mode?: 'files' | 'summary';
+      minScore?: number;
+      language?: string;
+      limit?: number;
+      ccThreshold?: number;
+      miThreshold?: number;
+      hotspotThreshold?: number;
+      debtThreshold?: number;
+      locThreshold?: number;
+    } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { mode = 'files', minScore = 3, language, limit = 25, ccThreshold, miThreshold, hotspotThreshold, debtThreshold, locThreshold } = options;
+    const query: Record<string, unknown> = { from: 'toxic_files', mode, min_score: minScore, limit };
+    if (language) query.language = language;
+    if (ccThreshold !== undefined) query.cc_threshold = ccThreshold;
+    if (miThreshold !== undefined) query.mi_threshold = miThreshold;
+    if (hotspotThreshold !== undefined) query.hotspot_threshold = hotspotThreshold;
+    if (debtThreshold !== undefined) query.debt_threshold = debtThreshold;
+    if (locThreshold !== undefined) query.loc_threshold = locThreshold;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query`,
+      body: query,
+    });
+  }
+
+  /**
+   * SonarQube-style project quality gate — PASSED / FAILED verdict.
+   * Evaluates 6 conditions (avg_cc, avg_mi, toxic ratio, untested ratio, hotspots, debt/file)
+   * against preset thresholds. Returns gate_status + conditions_evaluated[] + blocking_conditions[].
+   *
+   * preset: 'strict' | 'standard' (default) | 'relaxed'
+   */
+  async evaluateQualityGate(
+    projectId: string,
+    options: {
+      preset?: 'strict' | 'standard' | 'relaxed';
+      conditions?: {
+        avg_cc_lte?: number;
+        avg_mi_gte?: number;
+        toxic_file_ratio_lte?: number;
+        files_with_no_test_lte?: number;
+        hotspot_count_lte?: number;
+        debt_per_file_lte?: number;
+      };
+    } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { preset = 'standard', conditions } = options;
+    const query: Record<string, unknown> = { from: 'quality_gate', preset };
+    if (conditions) query.conditions = conditions;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query`,
+      body: query,
+    });
+  }
+
+  /**
+   * Bulk-update the status of up to 50 SAST findings in parallel.
+   * Useful for triage workflows: mark false positives and confirmed findings
+   * before handing off to the auto-fix agent.
+   */
+  async batchMarkFindings(
+    projectId: string,
+    findings: BatchFindingMark[],
+  ): Promise<BatchMarkFindingsResult> {
+    validateId(projectId, 'project');
+    const results = await Promise.allSettled(
+      findings.map((f) =>
+        this.request({
+          method: 'PATCH',
+          path: `/projects/${projectId}/github/improvements/${f.suggestion_id}`,
+          body: {
+            status: f.status,
+            ...(f.fp_reason ? { fp_reason: f.fp_reason } : {}),
+            ...(f.lifecycle_note ? { lifecycle_note: f.lifecycle_note } : {}),
+          },
+        }),
+      ),
+    );
+    const succeeded = results.filter((r): r is PromiseFulfilledResult<unknown> => r.status === 'fulfilled').length;
+    return { succeeded, failed: findings.length - succeeded, total: findings.length };
   }
 }
