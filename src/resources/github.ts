@@ -2002,4 +2002,28 @@ export class GitHubResource extends BaseResource {
       body,
     });
   }
+
+  async getFunctionRiskDelta(
+    projectId: string,
+    options: {
+      filePaths?: string[];
+      dir?: string;
+      mode?: 'top' | 'all' | 'summary';
+      limit?: number;
+    } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { filePaths = [], dir, mode = 'top', limit = 15 } = options;
+    const body: Record<string, unknown> = {
+      from: 'function_risk_delta',
+      where: { file_paths: filePaths, ...(dir ? { dir } : {}) },
+      mode,
+      limit,
+    };
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query`,
+      body,
+    });
+  }
 }
