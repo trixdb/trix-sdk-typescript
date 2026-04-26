@@ -1829,4 +1829,25 @@ export class GitHubResource extends BaseResource {
     const succeeded = results.filter((r): r is PromiseFulfilledResult<unknown> => r.status === 'fulfilled').length;
     return { succeeded, failed: findings.length - succeeded, total: findings.length };
   }
+
+  /** SOLID principle violations + OOP anti-patterns (SRP/OCP/ISP/DIP/LSP, feature_envy, data_clumps, anemic_domain_model). */
+  async getSolidAnalysis(
+    projectId: string,
+    options: {
+      principle?: 'all' | 'srp' | 'ocp' | 'isp' | 'dip' | 'lsp';
+      minSeverity?: 'info' | 'warning' | 'critical';
+      repoFullName?: string;
+      limit?: number;
+    } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { principle = 'all', minSeverity = 'warning', repoFullName, limit = 25 } = options;
+    const body: Record<string, unknown> = { from: 'solid_analysis', principle, minSeverity, limit };
+    if (repoFullName) body.repoFullName = repoFullName;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query`,
+      body,
+    });
+  }
 }
