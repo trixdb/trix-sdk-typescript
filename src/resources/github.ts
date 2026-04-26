@@ -1691,6 +1691,38 @@ export class GitHubResource extends BaseResource {
     });
   }
 
+  /** Per-file smell count delta across two scan snapshots. */
+  async getSmellTrend(
+    projectId: string,
+    options: { mode?: 'regressing' | 'improving' | 'all' | 'summary'; minDelta?: number; language?: string; limit?: number } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { mode = 'regressing', minDelta = 0, language, limit = 25 } = options;
+    const body: Record<string, unknown> = { from: 'smell_trend', mode, min_delta: minDelta, limit };
+    if (language) body.language = language;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query`,
+      body,
+    });
+  }
+
+  /** File-level coupling analysis — fan-in bottlenecks from callerCount sums. */
+  async getCouplingAnalysis(
+    projectId: string,
+    options: { mode?: 'bottlenecks' | 'all' | 'summary'; language?: string; limit?: number } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { mode = 'bottlenecks', language, limit = 25 } = options;
+    const body: Record<string, unknown> = { from: 'coupling_analysis', mode, limit };
+    if (language) body.language = language;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query`,
+      body,
+    });
+  }
+
   /** One-call pre-PR health check — GO / CAUTION / HOLD verdict. */
   async prePRChecklist(
     projectId: string,
