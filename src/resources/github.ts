@@ -1707,6 +1707,22 @@ export class GitHubResource extends BaseResource {
     });
   }
 
+  /** Directory-level smell heat map — severity-weighted smells per file by module. */
+  async getModuleSmellHeat(
+    projectId: string,
+    options: { mode?: 'modules' | 'summary'; depth?: number; language?: string; limit?: number } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { mode = 'modules', depth = 2, language, limit = 25 } = options;
+    const body: Record<string, unknown> = { from: 'module_smell_heat', mode, depth, limit };
+    if (language) body.language = language;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query`,
+      body,
+    });
+  }
+
   /** Composite refactoring urgency ranking — the definitive "fix this file first" list. */
   async getRefactorPriority(
     projectId: string,
