@@ -1961,4 +1961,26 @@ export class GitHubResource extends BaseResource {
       body,
     });
   }
+
+  async getApiSurface(
+    projectId: string,
+    options: {
+      mode?: 'all' | 'summary' | 'risky';
+      minCallers?: number;
+      language?: string;
+      filePathContains?: string;
+      limit?: number;
+    } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { mode = 'all', minCallers = 3, language, filePathContains, limit = 50 } = options;
+    const body: Record<string, unknown> = { from: 'api_surface', mode, min_callers: minCallers, limit };
+    if (language) body.language = language;
+    if (filePathContains) body.file_path_contains = filePathContains;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query`,
+      body,
+    });
+  }
 }
