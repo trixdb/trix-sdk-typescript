@@ -1983,4 +1983,23 @@ export class GitHubResource extends BaseResource {
       body,
     });
   }
+
+  async getModuleCohesion(
+    projectId: string,
+    options: {
+      mode?: 'files' | 'candidates' | 'summary';
+      language?: string;
+      limit?: number;
+    } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { mode = 'files', language, limit = 30 } = options;
+    const body: Record<string, unknown> = { from: 'module_cohesion', mode, limit };
+    if (language) body.language = language;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query`,
+      body,
+    });
+  }
 }
