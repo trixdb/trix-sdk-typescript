@@ -1917,4 +1917,27 @@ export class GitHubResource extends BaseResource {
       body,
     });
   }
+
+  async getFunctionProfile(
+    projectId: string,
+    options: {
+      mode?: 'all' | 'summary' | 'files';
+      minRisk?: number;
+      language?: string;
+      filePathContains?: string;
+      limit?: number;
+    } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { mode = 'all', minRisk, language, filePathContains, limit = 50 } = options;
+    const body: Record<string, unknown> = { from: 'function_profile', mode, limit };
+    if (minRisk !== undefined && minRisk > 0) body.min_risk = minRisk;
+    if (language) body.language = language;
+    if (filePathContains) body.file_path_contains = filePathContains;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query`,
+      body,
+    });
+  }
 }
