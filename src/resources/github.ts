@@ -1940,4 +1940,25 @@ export class GitHubResource extends BaseResource {
       body,
     });
   }
+
+  async getTestability(
+    projectId: string,
+    options: {
+      mode?: 'files' | 'summary' | 'critical';
+      language?: string;
+      filePathContains?: string;
+      limit?: number;
+    } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { mode = 'files', language, filePathContains, limit = 30 } = options;
+    const body: Record<string, unknown> = { from: 'testability', mode, limit };
+    if (language) body.language = language;
+    if (filePathContains) body.file_path_contains = filePathContains;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query`,
+      body,
+    });
+  }
 }
