@@ -1660,6 +1660,37 @@ export class GitHubResource extends BaseResource {
     });
   }
 
+  /** Composite project health score (0–100) with A–F grade, 7 weighted signals. */
+  async getProjectHealthScore(
+    projectId: string,
+    options: { mode?: 'summary' | 'breakdown' } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { mode = 'summary' } = options;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query-code`,
+      body: { from: 'project_health_score', mode },
+    });
+  }
+
+  /** Detect test code antipatterns: GOD_TEST_CLASS, COMPLEX_TEST_LOGIC, LARGE_TEST, ASSERTION_ROULETTE. */
+  async getTestSmell(
+    projectId: string,
+    options: { mode?: 'files' | 'summary'; kind?: string; language?: string; limit?: number } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { mode = 'files', kind, language, limit = 25 } = options;
+    const body: Record<string, unknown> = { from: 'test_smell', mode, limit };
+    if (kind) body.kind = kind;
+    if (language) body.language = language;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query`,
+      body,
+    });
+  }
+
   /** One-call pre-PR health check — GO / CAUTION / HOLD verdict. */
   async prePRChecklist(
     projectId: string,
