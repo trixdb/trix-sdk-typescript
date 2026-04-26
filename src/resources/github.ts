@@ -1872,4 +1872,26 @@ export class GitHubResource extends BaseResource {
       body,
     });
   }
+
+  /** Design pattern detection — Factory/Observer/Singleton + God Object/Spaghetti/Lava Flow anti-patterns. */
+  async getDesignPatterns(
+    projectId: string,
+    options: {
+      kind?: 'all' | 'pattern' | 'anti_pattern';
+      pattern?: string;
+      confidence?: 'high' | 'medium' | 'low';
+      limit?: number;
+    } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { kind = 'all', pattern, confidence, limit = 30 } = options;
+    const body: Record<string, unknown> = { from: 'design_patterns', kind, limit };
+    if (pattern) body.pattern = pattern;
+    if (confidence) body.confidence = confidence;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query`,
+      body,
+    });
+  }
 }
