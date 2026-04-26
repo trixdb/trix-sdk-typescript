@@ -1830,6 +1830,28 @@ export class GitHubResource extends BaseResource {
     return { succeeded, failed: findings.length - succeeded, total: findings.length };
   }
 
+  /** Naming convention violations — nondescript, numbered, generic, inconsistent casing. */
+  async getNamingViolations(
+    projectId: string,
+    options: {
+      rule?: 'all' | 'nondescript' | 'numbered' | 'generic' | 'inconsistent';
+      language?: string;
+      repoFullName?: string;
+      limit?: number;
+    } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { rule = 'all', language, repoFullName, limit = 25 } = options;
+    const body: Record<string, unknown> = { from: 'naming_violations', rule, limit };
+    if (language) body.language = language;
+    if (repoFullName) body.repoFullName = repoFullName;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query`,
+      body,
+    });
+  }
+
   /** SOLID principle violations + OOP anti-patterns (SRP/OCP/ISP/DIP/LSP, feature_envy, data_clumps, anemic_domain_model). */
   async getSolidAnalysis(
     projectId: string,
