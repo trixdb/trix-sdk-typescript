@@ -2003,6 +2003,26 @@ export class GitHubResource extends BaseResource {
     });
   }
 
+  async getFunctionOutliers(
+    projectId: string,
+    options: {
+      mode?: 'files' | 'by_file' | 'summary';
+      threshold?: number;
+      language?: string;
+      limit?: number;
+    } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { mode = 'files', threshold = 2.0, language, limit = 30 } = options;
+    const body: Record<string, unknown> = { from: 'function_outliers', mode, threshold, limit };
+    if (language) body.language = language;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query`,
+      body,
+    });
+  }
+
   async getFunctionRiskDelta(
     projectId: string,
     options: {
