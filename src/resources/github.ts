@@ -1873,6 +1873,29 @@ export class GitHubResource extends BaseResource {
     });
   }
 
+  /** Clean Code adherence metrics — function length, param count, naming quality, SRP (Robert C. Martin). */
+  async getCleanCode(
+    projectId: string,
+    options: {
+      mode?: 'summary' | 'files' | 'violations';
+      minScore?: number;
+      rule?: 'long_function' | 'too_many_params' | 'poor_naming' | 'too_many_responsibilities';
+      language?: string;
+      limit?: number;
+    } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { mode = 'summary', minScore = 90, rule, language, limit = 20 } = options;
+    const body: Record<string, unknown> = { from: 'clean_code', mode, min_score: minScore, limit };
+    if (rule) body.rule = rule;
+    if (language) body.language = language;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query`,
+      body,
+    });
+  }
+
   /** Design pattern detection — Factory/Observer/Singleton + God Object/Spaghetti/Lava Flow anti-patterns. */
   async getDesignPatterns(
     projectId: string,
