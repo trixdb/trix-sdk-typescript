@@ -1614,6 +1614,66 @@ export class GitHubResource extends BaseResource {
     });
   }
 
+  /** Per-file complexity regression detection comparing the two most recent scan snapshots. */
+  async getComplexityTrend(
+    projectId: string,
+    options: { mode?: 'regressing' | 'recovering' | 'all' | 'summary'; minDelta?: number; limit?: number } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { mode = 'summary', minDelta = 0, limit = 20 } = options;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query`,
+      body: { from: 'complexity_trend', mode, min_delta: minDelta, limit },
+    });
+  }
+
+  /** Bus factor and knowledge concentration risk per module. */
+  async getContributorRisk(
+    projectId: string,
+    options: { mode?: 'modules' | 'files' | 'summary'; minRisk?: string; depth?: number; limit?: number } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { mode = 'summary', minRisk, depth = 2, limit = 20 } = options;
+    const body: Record<string, unknown> = { from: 'contributor_risk', mode, depth, limit };
+    if (minRisk) body.min_risk = minRisk;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query`,
+      body,
+    });
+  }
+
+  /** Normalized smell density — smells per KLOC and per function. */
+  async getSmellDensity(
+    projectId: string,
+    options: { mode?: 'files' | 'modules' | 'summary'; minGrade?: string; depth?: number; limit?: number } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { mode = 'summary', minGrade, depth = 2, limit = 20 } = options;
+    const body: Record<string, unknown> = { from: 'smell_density', mode, depth, limit };
+    if (minGrade) body.min_grade = minGrade;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query-code`,
+      body,
+    });
+  }
+
+  /** One-call pre-PR health check — GO / CAUTION / HOLD verdict. */
+  async prePRChecklist(
+    projectId: string,
+    options: { filePaths: string[]; gatePreset?: 'strict' | 'standard' | 'relaxed'; includeSmells?: boolean },
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { filePaths, gatePreset = 'standard', includeSmells = true } = options;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query-code`,
+      body: { from: 'pre_pr_checklist', file_paths: filePaths, gate_preset: gatePreset, include_smells: includeSmells },
+    });
+  }
+
   /**
    * Bulk-update the status of up to 50 SAST findings in parallel.
    * Useful for triage workflows: mark false positives and confirmed findings
