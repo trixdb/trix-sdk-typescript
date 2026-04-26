@@ -450,7 +450,16 @@ export type CqlFromMode =
   | 'contributors'
   | 'test_quality'
   | 'dependencies'
-  | 'refactor_candidates';
+  | 'refactor_candidates'
+  | 'churn_vulnerability'
+  | 'rating'
+  | 'new_issues'
+  | 'risk_profile'
+  | 'velocity'
+  | 'pr_context'
+  | 'smell_summary'
+  | 'cognitive_breakdown'
+  | 'problematic_files';
 
 export interface CqlQuery {
   from?: CqlFromMode;
@@ -462,14 +471,24 @@ export interface CqlQuery {
   pattern?: string;
   patterns?: string[];
   risk?: 'high' | 'medium' | 'all';
-  /** Sub-mode for contributors: "summary" | "files" | "silos"; for custom_rules: "rules" | "findings" */
+  /** Sub-mode for multi-mode queries: rating: "summary"|"files"; new_issues: "summary"|"files"|"categories"|"timeline"; contributors: "summary"|"files"|"silos" */
   mode?: string;
-  /** Lookback days for contributors and history modes */
+  /** Lookback days for contributors, history, and new_issues timeline modes */
   days?: number;
   /** Minimum cyclomatic complexity for test_quality mode */
   min_complexity?: number;
   /** Ecosystem filter for dependencies mode: "npm" | "pip" | "go" | "cargo" | "rubygems" | "maven" */
   ecosystem?: string;
+  /** Baseline for new_issues mode: relative ("7d", "14d", "30d") or ISO date ("2026-04-01") */
+  since?: string;
+  /** Focus on a single rating dimension: "reliability" | "security" | "maintainability" */
+  dimension?: 'reliability' | 'security' | 'maintainability';
+  /** Include per-signal score breakdown in risk_profile results */
+  breakdown?: boolean;
+  /** Look-back window in weeks for velocity mode (default: 4, max: 52) */
+  weeks?: number;
+  /** Minimum cognitive complexity threshold for cognitive_breakdown mode (default: 1) */
+  threshold?: number;
 }
 export interface CqlResult { results: Record<string, unknown>[]; count: number; query: CqlQuery; }
 export interface AgentPRResult { prNumber: number; prUrl: string; branchName: string; sha: string; }
@@ -1817,4 +1836,63 @@ export interface ArchitectureReviewResult {
   concern_count: number;
   critical_count: number;
   high_count: number;
+}
+
+// ── batch_mark_findings ───────────────────────────────────────────────────────
+
+export type FindingStatus =
+  | 'open'
+  | 'in_progress'
+  | 'dismissed'
+  | 'resolved'
+  | 'false_positive'
+  | 'confirmed';
+
+export interface BatchFindingMark {
+  suggestion_id: string;
+  status: FindingStatus;
+  /** Required when status is 'false_positive' */
+  fp_reason?: string;
+  lifecycle_note?: string;
+}
+
+export interface BatchMarkFindingsResult {
+  succeeded: number;
+  failed: number;
+  total: number;
+}
+
+// ── Code Ownership / Reviewer Suggestion ──────────────────────────────────
+
+export interface ReviewerSuggestion {
+  reviewer: string;
+  expertise_score: number;
+  file_count: number;
+  avg_ownership_pct: number;
+  last_commit_at: string;
+}
+
+export interface SuggestReviewersResult {
+  results: ReviewerSuggestion[];
+  mode: string;
+  file_count?: number;
+}
+
+// ── Refactor Candidates ────────────────────────────────────────────────────
+
+export interface RefactorCandidate {
+  file_path: string;
+  refactor_score: number;
+  priority: 'critical' | 'high' | 'medium' | 'low';
+  cyclomatic_complexity: number;
+  cognitive_complexity: number;
+  smell_count: number;
+  open_issue_count: number;
+  hotspot_score: number;
+  language: string;
+}
+
+export interface RefactorCandidatesResult {
+  results: RefactorCandidate[];
+  total: number;
 }
