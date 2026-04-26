@@ -2023,6 +2023,26 @@ export class GitHubResource extends BaseResource {
     });
   }
 
+  async analyzeContributorQuality(
+    projectId: string,
+    options: {
+      mode?: 'contributors' | 'summary' | 'files';
+      author?: string;
+      minFiles?: number;
+      limit?: number;
+    } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { mode = 'contributors', author, minFiles = 2, limit = 30 } = options;
+    const body: Record<string, unknown> = { from: 'contributor_quality', mode, min_files: minFiles, limit };
+    if (author) body.author = author;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query`,
+      body,
+    });
+  }
+
   async findDeadCode(
     projectId: string,
     options: {
