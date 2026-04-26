@@ -1707,6 +1707,23 @@ export class GitHubResource extends BaseResource {
     });
   }
 
+  /** SAST rule/kind breakdown ranked by occurrence count. */
+  async getTopRules(
+    projectId: string,
+    options: { mode?: 'rules' | 'files'; category?: string; severity?: 'critical' | 'high' | 'medium' | 'low'; limit?: number } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { mode = 'rules', category, severity, limit = 25 } = options;
+    const body: Record<string, unknown> = { from: 'top_rules', mode, limit };
+    if (category) body.category = category;
+    if (severity) body.severity = severity;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query`,
+      body,
+    });
+  }
+
   /** Directory-level smell heat map — severity-weighted smells per file by module. */
   async getModuleSmellHeat(
     projectId: string,
