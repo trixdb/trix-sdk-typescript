@@ -1707,6 +1707,22 @@ export class GitHubResource extends BaseResource {
     });
   }
 
+  /** Composite refactoring urgency ranking — the definitive "fix this file first" list. */
+  async getRefactorPriority(
+    projectId: string,
+    options: { mode?: 'files' | 'summary'; language?: string; minScore?: number; limit?: number } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { mode = 'files', language, minScore = 0, limit = 25 } = options;
+    const body: Record<string, unknown> = { from: 'refactor_priority', mode, min_score: minScore, limit };
+    if (language) body.language = language;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query`,
+      body,
+    });
+  }
+
   /** 2D risk matrix: churn × complexity → DANGER_ZONE/WORKHORSE/SLEEPING_GIANT/SAFE. */
   async getHotspotMatrix(
     projectId: string,
