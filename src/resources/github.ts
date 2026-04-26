@@ -2023,6 +2023,27 @@ export class GitHubResource extends BaseResource {
     });
   }
 
+  async findDeadCode(
+    projectId: string,
+    options: {
+      mode?: 'functions' | 'files' | 'summary';
+      language?: string;
+      risk?: 'high' | 'medium' | 'low';
+      limit?: number;
+    } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { mode = 'functions', language, risk, limit = 50 } = options;
+    const body: Record<string, unknown> = { from: 'dead_exports', mode, limit };
+    if (language) body.language = language;
+    if (risk) body.risk = risk;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query`,
+      body,
+    });
+  }
+
   async getFunctionRiskDelta(
     projectId: string,
     options: {
