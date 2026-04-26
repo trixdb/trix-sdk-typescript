@@ -2085,6 +2085,24 @@ export class GitHubResource extends BaseResource {
     });
   }
 
+  async scopeAnalysis(
+    projectId: string,
+    options: {
+      filePaths?: string[];
+      dir?: string;
+    } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { filePaths, dir } = options;
+    const where: Record<string, unknown> = { file_paths: filePaths ?? [] };
+    if (dir) where.dir = dir;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query`,
+      body: { from: 'scope_analysis', where },
+    });
+  }
+
   async getFunctionRiskDelta(
     projectId: string,
     options: {
