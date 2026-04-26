@@ -2023,6 +2023,27 @@ export class GitHubResource extends BaseResource {
     });
   }
 
+  async getAbstractionQuality(
+    projectId: string,
+    options: {
+      mode?: 'functions' | 'summary';
+      kind?: 'leaky' | 'thin' | 'god';
+      language?: string;
+      limit?: number;
+    } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { mode = 'functions', kind, language, limit = 50 } = options;
+    const body: Record<string, unknown> = { from: 'abstraction_quality', mode, limit };
+    if (kind) body.kind = kind;
+    if (language) body.language = language;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query`,
+      body,
+    });
+  }
+
   async analyzeContributorQuality(
     projectId: string,
     options: {
