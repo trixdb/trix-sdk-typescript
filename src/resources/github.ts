@@ -1707,6 +1707,23 @@ export class GitHubResource extends BaseResource {
     });
   }
 
+  /** 2D risk matrix: churn × complexity → DANGER_ZONE/WORKHORSE/SLEEPING_GIANT/SAFE. */
+  async getHotspotMatrix(
+    projectId: string,
+    options: { mode?: 'files' | 'summary'; quadrant?: 'DANGER_ZONE' | 'WORKHORSE' | 'SLEEPING_GIANT' | 'SAFE'; language?: string; limit?: number } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { mode = 'files', quadrant, language, limit = 25 } = options;
+    const body: Record<string, unknown> = { from: 'hotspot_matrix', mode, limit };
+    if (quadrant) body.quadrant = quadrant;
+    if (language) body.language = language;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query`,
+      body,
+    });
+  }
+
   /** File-level coupling analysis — fan-in bottlenecks from callerCount sums. */
   async getCouplingAnalysis(
     projectId: string,
