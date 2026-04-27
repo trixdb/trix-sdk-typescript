@@ -2126,4 +2126,26 @@ export class GitHubResource extends BaseResource {
       body,
     });
   }
+
+  async deadCodeRatio(
+    projectId: string,
+    options: {
+      mode?: 'files' | 'summary';
+      tier?: 'zombie' | 'hollow' | 'lean';
+      language?: string;
+      minFunctions?: number;
+      limit?: number;
+    } = {},
+  ): Promise<Record<string, unknown>> {
+    validateId(projectId, 'project');
+    const { mode = 'files', tier, language, minFunctions = 3, limit = 50 } = options;
+    const where: Record<string, unknown> = { min_functions: minFunctions };
+    if (tier) where.tier = tier;
+    if (language) where.language = language;
+    return this.request<Record<string, unknown>>({
+      method: 'POST',
+      path: `/projects/${projectId}/github/query`,
+      body: { from: 'dead_code_ratio', mode, where, limit },
+    });
+  }
 }
