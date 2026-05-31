@@ -120,7 +120,15 @@ export interface ListMemoriesParams extends PaginationParams, SortParams<'create
   mode?: 'semantic' | 'keyword' | 'hybrid';
   tags?: string[];
   type?: MemoryType;
+  /** Filter to a single space by UUID, or pass "none" for account-level memories. */
   spaceId?: string;
+  /**
+   * Filter to multiple spaces. The SDK serializes this as a CSV
+   * (`?space_ids=a,b,c`) — the shape the API actually accepts. Use this
+   * instead of fanning out N parallel calls when an agent has access to
+   * several spaces. Takes precedence over `spaceId` when both are set.
+   */
+  spaceIds?: string[];
   /** Filter by resource ID */
   resourceId?: string;
   /** Filter by multiple resource IDs (comma-separated) */

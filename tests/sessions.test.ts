@@ -97,10 +97,12 @@ describe('CLI Sessions Resource', () => {
       expect(body.name).toBe('Test Session');
       expect(body.description).toBe('A test session');
       expect(body.type).toBe('project');
-      expect(body.spaceId).toBe('space_123');
+      // SDK accepts camelCase from callers and serializes to snake_case
+      // before hitting the wire — Trix API consumes snake_case throughout.
+      expect(body.space_id).toBe('space_123');
       expect(body.tags).toEqual(['test']);
-      expect(body.retentionPolicy).toBe('permanent');
-      expect(body.isPrivate).toBe(false);
+      expect(body.retention_policy).toBe('permanent');
+      expect(body.is_private).toBe(false);
       expect(body.metadata).toEqual({ key: 'value' });
     });
 
@@ -170,13 +172,13 @@ describe('CLI Sessions Resource', () => {
       const [url] = mockFetch.mock.calls[0];
       expect(url).toContain('status=active');
       expect(url).toContain('type=project');
-      expect(url).toContain('spaceId=space_123');
+      expect(url).toContain('space_id=space_123');
       expect(url).toContain('tags=test');
       expect(url).toContain('search=query');
       expect(url).toContain('limit=50');
       expect(url).toContain('page=2');
-      expect(url).toContain('sortBy=createdAt');
-      expect(url).toContain('sortOrder=desc');
+      expect(url).toContain('sort_by=createdAt');
+      expect(url).toContain('sort_order=desc');
     });
 
     it('should use GET method', async () => {
@@ -319,9 +321,9 @@ describe('CLI Sessions Resource', () => {
       expect(body.name).toBe('Updated Session');
       expect(body.description).toBe('Updated description');
       expect(body.tags).toEqual(['updated']);
-      expect(body.retentionPolicy).toBe('auto_delete');
-      expect(body.retentionDays).toBe(30);
-      expect(body.isPrivate).toBe(true);
+      expect(body.retention_policy).toBe('auto_delete');
+      expect(body.retention_days).toBe(30);
+      expect(body.is_private).toBe(true);
       expect(body.metadata).toEqual({ updated: true });
     });
 

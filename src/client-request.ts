@@ -17,6 +17,7 @@ import {
 } from './errors.js';
 import { redactSensitiveData } from './utils/security.js';
 import { retry, retryStream, StreamRetryOptions } from './utils/retry.js';
+import { toSnakeCase, isPlainObject } from './utils/case-conversion.js';
 import type {
   RequestContext,
   ResponseContext,
@@ -118,23 +119,48 @@ export interface RequestConfig {
   errorInterceptors: ErrorInterceptor[];
 }
 
-/** Build full URL with query parameters */
+/** Build full URL with query parameters.
+ *
+ * Two conversions happen here so resource code can stay idiomatic TypeScript:
+ *
+ *   1. **camelCase → snake_case**: `{ spaceId: '...' }` becomes `?space_id=...`.
+ *      Resources that already pre-converted are unaffected (the conversion is
+ *      idempotent — keys without internal capitalization pass through).
+ *   2. **arrays → CSV**: `{ spaceIds: ['a', 'b'] }` becomes `?space_ids=a,b`.
+ *      Trix API parses array-like query params as comma-separated strings
+ *      (see e.g. `schemas/memories.js`: `space_ids`, `tags`, `clusters`), and
+ *      Fastify's default qs parser collapses repeated keys to the last value,
+ *      so repeated-key serialization would silently drop all but one entry.
+ */
 export function buildUrl(baseUrl: string, path: string, query?: object): string {
   const url = new URL(path, baseUrl);
 
   if (query) {
-    Object.entries(query).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        if (Array.isArray(value)) {
-          value.forEach((v) => url.searchParams.append(key, String(v)));
-        } else {
-          url.searchParams.append(key, String(value));
-        }
+    const normalized = toSnakeCase(query as Record<string, unknown>);
+    for (const [key, value] of Object.entries(normalized)) {
+      if (value === undefined || value === null) continue;
+      if (Array.isArray(value)) {
+        if (value.length === 0) continue;
+        url.searchParams.append(key, value.map((v) => String(v)).join(','));
+      } else {
+        url.searchParams.append(key, String(value));
       }
-    });
+    }
   }
 
   return url.toString();
+}
+
+/** Convert top-level camelCase keys of a request body to snake_case.
+ *
+ * Only plain objects are touched. Arrays, Buffers, FormData, etc. pass
+ * through — they have structural meaning. Nested objects (`metadata`,
+ * `settings`, `tools[].config`, …) are user-controlled bags and are NOT
+ * recursed into; rewriting keys inside them would corrupt the user's data.
+ */
+function normalizeBody(body: unknown): unknown {
+  if (!isPlainObject(body)) return body;
+  return toSnakeCase(body);
 }
 
 /** Build request headers */
@@ -277,7 +303,7 @@ export async function executeRequest<T>(
     method: options.method,
     url,
     headers,
-    body: options.body,
+    body: normalizeBody(options.body),
   };
 
   if (config.requestInterceptors.length > 0) {
@@ -366,10 +392,11 @@ export async function executeStreamRequest(
   const timeoutId = setTimeout(() => controller.abort(), requestTimeout);
 
   try {
+    const normalizedBody = normalizeBody(options.body);
     const response = await config.fetchImpl(url, {
       method: options.method,
       headers,
-      body: options.body ? JSON.stringify(options.body) : undefined,
+      body: normalizedBody ? JSON.stringify(normalizedBody) : undefined,
       signal: controller.signal,
     });
 
