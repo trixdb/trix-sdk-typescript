@@ -141,6 +141,12 @@ export interface ListMemoriesParams extends PaginationParams, SortParams<'create
   minQuality?: number;
   /** Include soft-deleted memories in results */
   includeDeleted?: boolean;
+  /**
+   * Named retrieval pipeline preset (ADR-111). Selects how this query is
+   * retrieved (strategy/expansions/rerankers); resolved caller > space >
+   * account. Forwarded as `?pipeline=` to GET /memories.
+   */
+  pipeline?: string;
 }
 
 // ============================================================================
