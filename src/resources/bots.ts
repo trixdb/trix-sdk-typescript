@@ -44,33 +44,33 @@ export class Bots extends BaseResource {
   }
 
   async create(params: CreateBotParams): Promise<Bot> {
-    return this.request<Bot>({ method: 'POST', path: '/bots', body: params });
+    return this.request<Bot>({ method: 'POST', path: '/agents', body: params });
   }
 
   async list(params?: ListBotsParams): Promise<Bot[]> {
-    const result = await this.request<{ bots: Bot[] }>({
+    const result = await this.request<{ agents: Bot[] }>({
       method: 'GET',
-      path: '/bots',
+      path: '/agents',
       params: params ? buildParams(params as Record<string, unknown>) : undefined,
     });
-    return result.bots;
+    return result.agents;
   }
 
   async get(idOrSlug: string): Promise<Bot> {
     return this.request<Bot>({
       method: 'GET',
-      path: `/bots/${encodeURIComponent(idOrSlug)}`,
+      path: `/agents/${encodeURIComponent(idOrSlug)}`,
     });
   }
 
   async update(id: string, params: UpdateBotParams): Promise<Bot> {
     validateId(id, 'bot');
-    return this.request<Bot>({ method: 'PATCH', path: `/bots/${id}`, body: params });
+    return this.request<Bot>({ method: 'PATCH', path: `/agents/${id}`, body: params });
   }
 
   async delete(id: string): Promise<void> {
     validateId(id, 'bot');
-    return this.request<void>({ method: 'DELETE', path: `/bots/${id}` });
+    return this.request<void>({ method: 'DELETE', path: `/agents/${id}` });
   }
 
   // Space access
@@ -78,7 +78,7 @@ export class Bots extends BaseResource {
     validateId(botId, 'bot');
     return this.request<BotSpace>({
       method: 'POST',
-      path: `/bots/${botId}/spaces`,
+      path: `/agents/${botId}/spaces`,
       body: params,
     });
   }
@@ -88,7 +88,7 @@ export class Bots extends BaseResource {
     validateId(spaceId, 'space');
     return this.request<void>({
       method: 'DELETE',
-      path: `/bots/${botId}/spaces/${spaceId}`,
+      path: `/agents/${botId}/spaces/${spaceId}`,
     });
   }
 
@@ -97,7 +97,7 @@ export class Bots extends BaseResource {
     validateId(botId, 'bot');
     return this.request<BotTrigger>({
       method: 'POST',
-      path: `/bots/${botId}/triggers`,
+      path: `/agents/${botId}/triggers`,
       body: params,
     });
   }
@@ -110,7 +110,7 @@ export class Bots extends BaseResource {
     validateId(botId, 'bot');
     return this.request<BotTrigger>({
       method: 'PATCH',
-      path: `/bots/${botId}/triggers/${triggerId}`,
+      path: `/agents/${botId}/triggers/${triggerId}`,
       body: params,
     });
   }
@@ -119,7 +119,7 @@ export class Bots extends BaseResource {
     validateId(botId, 'bot');
     return this.request<void>({
       method: 'DELETE',
-      path: `/bots/${botId}/triggers/${triggerId}`,
+      path: `/agents/${botId}/triggers/${triggerId}`,
     });
   }
 
@@ -128,7 +128,7 @@ export class Bots extends BaseResource {
     validateId(botId, 'bot');
     return this.request<BotRun>({
       method: 'POST',
-      path: `/bots/${encodeURIComponent(botId)}/run`,
+      path: `/agents/${encodeURIComponent(botId)}/run`,
       body: params || {},
     });
   }
@@ -137,7 +137,7 @@ export class Bots extends BaseResource {
     validateId(botId, 'bot');
     const result = await this.request<{ runs: BotRun[] }>({
       method: 'GET',
-      path: `/bots/${encodeURIComponent(botId)}/runs`,
+      path: `/agents/${encodeURIComponent(botId)}/runs`,
       params: params ? buildParams(params as Record<string, unknown>) : undefined,
     });
     return result.runs;
@@ -145,9 +145,12 @@ export class Bots extends BaseResource {
 
   async getRun(botId: string, runId: string): Promise<BotRun> {
     validateId(runId, 'run');
+    // Runs are addressed globally by id: GET /v1/agents/runs/:runId (not nested
+    // under the agent), so botId is validated only for symmetry with run().
+    validateId(botId, 'bot');
     return this.request<BotRun>({
       method: 'GET',
-      path: `/bots/${encodeURIComponent(botId)}/runs/${runId}`,
+      path: `/agents/runs/${encodeURIComponent(runId)}`,
     });
   }
 
@@ -162,7 +165,7 @@ export class Bots extends BaseResource {
     validateId(botId, 'bot');
     const stream = await this.client.requestStream({
       method: 'POST',
-      path: `/bots/${encodeURIComponent(botId)}/run`,
+      path: `/agents/${encodeURIComponent(botId)}/run`,
       body: params || {},
       headers: { 'Accept': 'text/event-stream' },
     });
@@ -239,16 +242,16 @@ export class Bots extends BaseResource {
     let offset = 0;
 
     while (true) {
-      const result = await this.request<{ bots: Bot[] }>({
+      const result = await this.request<{ agents: Bot[] }>({
         method: 'GET',
-        path: '/bots',
+        path: '/agents',
         params: { ...buildParams((params ?? {}) as Record<string, unknown>), limit, offset },
       });
 
-      for (const bot of result.bots) {
+      for (const bot of result.agents) {
         yield bot;
       }
-      if (result.bots.length < limit) break;
+      if (result.agents.length < limit) break;
       offset += limit;
     }
   }
@@ -268,7 +271,7 @@ export class Bots extends BaseResource {
     while (true) {
       const result = await this.request<{ runs: BotRun[] }>({
         method: 'GET',
-        path: `/bots/${encodeURIComponent(botId)}/runs`,
+        path: `/agents/${encodeURIComponent(botId)}/runs`,
         params: { limit, offset },
       });
 

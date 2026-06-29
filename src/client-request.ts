@@ -119,21 +119,25 @@ export interface RequestConfig {
   errorInterceptors: ErrorInterceptor[];
 }
 
-/** Build full URL with query parameters.
- *
- * Two conversions happen here so resource code can stay idiomatic TypeScript:
- *
- *   1. **camelCase → snake_case**: `{ spaceId: '...' }` becomes `?space_id=...`.
- *      Resources that already pre-converted are unaffected (the conversion is
- *      idempotent — keys without internal capitalization pass through).
- *   2. **arrays → CSV**: `{ spaceIds: ['a', 'b'] }` becomes `?space_ids=a,b`.
- *      Trix API parses array-like query params as comma-separated strings
- *      (see e.g. `schemas/memories.js`: `space_ids`, `tags`, `clusters`), and
- *      Fastify's default qs parser collapses repeated keys to the last value,
- *      so repeated-key serialization would silently drop all but one entry.
- */
+/** API version path segment derived from {@link API_VERSION}, e.g. `/v1`. */
+export const API_PREFIX = `/${API_VERSION}`;
+
+/** Ensure a path carries `/v1` exactly once (the transport owns the version, so
+ * resources use unversioned paths and we never emit `/v1/v1`). */
+export function withApiVersion(path: string): string {
+  const normalized = path.startsWith('/') ? path : `/${path}`;
+  if (normalized === API_PREFIX || normalized.startsWith(`${API_PREFIX}/`)) {
+    return normalized;
+  }
+  return `${API_PREFIX}${normalized}`;
+}
+
+/** Build the full, versioned URL with query parameters. Concatenates onto the
+ * base URL rather than `new URL(path, baseUrl)` (which drops a base path for
+ * leading-slash paths); query keys are snake_case'd and arrays CSV-serialized. */
 export function buildUrl(baseUrl: string, path: string, query?: object): string {
-  const url = new URL(path, baseUrl);
+  const base = baseUrl.replace(/\/+$/, '');
+  const url = new URL(base + withApiVersion(path));
 
   if (query) {
     const normalized = toSnakeCase(query as Record<string, unknown>);

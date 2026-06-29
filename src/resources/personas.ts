@@ -19,39 +19,41 @@ export class Personas extends BaseResource {
   }
 
   async create(params: CreatePersonaParams): Promise<Persona> {
-    return this.request<Persona>({ method: 'POST', path: '/personas', body: params });
+    return this.request<Persona>({ method: 'POST', path: '/agents', body: params });
   }
 
   async list(): Promise<Persona[]> {
-    const result = await this.request<{ data: Persona[] }>({ method: 'GET', path: '/personas' });
-    return result.data;
+    // Personas were merged into agents (API personas surface is 410 Gone); the
+    // agents list endpoint returns its rows under the `agents` key.
+    const result = await this.request<{ agents: Persona[] }>({ method: 'GET', path: '/agents' });
+    return result.agents;
   }
 
   async get(id: string): Promise<Persona> {
     validateId(id, 'persona');
-    return this.request<Persona>({ method: 'GET', path: `/personas/${id}` });
+    return this.request<Persona>({ method: 'GET', path: `/agents/${id}` });
   }
 
   async getBySlug(slug: string): Promise<Persona> {
     if (!slug || typeof slug !== 'string') throw new Error('Slug must be a non-empty string');
-    return this.request<Persona>({ method: 'GET', path: `/personas/${encodeURIComponent(slug)}` });
+    return this.request<Persona>({ method: 'GET', path: `/agents/${encodeURIComponent(slug)}` });
   }
 
   async update(id: string, params: UpdatePersonaParams): Promise<Persona> {
     validateId(id, 'persona');
-    return this.request<Persona>({ method: 'PATCH', path: `/personas/${id}`, body: params });
+    return this.request<Persona>({ method: 'PATCH', path: `/agents/${id}`, body: params });
   }
 
   async delete(id: string): Promise<void> {
     validateId(id, 'persona');
-    return this.request<void>({ method: 'DELETE', path: `/personas/${id}` });
+    return this.request<void>({ method: 'DELETE', path: `/agents/${id}` });
   }
 
   async addSpace(personaId: string, params: AddPersonaSpaceParams): Promise<PersonaSpace> {
     validateId(personaId, 'persona');
     return this.request<PersonaSpace>({
       method: 'POST',
-      path: `/personas/${personaId}/spaces`,
+      path: `/agents/${personaId}/spaces`,
       body: params,
     });
   }
@@ -61,7 +63,7 @@ export class Personas extends BaseResource {
     validateId(spaceId, 'space');
     return this.request<void>({
       method: 'DELETE',
-      path: `/personas/${personaId}/spaces/${spaceId}`,
+      path: `/agents/${personaId}/spaces/${spaceId}`,
     });
   }
 
