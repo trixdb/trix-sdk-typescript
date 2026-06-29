@@ -46,7 +46,7 @@ describe('Bots', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'POST',
-        path: '/bots',
+        path: '/agents',
         body: { name: 'Summarizer', system_prompt: 'Summarize text.' },
       });
       expect(result.id).toBe('bot_123');
@@ -56,26 +56,26 @@ describe('Bots', () => {
 
   describe('list', () => {
     it('should list all bots', async () => {
-      mockClient.request.mockResolvedValue({ bots: [BOT] });
+      mockClient.request.mockResolvedValue({ agents: [BOT] });
 
       const result = await bots.list();
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'GET',
-        path: '/bots',
+        path: '/agents',
         query: undefined,
       });
       expect(result).toHaveLength(1);
     });
 
     it('should filter by status', async () => {
-      mockClient.request.mockResolvedValue({ bots: [] });
+      mockClient.request.mockResolvedValue({ agents: [] });
 
       await bots.list({ status: 'active' });
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'GET',
-        path: '/bots',
+        path: '/agents',
         query: { status: 'active' },
       });
     });
@@ -89,7 +89,7 @@ describe('Bots', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'GET',
-        path: '/bots/bot_123',
+        path: '/agents/bot_123',
       });
       expect(result.id).toBe('bot_123');
     });
@@ -103,7 +103,7 @@ describe('Bots', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'PATCH',
-        path: '/bots/bot_123',
+        path: '/agents/bot_123',
         body: { name: 'Updated Bot' },
       });
       expect(result.name).toBe('Updated Bot');
@@ -118,7 +118,7 @@ describe('Bots', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'DELETE',
-        path: '/bots/bot_123',
+        path: '/agents/bot_123',
       });
     });
   });
@@ -131,7 +131,7 @@ describe('Bots', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'POST',
-        path: '/bots/bot_123/run',
+        path: '/agents/bot_123/run',
         body: { message: 'Summarize today' },
       });
       expect(result.status).toBe('running');
@@ -146,7 +146,7 @@ describe('Bots', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'GET',
-        path: '/bots/bot_123/runs',
+        path: '/agents/bot_123/runs',
         query: undefined,
       });
       expect(result).toHaveLength(1);
@@ -159,9 +159,10 @@ describe('Bots', () => {
 
       const result = await bots.getRun('bot_123', 'run_456');
 
+      // Runs are addressed globally by id, not nested under the agent.
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'GET',
-        path: '/bots/bot_123/runs/run_456',
+        path: '/agents/runs/run_456',
       });
       expect(result.status).toBe('completed');
     });
@@ -178,7 +179,7 @@ describe('Bots', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'POST',
-        path: '/bots/bot_123/spaces',
+        path: '/agents/bot_123/spaces',
         body: { spaceId: 'space_1', permission: 'read' },
       });
     });
@@ -192,7 +193,7 @@ describe('Bots', () => {
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'DELETE',
-        path: '/bots/bot_123/spaces/space_1',
+        path: '/agents/bot_123/spaces/space_1',
       });
     });
   });

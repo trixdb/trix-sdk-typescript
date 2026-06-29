@@ -39,7 +39,7 @@ export class Knowledge {
   ): Promise<KnowledgeSummaryResult> {
     return this.client.request<KnowledgeSummaryResult>({
       method: 'POST',
-      path: '/v1/knowledge/summary',
+      path: '/knowledge/summary',
       body: {
         topic,
         limit: options?.limit ?? 30,
@@ -75,7 +75,7 @@ export class Knowledge {
   }): Promise<ToNoteResult> {
     return this.client.request<ToNoteResult>({
       method: 'POST',
-      path: '/v1/knowledge/to-note',
+      path: '/knowledge/to-note',
       body: {
         memory_ids: options.memoryIds,
         query: options.query,

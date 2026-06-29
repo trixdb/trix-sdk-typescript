@@ -92,7 +92,7 @@ describe('Personas Resource', () => {
       expect(persona.settings).toEqual({ theme: 'dark' });
     });
 
-    it('should send POST to /personas with body', async () => {
+    it('should send POST to /agents with body', async () => {
       const mockFetch = createMockFetch({ status: 200, body: mockPersona });
       const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
@@ -103,7 +103,7 @@ describe('Personas Resource', () => {
       });
 
       const [url, options] = mockFetch.mock.calls[0];
-      expect(url).toContain('/personas');
+      expect(url).toContain('/agents');
       expect(options.method).toBe('POST');
       const body = JSON.parse(options.body);
       expect(body.name).toBe('Research');
@@ -116,7 +116,7 @@ describe('Personas Resource', () => {
     it('should list personas and extract data array', async () => {
       const mockFetch = createMockFetch({
         status: 200,
-        body: { data: [mockPersona] },
+        body: { agents: [mockPersona] },
       });
       const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
@@ -128,7 +128,7 @@ describe('Personas Resource', () => {
     });
 
     it('should return empty array when no personas', async () => {
-      const mockFetch = createMockFetch({ status: 200, body: { data: [] } });
+      const mockFetch = createMockFetch({ status: 200, body: { agents: [] } });
       const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
       const personas = await client.personas.list();
@@ -136,14 +136,14 @@ describe('Personas Resource', () => {
       expect(personas).toHaveLength(0);
     });
 
-    it('should call GET /personas', async () => {
-      const mockFetch = createMockFetch({ status: 200, body: { data: [] } });
+    it('should call GET /agents', async () => {
+      const mockFetch = createMockFetch({ status: 200, body: { agents: [] } });
       const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
       await client.personas.list();
 
       const [url, options] = mockFetch.mock.calls[0];
-      expect(url).toContain('/personas');
+      expect(url).toContain('/agents');
       expect(options.method).toBe('GET');
     });
   });
@@ -160,14 +160,14 @@ describe('Personas Resource', () => {
       expect(persona.slug).toBe('research');
     });
 
-    it('should call GET /personas/:id', async () => {
+    it('should call GET /agents/:id', async () => {
       const mockFetch = createMockFetch({ status: 200, body: mockPersona });
       const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
       await client.personas.get('persona_123');
 
       const [url, options] = mockFetch.mock.calls[0];
-      expect(url).toContain('/personas/persona_123');
+      expect(url).toContain('/agents/persona_123');
       expect(options.method).toBe('GET');
     });
 
@@ -204,7 +204,7 @@ describe('Personas Resource', () => {
       await client.personas.getBySlug('my research');
 
       const [url] = mockFetch.mock.calls[0];
-      expect(url).toContain('/personas/my%20research');
+      expect(url).toContain('/agents/my%20research');
     });
 
     it('should use GET method', async () => {
@@ -249,7 +249,7 @@ describe('Personas Resource', () => {
       expect(persona.name).toBe('Updated Research');
     });
 
-    it('should send PATCH to /personas/:id with body', async () => {
+    it('should send PATCH to /agents/:id with body', async () => {
       const mockFetch = createMockFetch({ status: 200, body: mockPersona });
       const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
       const params: UpdatePersonaParams = {
@@ -261,7 +261,7 @@ describe('Personas Resource', () => {
       await client.personas.update('persona_123', params);
 
       const [url, options] = mockFetch.mock.calls[0];
-      expect(url).toContain('/personas/persona_123');
+      expect(url).toContain('/agents/persona_123');
       expect(options.method).toBe('PATCH');
       const body = JSON.parse(options.body);
       expect(body.name).toBe('Updated');
@@ -280,14 +280,14 @@ describe('Personas Resource', () => {
   });
 
   describe('delete', () => {
-    it('should send DELETE to /personas/:id', async () => {
+    it('should send DELETE to /agents/:id', async () => {
       const mockFetch = createMockFetch({ status: 204, body: {} });
       const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
       await client.personas.delete('persona_123');
 
       const [url, options] = mockFetch.mock.calls[0];
-      expect(url).toContain('/personas/persona_123');
+      expect(url).toContain('/agents/persona_123');
       expect(options.method).toBe('DELETE');
     });
 
@@ -335,7 +335,7 @@ describe('Personas Resource', () => {
       expect(result.role).toBe('admin');
     });
 
-    it('should send POST to /personas/:id/spaces with body', async () => {
+    it('should send POST to /agents/:id/spaces with body', async () => {
       const mockFetch = createMockFetch({ status: 200, body: mockPersonaSpace });
       const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
@@ -345,7 +345,7 @@ describe('Personas Resource', () => {
       });
 
       const [url, options] = mockFetch.mock.calls[0];
-      expect(url).toContain('/personas/persona_123/spaces');
+      expect(url).toContain('/agents/persona_123/spaces');
       expect(options.method).toBe('POST');
       const body = JSON.parse(options.body);
       expect(body.space_id).toBe('space_456');
@@ -363,14 +363,14 @@ describe('Personas Resource', () => {
   });
 
   describe('removeSpace', () => {
-    it('should send DELETE to /personas/:id/spaces/:spaceId', async () => {
+    it('should send DELETE to /agents/:id/spaces/:spaceId', async () => {
       const mockFetch = createMockFetch({ status: 204, body: {} });
       const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
       await client.personas.removeSpace('persona_123', 'space_456');
 
       const [url, options] = mockFetch.mock.calls[0];
-      expect(url).toContain('/personas/persona_123/spaces/space_456');
+      expect(url).toContain('/agents/persona_123/spaces/space_456');
       expect(options.method).toBe('DELETE');
     });
 
@@ -428,14 +428,14 @@ describe('Personas Resource', () => {
       expect(spaces).toEqual([]);
     });
 
-    it('should call GET /personas/:id internally', async () => {
+    it('should call GET /agents/:id internally', async () => {
       const mockFetch = createMockFetch({ status: 200, body: mockPersona });
       const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
 
       await client.personas.getSpaces('persona_123');
 
       const [url, options] = mockFetch.mock.calls[0];
-      expect(url).toContain('/personas/persona_123');
+      expect(url).toContain('/agents/persona_123');
       expect(options.method).toBe('GET');
     });
 
