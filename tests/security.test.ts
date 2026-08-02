@@ -138,15 +138,52 @@ describe('validateBaseUrl', () => {
 
   describe('localhost URLs', () => {
     it('should reject localhost without allowHttp', () => {
-      expect(() => validateBaseUrl('https://localhost')).toThrow(/Localhost/);
-      expect(() => validateBaseUrl('https://127.0.0.1')).toThrow(/Localhost/);
-      expect(() => validateBaseUrl('https://[::1]')).toThrow(/Localhost/);
-      expect(() => validateBaseUrl('https://0.0.0.0')).toThrow(/Localhost/);
+      expect(() => validateBaseUrl('https://localhost')).toThrow(/localhost/i);
+      expect(() => validateBaseUrl('https://127.0.0.1')).toThrow(/localhost/i);
+      expect(() => validateBaseUrl('https://[::1]')).toThrow(/localhost/i);
+      expect(() => validateBaseUrl('https://0.0.0.0')).toThrow(/localhost/i);
     });
 
     it('should allow localhost with allowHttp', () => {
       expect(validateBaseUrl('http://localhost:3000', true)).toBe('http://localhost:3000');
       expect(validateBaseUrl('http://127.0.0.1:3000', true)).toBe('http://127.0.0.1:3000');
+    });
+  });
+
+  // #12: validateBaseUrl lacked the private-IP/metadata SSRF blocklist that
+  // validateWebhookUrl has; both now share one helper, so parity must hold.
+  describe('SSRF blocklist parity with validateWebhookUrl', () => {
+    it('rejects the cloud metadata endpoint (169.254.169.254)', () => {
+      expect(() => validateBaseUrl('https://169.254.169.254')).toThrow();
+    });
+
+    it('rejects private IPv4 ranges', () => {
+      expect(() => validateBaseUrl('https://10.0.0.1')).toThrow(/private IP/);
+      expect(() => validateBaseUrl('https://192.168.1.1')).toThrow(/private IP/);
+      expect(() => validateBaseUrl('https://172.16.0.1')).toThrow(/private IP/);
+    });
+
+    it('rejects link-local addresses', () => {
+      expect(() => validateBaseUrl('https://169.254.0.1')).toThrow(/link-local/);
+    });
+
+    it('rejects private and link-local IPv6', () => {
+      expect(() => validateBaseUrl('https://[fc00::1]')).toThrow(/private IPv6/);
+      expect(() => validateBaseUrl('https://[fe80::1]')).toThrow(/link-local/);
+    });
+
+    it('rejects IPv4-mapped IPv6 tunneling to private space', () => {
+      expect(() => validateBaseUrl('https://[::ffff:10.0.0.1]')).toThrow(/IPv4-mapped/);
+    });
+
+    it('still accepts public hosts and public IPs', () => {
+      expect(validateBaseUrl('https://api.example.com')).toBe('https://api.example.com');
+      expect(validateBaseUrl('https://8.8.8.8')).toBe('https://8.8.8.8');
+    });
+
+    it('allows private hosts when allowInsecure is set (dev escape hatch)', () => {
+      expect(validateBaseUrl('http://10.0.0.1', true)).toBe('http://10.0.0.1');
+      expect(validateBaseUrl('https://169.254.169.254', true)).toBe('https://169.254.169.254');
     });
   });
 
