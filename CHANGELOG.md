@@ -17,6 +17,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - `UnifiedSearchResult` and `UnifiedSearchResponse` types describing the
   `GET`/`POST /v1/search` response shape.
+- **Duplicate writes on retry (#3):** mutating requests (POST/PUT/PATCH/DELETE)
+  now carry a stable `Idempotency-Key` (UUID v4) that is generated once per
+  logical request and reused across every automatic retry. Previously a
+  transient 5xx / network / timeout during a write could be re-sent with no
+  idempotency guard, causing duplicate writes; trix-api now replays the first
+  response instead. GET requests are unaffected, and a caller-supplied
+  `Idempotency-Key` (any casing) is preserved.
 
 ## [0.1.1] - 2025-12-30
 
