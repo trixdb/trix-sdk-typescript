@@ -46,7 +46,14 @@ export interface PaginatedResponse<T> {
     total: number;
     page: number;
     limit: number;
+    /**
+     * Whether more pages remain. The API emits this as snake_case `has_more`;
+     * `hasMore` is the camelCased alias. Consumers should read
+     * `has_more ?? hasMore` to tolerate either shape.
+     */
     hasMore: boolean;
+    /** Snake_case form as sent on the wire by the API. */
+    has_more?: boolean;
   };
 }
 
