@@ -21,7 +21,7 @@ export interface SkillResource {
 
 export interface Skill {
   id: string;
-  account_id: string;
+  accountId: string;
   name: string;
   slug: string;
   description: string;
@@ -34,17 +34,17 @@ export interface Skill {
   metadata: Record<string, unknown>;
   visibility: SkillVisibility;
   status: SkillStatus;
-  allowed_tools: string[];
-  install_count: number;
-  source_url?: string;
-  source_skill_id?: string;
-  created_at: string;
-  updated_at: string;
+  allowedTools: string[];
+  installCount: number;
+  sourceUrl?: string;
+  sourceSkillId?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface BotSkillAttachment {
-  bot_id: string;
-  skill_id: string;
+  botId: string;
+  skillId: string;
   enabled: boolean;
   config: Record<string, unknown>;
   priority: number;
@@ -62,8 +62,8 @@ export interface CreateSkillParams {
   resources?: SkillResource[];
   metadata?: Record<string, unknown>;
   visibility?: SkillVisibility;
-  allowed_tools?: string[];
-  source_url?: string;
+  allowedTools?: string[];
+  sourceUrl?: string;
 }
 
 export interface UpdateSkillParams {
@@ -79,8 +79,8 @@ export interface UpdateSkillParams {
   metadata?: Record<string, unknown>;
   visibility?: SkillVisibility;
   status?: SkillStatus;
-  allowed_tools?: string[];
-  source_url?: string;
+  allowedTools?: string[];
+  sourceUrl?: string;
 }
 
 export interface ListSkillsParams {
@@ -95,7 +95,7 @@ export interface MarketplaceSearchParams {
 }
 
 export interface AttachSkillParams {
-  bot_id: string;
+  botId: string;
   enabled?: boolean;
   config?: Record<string, unknown>;
   priority?: number;

@@ -47,13 +47,11 @@ export interface PaginatedResponse<T> {
     page: number;
     limit: number;
     /**
-     * Whether more pages remain. The API emits this as snake_case `has_more`;
-     * `hasMore` is the camelCased alias. Consumers should read
-     * `has_more ?? hasMore` to tolerate either shape.
+     * Whether more pages remain. The API emits snake_case `has_more` on the
+     * wire; responses are camelCased centrally in `handleResponse` (#4), so
+     * consumers read `hasMore`.
      */
     hasMore: boolean;
-    /** Snake_case form as sent on the wire by the API. */
-    has_more?: boolean;
   };
 }
 

@@ -7,13 +7,13 @@
 
 export interface GitHubConnection {
   id: string;
-  project_id: string;
-  repo_full_name: string;
-  webhook_active: boolean;
-  sync_commits: boolean;
-  sync_pull_requests: boolean;
-  sync_issues: boolean;
-  last_webhook_at?: string;
+  projectId: string;
+  repoFullName: string;
+  webhookActive: boolean;
+  syncCommits: boolean;
+  syncPullRequests: boolean;
+  syncIssues: boolean;
+  lastWebhookAt?: string;
 }
 
 export interface GitHubConnectionsResponse {
@@ -22,22 +22,22 @@ export interface GitHubConnectionsResponse {
 }
 
 export interface LinkRepoParams {
-  connection_id: string;
-  repo_id: string;
-  repo_full_name: string;
+  connectionId: string;
+  repoId: string;
+  repoFullName: string;
 }
 
 export interface LinkRepoResponse {
   connection: GitHubConnection;
-  webhook_url: string;
-  webhook_secret: string;
+  webhookUrl: string;
+  webhookSecret: string;
 }
 
 export interface UpdateConnectionParams {
-  pr_review_bot_enabled?: boolean;
-  sync_commits?: boolean;
-  sync_pull_requests?: boolean;
-  sync_issues?: boolean;
+  prReviewBotEnabled?: boolean;
+  syncCommits?: boolean;
+  syncPullRequests?: boolean;
+  syncIssues?: boolean;
 }
 
 // ── Activity ───────────────────────────────────────────────────────────────
@@ -46,7 +46,7 @@ export interface ActivityMemory {
   id: string;
   content: string;
   type: string;
-  created_at: string;
+  createdAt: string;
   metadata?: Record<string, unknown>;
 }
 
@@ -65,10 +65,10 @@ export interface ActivityParams {
 // ── Churn & Complexity ─────────────────────────────────────────────────────
 
 export interface ChurnFile {
-  file_path: string;
-  repo_full_name: string;
-  touch_count: number;
-  last_touched_at: string;
+  filePath: string;
+  repoFullName: string;
+  touchCount: number;
+  lastTouchedAt: string;
 }
 
 export interface ChurnFilesResponse {
@@ -78,35 +78,35 @@ export interface ChurnFilesResponse {
 
 export interface FunctionComplexityMetric {
   name: string;
-  start_line: number;
-  end_line: number;
+  startLine: number;
+  endLine: number;
   loc: number;
   cyclomatic: number;
   cognitive: number;
   /** Number of files in the scan set that call this function (load-bearing indicator) */
-  caller_count?: number;
+  callerCount?: number;
   /** Number of structurally identical functions detected across the codebase */
-  clone_count?: number;
-  clone_hash?: string;
-  clone_partners?: string[];
+  cloneCount?: number;
+  cloneHash?: string;
+  clonePartners?: string[];
 }
 
 export interface FileComplexityMetric {
-  file_path: string;
-  repo_full_name: string;
+  filePath: string;
+  repoFullName: string;
   language?: string;
-  cyclomatic_complexity?: number;
-  cognitive_complexity?: number;
+  cyclomaticComplexity?: number;
+  cognitiveComplexity?: number;
   loc?: number;
-  hotspot_score?: number;
-  complexity_level?: 'ok' | 'warning' | 'critical';
-  computed_at?: string;
+  hotspotScore?: number;
+  complexityLevel?: 'ok' | 'warning' | 'critical';
+  computedAt?: string;
   /** Per-function breakdown with CC, CogC, LOC, callerCount, cloneCount */
   functions?: FunctionComplexityMetric[];
   /** Exported symbols never imported in the scanned file set (dead code candidates) */
-  unused_exports?: string[];
+  unusedExports?: string[];
   /** Test coverage pairing result by filename convention */
-  test_coverage?: { status: 'covered' | 'uncovered' | 'unknown'; test_file: string | null };
+  testCoverage?: { status: 'covered' | 'uncovered' | 'unknown'; testFile: string | null };
 }
 
 export interface FileComplexityResponse {
@@ -116,23 +116,23 @@ export interface FileComplexityResponse {
 
 export interface QualitySummaryResponse {
   summary: {
-    total_files_tracked: number;
-    hotspot_count: number;
-    hotspot_ratio: number;
+    totalFilesTracked: number;
+    hotspotCount: number;
+    hotspotRatio: number;
   };
-  top_hotspots: ChurnFile[];
+  topHotspots: ChurnFile[];
 }
 
 // ── Symbols ────────────────────────────────────────────────────────────────
 
 export interface CodeSymbol {
-  file_path: string;
-  repo_full_name: string;
-  symbol_name: string;
-  symbol_kind: string;
-  line_start?: number;
+  filePath: string;
+  repoFullName: string;
+  symbolName: string;
+  symbolKind: string;
+  lineStart?: number;
   language?: string;
-  churn_score: number;
+  churnScore: number;
 }
 
 export interface SymbolsResponse {
@@ -143,17 +143,17 @@ export interface SymbolsResponse {
 // ── Analytics (Phase 3–4) ──────────────────────────────────────────────────
 
 export interface VelocityResponse {
-  merged_last_7_days: number;
-  merged_last_30_days: number;
-  avg_cycle_time_hours: number | null;
-  avg_cycle_time_days: number | null;
+  mergedLast7Days: number;
+  mergedLast30Days: number;
+  avgCycleTimeHours: number | null;
+  avgCycleTimeDays: number | null;
 }
 
 export interface FlaggedPR {
   id: string;
   summary: string;
   flags: string[];
-  created_at: string;
+  createdAt: string;
 }
 
 export interface FlaggedPRsResponse {
@@ -188,25 +188,25 @@ export interface PRBriefsResponse {
 }
 
 export interface CycleTimeResponse {
-  avg_cycle_days_last_30: number | null;
-  avg_cycle_days_30_60: number | null;
-  avg_open_age_days: number | null;
-  open_issue_count: number;
-  closed_last_30: number;
+  avgCycleDaysLast30: number | null;
+  avgCycleDays3060: number | null;
+  avgOpenAgeDays: number | null;
+  openIssueCount: number;
+  closedLast30: number;
   trend: 'improving' | 'stable' | 'worsening';
 }
 
 export interface AgentAttributionResponse {
-  total_commits: number;
-  total_prs: number;
-  agent_breakdown: Record<string, number>;
-  agent_total: number;
-  human_total: number;
-  agent_ratio: number;
+  totalCommits: number;
+  totalPrs: number;
+  agentBreakdown: Record<string, number>;
+  agentTotal: number;
+  humanTotal: number;
+  agentRatio: number;
   /** Average PR quality score (0-100) per AI tool, keyed by agent name */
-  agent_quality_scores: Record<string, number | null>;
+  agentQualityScores: Record<string, number | null>;
   /** Average PR quality score (0-100) for human-authored PRs */
-  human_avg_quality: number | null;
+  humanAvgQuality: number | null;
 }
 
 export interface LinkedGoal {
@@ -214,9 +214,9 @@ export interface LinkedGoal {
   title: string;
   progress: number;
   status: string;
-  progress_type: string;
-  last_github_progress: number | null;
-  last_github_updated_at: string | null;
+  progressType: string;
+  lastGithubProgress: number | null;
+  lastGithubUpdatedAt: string | null;
 }
 
 export interface GoalProgressResponse {
@@ -225,13 +225,13 @@ export interface GoalProgressResponse {
 
 export interface GoalProgressEvent {
   id: string;
-  goal_id: string;
-  goal_title: string;
-  goal_status: string;
-  previous_progress: number;
-  new_progress: number;
+  goalId: string;
+  goalTitle: string;
+  goalStatus: string;
+  previousProgress: number;
+  newProgress: number;
   note: string | null;
-  created_at: string;
+  createdAt: string;
 }
 
 export interface GoalProgressHistoryResponse {
@@ -291,20 +291,20 @@ export interface ScanRepoResponse {
   issues: number;
   files: number;
   hotspots: number;
-  pr_briefs: number;
+  prBriefs: number;
   errors?: string[];
 }
 
 export interface GenerateNarrativeResponse {
   narrative: string;
   stored: boolean;
-  window_days: number;
+  windowDays: number;
 }
 
 export interface StoredNarrative {
   id: string;
   content: string;
-  created_at: string;
+  createdAt: string;
   metadata?: Record<string, unknown>;
 }
 
@@ -323,7 +323,7 @@ export interface CodeImprovementFilters {
   priority?: ImprovementPriority;
   status?: ImprovementStatus;
   /** Filter by file path substring, e.g. "src/auth" returns all findings in that directory. */
-  file_path?: string;
+  filePath?: string;
 }
 
 export interface CodeImprovement {
@@ -332,11 +332,11 @@ export interface CodeImprovement {
   priority: ImprovementPriority;
   title: string;
   description: string;
-  file_path: string | null;
+  filePath: string | null;
   evidence: Record<string, unknown>;
   status: ImprovementStatus;
-  generated_by: 'rule' | 'llm';
-  generated_at: string;
+  generatedBy: 'rule' | 'llm';
+  generatedAt: string;
 }
 
 export interface CodeImprovementsResponse { suggestions: CodeImprovement[]; }
@@ -348,12 +348,12 @@ export interface ImprovementSummaryRow {
 }
 export interface ImprovementsHistoryItem {
   id: string;
-  snapshotted_at: string;
-  suggestion_count: number;
-  critical_count: number;
-  warning_count: number;
-  total_files: number;
-  hotspot_count: number;
+  snapshottedAt: string;
+  suggestionCount: number;
+  criticalCount: number;
+  warningCount: number;
+  totalFiles: number;
+  hotspotCount: number;
 }
 
 export interface RepoLanguage { name: string; bytes: number; pct: number; }
@@ -419,11 +419,11 @@ export interface QualityGate { passed: boolean; checks: QualityCheck[]; score: n
 
 export interface PRQualityWeek {
   /** ISO date (YYYY-MM-DD) for the Monday of this week. */
-  week_start: string;
+  weekStart: string;
   /** Average PR quality score (0-100) for all reviewed PRs that week. */
-  avg_quality: number;
+  avgQuality: number;
   /** Number of PRs with a quality score that week. */
-  pr_count: number;
+  prCount: number;
 }
 export type CqlFromMode =
   | 'files'
@@ -471,12 +471,12 @@ export interface CqlQuery {
   pattern?: string;
   patterns?: string[];
   risk?: 'high' | 'medium' | 'all';
-  /** Sub-mode for multi-mode queries: rating: "summary"|"files"; new_issues: "summary"|"files"|"categories"|"timeline"; contributors: "summary"|"files"|"silos" */
+  /** Sub-mode for multi-mode queries: rating: "summary"|"files"; newIssues: "summary"|"files"|"categories"|"timeline"; contributors: "summary"|"files"|"silos" */
   mode?: string;
   /** Lookback days for contributors, history, and new_issues timeline modes */
   days?: number;
   /** Minimum cyclomatic complexity for test_quality mode */
-  min_complexity?: number;
+  minComplexity?: number;
   /** Ecosystem filter for dependencies mode: "npm" | "pip" | "go" | "cargo" | "rubygems" | "maven" */
   ecosystem?: string;
   /** Baseline for new_issues mode: relative ("7d", "14d", "30d") or ISO date ("2026-04-01") */
@@ -492,17 +492,17 @@ export interface CqlQuery {
 }
 export interface CqlResult { results: Record<string, unknown>[]; count: number; query: CqlQuery; }
 export interface AgentPRResult { prNumber: number; prUrl: string; branchName: string; sha: string; }
-export interface SecurityFinding { category: string; priority: string; title: string; description: string; file_path: string | null; evidence: Record<string, unknown>; generated_by: string; }
-export interface DepVuln { category: string; priority: 'critical' | 'high' | 'medium' | 'low'; title: string; description: string; file_path: string | null; evidence: { vuln_id: string; package: string; ecosystem: string; cvss: number | null; fix_version: string | null; url: string | null; }; }
+export interface SecurityFinding { category: string; priority: string; title: string; description: string; filePath: string | null; evidence: Record<string, unknown>; generatedBy: string; }
+export interface DepVuln { category: string; priority: 'critical' | 'high' | 'medium' | 'low'; title: string; description: string; filePath: string | null; evidence: { vulnId: string; package: string; ecosystem: string; cvss: number | null; fixVersion: string | null; url: string | null; }; }
 export interface PRFileMetric { path: string; cc: number | null; cogc: number | null; mi: number | null; loc: number | null; testCoverage: { status: string } | null; unusedExports: string[]; }
 export interface PRReviewResult { review: { body: string; event: string; url: string | null }; qualityScore: number; signals: unknown[]; smells: unknown[]; securityFindings: SecurityFinding[]; depVulns: DepVuln[]; fileMetrics: PRFileMetric[]; inlineComments: number; filesAnalyzed: number; unsupportedFiles: number; posted: boolean; }
 export interface ScanCodeSummary { secrets: number; security: number; critical: number; high: number; safe: boolean; }
-export interface ScanCodeResult { file_path: string; findings: SecurityFinding[]; summary: ScanCodeSummary; }
+export interface ScanCodeResult { filePath: string; findings: SecurityFinding[]; summary: ScanCodeSummary; }
 
 // ── Code health analytics (Session 15–16) ────────────────────────────────────
 
 export interface CodeSummaryDebt { totalMinutes: number; totalHours: number; topCategories: Array<{ category: string; count: number; minutes: number }>; }
-export interface CodeSummaryHotspot { file_path: string; repo_full_name: string; language: string | null; hotspot_score: number | null; cyclomatic_complexity: number | null; cognitive_complexity: number | null; complexity_level: string | null; loc: number | null; }
+export interface CodeSummaryHotspot { filePath: string; repoFullName: string; language: string | null; hotspotScore: number | null; cyclomaticComplexity: number | null; cognitiveComplexity: number | null; complexityLevel: string | null; loc: number | null; }
 export interface CodeSummaryResult { qualityGate: QualityGate; debt: CodeSummaryDebt; hotspots: CodeSummaryHotspot[]; openCounts: { critical: number; high: number; total: number }; topSmells: Array<{ kind: string; count: number }>; languages: Array<{ language: string; files: number; loc: number }>; lastScannedAt: string | null; }
 
 export interface CloneInstance { filePath: string; repoFullName: string; fnName: string; startLine: number | null; loc: number | null; language: string | null; }
@@ -775,8 +775,8 @@ export interface PRSizeBucket {
   key: string;
   count: number;
   pct: number;
-  avg_quality: number | null;
-  test_coverage_pct: number;
+  avgQuality: number | null;
+  testCoveragePct: number;
 }
 
 export interface PrSizeDistributionResult {
@@ -1242,7 +1242,7 @@ export interface PRCodeReviewSmell {
 export interface PRCodeReviewSecurityFinding {
   title?: string;
   description?: string;
-  file_path?: string;
+  filePath?: string;
   line?: number;
   file?: string;
 }
@@ -1317,7 +1317,7 @@ export interface QualityGateResult {
 // ── Batch Scan Code ────────────────────────────────────────────────────────
 
 export interface BatchScanFileInput {
-  file_path: string;
+  filePath: string;
   content: string;
 }
 
@@ -1332,7 +1332,7 @@ export interface BatchScanFileSummary {
 }
 
 export interface BatchScanFileResult {
-  file_path: string;
+  filePath: string;
   findings: SecurityFinding[];
   secrets: number;
   security: number;
@@ -1375,13 +1375,13 @@ export interface DesignFinding {
   priority: 'critical' | 'high' | 'medium' | 'low';
   title: string;
   description: string;
-  file_path: string;
+  filePath: string;
   evidence: Record<string, unknown>;
-  generated_by: string;
+  generatedBy: string;
 }
 
 export interface AnalyzeCodeComplexityResult {
-  file_path: string;
+  filePath: string;
   language: string;
   metrics: CodeComplexityMetrics;
   functions: FunctionComplexityMetric[];
@@ -1412,7 +1412,7 @@ export interface PreFlightPRResult {
   blockers: PreFlightBlocker[];
   warnings: PreFlightWarning[];
   summary: { filesChecked: number; secrets: number; security: number; smells: number; design: number };
-  files: Array<{ file_path: string; language: string; secrets: number; security: number; smells: number; design: number; cyclomatic: number }>;
+  files: Array<{ filePath: string; language: string; secrets: number; security: number; smells: number; design: number; cyclomatic: number }>;
 }
 
 export type ActionItemType = 'security' | 'performance' | 'refactor' | 'test_coverage' | 'dependency' | 'maintenance';
@@ -1423,7 +1423,7 @@ export interface ActionItem {
   priority: ActionItemPriority;
   title: string;
   detail: string;
-  file_path: string | null;
+  filePath: string | null;
   line: number | null;
   score: number;
   metadata: Record<string, unknown>;
@@ -1436,7 +1436,7 @@ export interface ActionPlanResult {
     security: number;
     performance: number;
     refactor: number;
-    test_coverage: number;
+    testCoverage: number;
     dependency: number;
     maintenance: number;
   };
@@ -1474,19 +1474,19 @@ export type CustomRuleCategory = 'security' | 'performance' | 'refactor' | 'main
 
 export interface CustomRule {
   id: string;
-  project_id: string;
+  projectId: string;
   name: string;
   description: string;
   language: CustomRuleLanguage;
-  tree_sitter_query: string;
+  treeSitterQuery: string;
   severity: CustomRuleSeverity;
   category: CustomRuleCategory;
-  message_template: string;
+  messageTemplate: string;
   enabled: boolean;
-  run_count: number;
-  last_match_count: number;
-  created_at: string;
-  updated_at: string;
+  runCount: number;
+  lastMatchCount: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CustomRulesResponse {
@@ -1497,22 +1497,22 @@ export interface CustomRulesResponse {
 export interface CreateCustomRuleParams {
   name: string;
   language: CustomRuleLanguage;
-  tree_sitter_query: string;
+  treeSitterQuery: string;
   severity: CustomRuleSeverity;
   category: CustomRuleCategory;
   description?: string;
-  message_template?: string;
+  messageTemplate?: string;
   enabled?: boolean;
 }
 
 export interface UpdateCustomRuleParams {
   name?: string;
   language?: CustomRuleLanguage;
-  tree_sitter_query?: string;
+  treeSitterQuery?: string;
   severity?: CustomRuleSeverity;
   category?: CustomRuleCategory;
   description?: string;
-  message_template?: string;
+  messageTemplate?: string;
   enabled?: boolean;
 }
 
@@ -1523,7 +1523,7 @@ export interface CustomRuleMatch {
 }
 
 export interface CustomRuleTestHit {
-  file_path: string;
+  filePath: string;
   matches: CustomRuleMatch[];
 }
 
@@ -1538,7 +1538,7 @@ export interface CustomRuleTestResult {
 // ── detect_conventions ────────────────────────────────────────────────────────
 
 export interface ConventionsResult {
-  languages: Array<{ language: string; file_count: number }>;
+  languages: Array<{ language: string; fileCount: number }>;
   naming: Record<string, Array<{ name: string; count: number; pct: number }>>;
   functionSize: {
     medianLoc: number;
@@ -1564,50 +1564,50 @@ export interface ConventionsResult {
 // ── generate_tests ────────────────────────────────────────────────────────────
 
 export interface GenerateTestsParams {
-  repo_full_name: string;
-  file_path: string;
+  repoFullName: string;
+  filePath: string;
   ref?: string;
-  test_placement?: 'collocated' | 'separate_directory';
+  testPlacement?: 'collocated' | 'separate_directory';
   framework?: string;
 }
 
 export interface GenerateTestsResult {
-  test_file_path: string;
-  test_code: string;
+  testFilePath: string;
+  testCode: string;
   language: string;
   framework: string;
-  function_count: number;
+  functionCount: number;
   functions: string[];
 }
 
 // ── post_review_findings ──────────────────────────────────────────────────────
 
 export interface ReviewFinding {
-  file_path?: string;
+  filePath?: string;
   line?: number;
   severity?: 'critical' | 'high' | 'medium' | 'low';
   title?: string;
   description?: string;
-  fix_code?: string | null;
+  fixCode?: string | null;
 }
 
 export interface PostReviewFindingsParams {
-  pr_number: number;
-  repo_full_name: string;
+  prNumber: number;
+  repoFullName: string;
   findings?: ReviewFinding[];
   grade?: string;
-  quality_score?: number;
-  gate_verdict?: 'PASS' | 'WARN' | 'BLOCK';
-  overall_comment?: string;
-  dry_run?: boolean;
+  qualityScore?: number;
+  gateVerdict?: 'PASS' | 'WARN' | 'BLOCK';
+  overallComment?: string;
+  dryRun?: boolean;
 }
 
 export interface PostReviewFindingsResult {
-  review_url?: string;
-  review_id?: number;
+  reviewUrl?: string;
+  reviewId?: number;
   event: 'REQUEST_CHANGES' | 'APPROVE' | 'COMMENT';
-  inline_comments: number;
-  unmapped_findings: number;
+  inlineComments: number;
+  unmappedFindings: number;
   dryRun?: boolean;
   wouldPost?: { body: string; event: string; inlineComments: number };
 }
@@ -1615,27 +1615,27 @@ export interface PostReviewFindingsResult {
 // ── create_fix_pr ─────────────────────────────────────────────────────────────
 
 export interface FixSpec {
-  file_path: string;
-  start_line: number;
-  end_line: number;
+  filePath: string;
+  startLine: number;
+  endLine: number;
   replacement: string;
   description?: string;
 }
 
 export interface CreateFixPRParams {
-  repo_full_name: string;
-  base_branch?: string;
+  repoFullName: string;
+  baseBranch?: string;
   branch?: string;
-  pr_title?: string;
+  prTitle?: string;
   fixes: FixSpec[];
 }
 
 export interface CreateFixPRResult {
-  pr_url: string;
-  pr_number: number;
+  prUrl: string;
+  prNumber: number;
   branch: string;
-  files_patched: number;
-  fixes_applied: number;
+  filesPatched: number;
+  fixesApplied: number;
 }
 
 // ── review_dependency_changes ─────────────────────────────────────────────────
@@ -1646,22 +1646,22 @@ export interface DependencyVulnerability {
   title: string;
   description: string;
   manifest: string;
-  cve_id: string | null;
+  cveId: string | null;
   cvss: number | null;
-  fix_available: boolean;
-  fix_version: string | null;
+  fixAvailable: boolean;
+  fixVersion: string | null;
   ecosystem: string | null;
 }
 
 export interface ReviewDepsResult {
-  manifests_changed: Array<{
+  manifestsChanged: Array<{
     manifest: string;
     ecosystem: string;
     added: string[];
     bumped: string[];
   }>;
   vulnerabilities: DependencyVulnerability[];
-  risk_level: 'none' | 'low' | 'medium' | 'high' | 'critical';
+  riskLevel: 'none' | 'low' | 'medium' | 'high' | 'critical';
   summary: string;
 }
 
@@ -1669,45 +1669,45 @@ export interface ReviewDepsResult {
 
 export interface SemanticDiffResult {
   supported: boolean;
-  added_functions: string[];
-  removed_functions: string[];
-  modified_functions: Array<{
+  addedFunctions: string[];
+  removedFunctions: string[];
+  modifiedFunctions: Array<{
     name: string;
-    cc_delta: number;
-    head_cc: number;
-    loc_delta: number;
+    ccDelta: number;
+    headCc: number;
+    locDelta: number;
   }>;
 }
 
 export interface ChangeImpactFile {
-  file_path: string;
+  filePath: string;
   status: string;
   additions: number;
   deletions: number;
   risk: 'critical' | 'high' | 'medium' | 'low';
-  caller_count: number;
-  hotspot_score: number | null;
-  complexity_level: string | null;
-  cyclomatic_complexity: number | null;
-  semantic_diff: SemanticDiffResult | null;
-  review_focus: string[];
+  callerCount: number;
+  hotspotScore: number | null;
+  complexityLevel: string | null;
+  cyclomaticComplexity: number | null;
+  semanticDiff: SemanticDiffResult | null;
+  reviewFocus: string[];
 }
 
 export interface ChangeImpactResult {
-  overall_risk: 'critical' | 'high' | 'medium' | 'low';
-  files_analyzed: number;
-  high_risk_files: number;
+  overallRisk: 'critical' | 'high' | 'medium' | 'low';
+  filesAnalyzed: number;
+  highRiskFiles: number;
   files: ChangeImpactFile[];
-  review_priority: string[];
+  reviewPriority: string[];
   summary: string;
 }
 
 // ── explain_code ──────────────────────────────────────────────────────────────
 
 export interface ExplainCodeParams {
-  repo_full_name: string;
-  file_path: string;
-  function_name: string;
+  repoFullName: string;
+  filePath: string;
+  functionName: string;
   ref?: string;
 }
 
@@ -1715,20 +1715,20 @@ export interface CodeExplanation {
   purpose: string;
   inputs: string[];
   outputs: string;
-  key_logic: string[];
-  edge_cases: string[];
-  potential_issues: string[];
-  complexity_notes: string;
+  keyLogic: string[];
+  edgeCases: string[];
+  potentialIssues: string[];
+  complexityNotes: string;
 }
 
 export interface ExplainCodeResult {
-  file_path: string;
-  function_name: string;
+  filePath: string;
+  functionName: string;
   language: string;
   ref: string;
-  cyclomatic_complexity: number | null;
+  cyclomaticComplexity: number | null;
   explanation: CodeExplanation;
-  code_snippet: string;
+  codeSnippet: string;
 }
 
 // ── suggest_refactoring ───────────────────────────────────────────────────────
@@ -1741,36 +1741,36 @@ export type RefactoringGoal =
   | 'improve_performance';
 
 export interface SuggestRefactoringParams {
-  repo_full_name: string;
-  file_path: string;
-  function_name: string;
+  repoFullName: string;
+  filePath: string;
+  functionName: string;
   ref?: string;
   goals?: RefactoringGoal[];
   context?: string;
 }
 
 export interface RefactoringSuggestion {
-  refactored_code: string;
-  helpers_needed: string[];
-  changes_summary: string;
-  estimated_cc_reduction: number | null;
+  refactoredCode: string;
+  helpersNeeded: string[];
+  changesSummary: string;
+  estimatedCcReduction: number | null;
   rationale: string;
   risks: string[];
 }
 
 export interface SuggestRefactoringResult {
-  file_path: string;
-  function_name: string;
+  filePath: string;
+  functionName: string;
   language: string;
   ref: string;
-  original_metrics: { cyclomatic: number | null; cognitive: number | null; loc: number | null };
-  original_start_line: number;
-  goals_applied: RefactoringGoal[];
+  originalMetrics: { cyclomatic: number | null; cognitive: number | null; loc: number | null };
+  originalStartLine: number;
+  goalsApplied: RefactoringGoal[];
   suggestion: RefactoringSuggestion;
-  fix_pr_hint: {
-    file_path: string;
-    start_line: number;
-    end_line: number;
+  fixPrHint: {
+    filePath: string;
+    startLine: number;
+    endLine: number;
     replacement: string;
     description: string;
   };
@@ -1791,25 +1791,25 @@ export type AstQueryLanguage =
 export interface BuildAstQueryParams {
   description: string;
   language?: AstQueryLanguage;
-  example_code?: string;
-  file_path_filter?: string;
+  exampleCode?: string;
+  filePathFilter?: string;
 }
 
 export interface BuildAstQueryResult {
   description: string;
   language: AstQueryLanguage;
   pattern: string;
-  capture_name: string;
+  captureName: string;
   explanation: string;
   caveats: string[];
-  example_matches: string[];
-  cql_payload: {
+  exampleMatches: string[];
+  cqlPayload: {
     from: 'ast_pattern';
     pattern: string;
     language: AstQueryLanguage;
     where?: Record<string, unknown>;
   };
-  usage_hint: string;
+  usageHint: string;
 }
 
 // ── architecture_review ───────────────────────────────────────────────────────
@@ -1819,23 +1819,23 @@ export interface ArchitectureConcern {
   severity: 'low' | 'medium' | 'high' | 'critical';
   title: string;
   description: string;
-  affected_files: string[];
+  affectedFiles: string[];
   recommendation: string;
 }
 
 export interface ArchitectureReviewResult {
-  pr_number: number;
-  repo_full_name: string;
+  prNumber: number;
+  repoFullName: string;
   base: string | null;
   head: string | null;
-  files_changed: number;
+  filesChanged: number;
   severity: 'none' | 'low' | 'medium' | 'high' | 'critical';
   concerns: ArchitectureConcern[];
-  positive_observations: string[];
-  overall_assessment: string;
-  concern_count: number;
-  critical_count: number;
-  high_count: number;
+  positiveObservations: string[];
+  overallAssessment: string;
+  concernCount: number;
+  criticalCount: number;
+  highCount: number;
 }
 
 // ── batch_mark_findings ───────────────────────────────────────────────────────
@@ -1849,11 +1849,11 @@ export type FindingStatus =
   | 'confirmed';
 
 export interface BatchFindingMark {
-  suggestion_id: string;
+  suggestionId: string;
   status: FindingStatus;
   /** Required when status is 'false_positive' */
-  fp_reason?: string;
-  lifecycle_note?: string;
+  fpReason?: string;
+  lifecycleNote?: string;
 }
 
 export interface BatchMarkFindingsResult {
@@ -1866,29 +1866,29 @@ export interface BatchMarkFindingsResult {
 
 export interface ReviewerSuggestion {
   reviewer: string;
-  expertise_score: number;
-  file_count: number;
-  avg_ownership_pct: number;
-  last_commit_at: string;
+  expertiseScore: number;
+  fileCount: number;
+  avgOwnershipPct: number;
+  lastCommitAt: string;
 }
 
 export interface SuggestReviewersResult {
   results: ReviewerSuggestion[];
   mode: string;
-  file_count?: number;
+  fileCount?: number;
 }
 
 // ── Refactor Candidates ────────────────────────────────────────────────────
 
 export interface RefactorCandidate {
-  file_path: string;
-  refactor_score: number;
+  filePath: string;
+  refactorScore: number;
   priority: 'critical' | 'high' | 'medium' | 'low';
-  cyclomatic_complexity: number;
-  cognitive_complexity: number;
-  smell_count: number;
-  open_issue_count: number;
-  hotspot_score: number;
+  cyclomaticComplexity: number;
+  cognitiveComplexity: number;
+  smellCount: number;
+  openIssueCount: number;
+  hotspotScore: number;
   language: string;
 }
 

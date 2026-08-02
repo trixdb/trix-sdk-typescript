@@ -17,7 +17,7 @@ import {
 } from './errors.js';
 import { redactSensitiveData } from './utils/security.js';
 import { retry, retryStream, StreamRetryOptions } from './utils/retry.js';
-import { toSnakeCase, isPlainObject } from './utils/case-conversion.js';
+import { toSnakeCase, toCamelCaseDeep, isPlainObject } from './utils/case-conversion.js';
 import { SDK_VERSION } from './version.js';
 import { MAX_RESPONSE_SIZE, readJsonWithCap, withInactivityTimeout } from './utils/response-limits.js';
 import type {
@@ -223,7 +223,12 @@ export async function handleResponse<T>(response: Response): Promise<T> {
 
     const contentType = response.headers.get('content-type');
     if (contentType?.includes('application/json')) {
-      return (await readJsonWithCap(response, MAX_RESPONSE_SIZE)) as T;
+      // The API speaks snake_case; the SDK's types are camelCase. Convert once,
+      // centrally, on the parsed body (covers both the capped-read and the
+      // json() fallback inside readJsonWithCap). An empty body yields undefined,
+      // which passes through untouched.
+      const parsed = await readJsonWithCap(response, MAX_RESPONSE_SIZE);
+      return toCamelCaseDeep(parsed) as T;
     }
 
     return undefined as unknown as T;

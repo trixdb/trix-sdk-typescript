@@ -7,37 +7,37 @@ export type ConversationRole = 'owner' | 'admin' | 'member';
 
 export interface HubMember {
   id: string;
-  hub_id: string;
-  user_id: string;
+  hubId: string;
+  userId: string;
   role: HubRole;
   permissions: Record<string, boolean>;
   name?: string;
   email?: string;
   avatar?: string;
   status?: string;
-  joined_at: string;
-  updated_at: string;
+  joinedAt: string;
+  updatedAt: string;
 }
 
 export interface ConversationMember {
   id: string;
-  conversation_id: string;
-  user_id: string;
+  conversationId: string;
+  userId: string;
   role: ConversationRole;
   permissions?: Record<string, boolean>;
-  is_agent: boolean;
+  isAgent: boolean;
   autonomy?: string;
-  trigger_mode?: string;
+  triggerMode?: string;
   name?: string;
   email?: string;
   avatar?: string;
   status?: string;
-  joined_at: string;
-  updated_at: string;
+  joinedAt: string;
+  updatedAt: string;
 }
 
 export interface AddHubMemberParams {
-  user_id: string;
+  userId: string;
   role?: HubRole;
   permissions?: Record<string, boolean>;
 }
@@ -48,30 +48,30 @@ export interface UpdateHubMemberParams {
 }
 
 export interface AddConversationMemberParams {
-  user_id: string;
+  userId: string;
   role?: ConversationRole;
   permissions?: Record<string, boolean>;
-  is_agent?: boolean;
+  isAgent?: boolean;
   autonomy?: string;
-  trigger_mode?: string;
+  triggerMode?: string;
 }
 
 export interface UpdateConversationMemberParams {
   role?: ConversationRole;
   permissions?: Record<string, boolean>;
   autonomy?: string;
-  trigger_mode?: string;
+  triggerMode?: string;
 }
 
 export interface HubCustomRole {
   id: string;
-  hub_id: string;
+  hubId: string;
   name: string;
   color: string | null;
   icon: string | null;
   position: number;
   permissions: Record<string, string>;
-  is_default: boolean;
+  isDefault: boolean;
 }
 
 export interface CreateRoleInput {
@@ -92,7 +92,7 @@ export interface UpdateRoleInput {
 
 export interface ConvRoleOverride {
   id: string;
-  conversation_id: string;
-  role_id: string;
+  conversationId: string;
+  roleId: string;
   permissions: Record<string, string>;
 }

@@ -32,7 +32,7 @@ import { validateId } from '../utils/security.js';
 
 /** Facts returned for a single memory (`GET /v1/memories/:id/facts`). */
 export interface MemoryFactsResult {
-  memory_id: string;
+  memoryId: string;
   facts: Fact[];
   total: number;
 }

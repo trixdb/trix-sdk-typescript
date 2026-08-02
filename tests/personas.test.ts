@@ -315,7 +315,7 @@ describe('Personas Resource', () => {
         space_id: 'space_456',
       });
 
-      expect(result.space_id).toBe('space_456');
+      expect(result.spaceId).toBe('space_456');
       expect(result.role).toBe('member');
     });
 
@@ -414,7 +414,7 @@ describe('Personas Resource', () => {
       const spaces = await client.personas.getSpaces('persona_123');
 
       expect(spaces).toHaveLength(1);
-      expect(spaces[0].space_id).toBe('space_456');
+      expect(spaces[0].spaceId).toBe('space_456');
       expect(spaces[0].role).toBe('member');
     });
 

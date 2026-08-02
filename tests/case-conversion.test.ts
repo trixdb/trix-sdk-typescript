@@ -12,9 +12,11 @@
 import {
   toSnakeCase,
   toSnakeCaseKey,
+  toCamelCaseKey,
+  toCamelCaseDeep,
   isPlainObject,
 } from '../src/utils/case-conversion';
-import { buildUrl } from '../src/client-request';
+import { buildUrl, handleResponse } from '../src/client-request';
 
 describe('toSnakeCaseKey', () => {
   it('converts camelCase boundaries', () => {
@@ -66,6 +68,121 @@ describe('isPlainObject', () => {
     expect(isPlainObject(null)).toBe(false);
     expect(isPlainObject('x')).toBe(false);
     expect(isPlainObject(42)).toBe(false);
+  });
+});
+
+describe('toCamelCaseKey', () => {
+  it('converts snake_case boundaries', () => {
+    expect(toCamelCaseKey('space_id')).toBe('spaceId');
+    expect(toCamelCaseKey('has_more')).toBe('hasMore');
+    expect(toCamelCaseKey('max_turns_per_run')).toBe('maxTurnsPerRun');
+    expect(toCamelCaseKey('actor_user_id')).toBe('actorUserId');
+  });
+
+  it('is idempotent on already-camelCase keys', () => {
+    expect(toCamelCaseKey('spaceId')).toBe('spaceId');
+    expect(toCamelCaseKey('tags')).toBe('tags');
+  });
+
+  it('handles digits and preserves a leading underscore', () => {
+    expect(toCamelCaseKey('v2_endpoint')).toBe('v2Endpoint');
+    expect(toCamelCaseKey('_id')).toBe('_id');
+  });
+});
+
+describe('toCamelCaseDeep', () => {
+  it('converts snake wire keys to camel typed fields, deeply', () => {
+    const wire = {
+      space_id: 'abc',
+      created_at: 't',
+      pagination: { has_more: true, total_results: 3 },
+    };
+    expect(toCamelCaseDeep(wire)).toEqual({
+      spaceId: 'abc',
+      createdAt: 't',
+      pagination: { hasMore: true, totalResults: 3 },
+    });
+  });
+
+  it('converts nested arrays of typed objects element-wise', () => {
+    const wire = { data: [{ space_id: 'a' }, { space_id: 'b' }] };
+    expect(toCamelCaseDeep(wire)).toEqual({
+      data: [{ spaceId: 'a' }, { spaceId: 'b' }],
+    });
+  });
+
+  it('camelCases the field name of an opaque bag but preserves its keys verbatim', () => {
+    const wire = {
+      event_filter: { user_defined_key: 1, nested: { another_key: 2 } },
+      metadata: { keep_me: 'x' },
+    };
+    expect(toCamelCaseDeep(wire)).toEqual({
+      eventFilter: { user_defined_key: 1, nested: { another_key: 2 } },
+      metadata: { keep_me: 'x' },
+    });
+  });
+
+  it('treats data/results structurally: array recurses, object is opaque', () => {
+    // Object form (e.g. a webhook/enrichment payload bag) → keys preserved.
+    expect(toCamelCaseDeep({ data: { raw_key: 1 } })).toEqual({ data: { raw_key: 1 } });
+    // Array form (e.g. paginated list) → element keys converted.
+    expect(toCamelCaseDeep({ results: [{ memory_id: 'm' }] })).toEqual({
+      results: [{ memoryId: 'm' }],
+    });
+  });
+
+  it('passes primitives, null, and bare arrays through', () => {
+    expect(toCamelCaseDeep(null)).toBeNull();
+    expect(toCamelCaseDeep(42)).toBe(42);
+    expect(toCamelCaseDeep([{ a_b: 1 }])).toEqual([{ aB: 1 }]);
+  });
+});
+
+describe('round-trip stability with toSnakeCase', () => {
+  it('toCamelCaseDeep(toSnakeCase(x)) === x for SDK objects with opaque bags', () => {
+    const sdkObject = {
+      spaceId: 'abc',
+      maxTokens: 10,
+      tags: ['a', 'b'],
+      metadata: { user_key: 1, nested: { deep_key: 2 } },
+    };
+    const roundTripped = toCamelCaseDeep(toSnakeCase(sdkObject));
+    expect(roundTripped).toEqual(sdkObject);
+  });
+});
+
+function jsonResponse(body: unknown): Response {
+  return {
+    ok: true,
+    status: 200,
+    statusText: 'OK',
+    headers: new Headers({ 'content-type': 'application/json' }),
+    json: jest.fn().mockResolvedValue(body),
+  } as unknown as Response;
+}
+
+describe('handleResponse case conversion', () => {
+  it('camelCases a snake_case JSON response body', async () => {
+    const result = await handleResponse<{ spaceId: string; createdAt: string }>(
+      jsonResponse({ space_id: 'abc', created_at: '2026-01-01' })
+    );
+    expect(result).toEqual({ spaceId: 'abc', createdAt: '2026-01-01' });
+  });
+
+  it('preserves opaque bag contents while camelCasing the field name', async () => {
+    const result = await handleResponse<{ metadata: Record<string, unknown> }>(
+      jsonResponse({ metadata: { snake_stays: true } })
+    );
+    expect(result.metadata).toEqual({ snake_stays: true });
+  });
+
+  it('returns undefined for a 204 without touching the body', async () => {
+    const res = {
+      ok: true,
+      status: 204,
+      headers: new Headers(),
+    } as unknown as Response;
+    expect(await handleResponse(res)).toBeUndefined();
   });
 });
 

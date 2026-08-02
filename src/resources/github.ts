@@ -1817,11 +1817,13 @@ export class GitHubResource extends BaseResource {
       findings.map((f) =>
         this.request({
           method: 'PATCH',
-          path: `/projects/${projectId}/github/improvements/${f.suggestion_id}`,
+          path: `/projects/${projectId}/github/improvements/${f.suggestionId}`,
           body: {
             status: f.status,
-            ...(f.fp_reason ? { fp_reason: f.fp_reason } : {}),
-            ...(f.lifecycle_note ? { lifecycle_note: f.lifecycle_note } : {}),
+            // Request body keys stay snake_case for the wire (outbound toSnakeCase
+            // is shallow); the reads are camelCase to match BatchFindingMark.
+            ...(f.fpReason ? { fp_reason: f.fpReason } : {}),
+            ...(f.lifecycleNote ? { lifecycle_note: f.lifecycleNote } : {}),
           },
         }),
       ),

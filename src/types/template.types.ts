@@ -7,35 +7,35 @@ export type TemplateCategory = 'assistant' | 'automation' | 'research' | 'creati
 
 export interface TemplateReview {
   id: string;
-  template_id: string;
-  account_id: string;
+  templateId: string;
+  accountId: string;
   rating: number;
   comment?: string;
-  created_at: string;
+  createdAt: string;
 }
 
 export interface Template {
   id: string;
-  account_id: string;
+  accountId: string;
   name: string;
   slug: string;
   description?: string;
   category: TemplateCategory;
   visibility: TemplateVisibility;
-  system_prompt: string;
+  systemPrompt: string;
   model?: string;
   provider?: string;
   temperature?: number;
-  max_tokens?: number;
+  maxTokens?: number;
   tools?: { server: string; tools?: string[] }[];
   settings: Record<string, unknown>;
   metadata: Record<string, unknown>;
-  install_count: number;
-  avg_rating?: number;
-  review_count: number;
+  installCount: number;
+  avgRating?: number;
+  reviewCount: number;
   tags: string[];
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateTemplateParams {
@@ -44,11 +44,11 @@ export interface CreateTemplateParams {
   description?: string;
   category?: TemplateCategory;
   visibility?: TemplateVisibility;
-  system_prompt: string;
+  systemPrompt: string;
   model?: string;
   provider?: string;
   temperature?: number;
-  max_tokens?: number;
+  maxTokens?: number;
   tools?: { server: string; tools?: string[] }[];
   settings?: Record<string, unknown>;
   metadata?: Record<string, unknown>;
@@ -61,11 +61,11 @@ export interface UpdateTemplateParams {
   description?: string | null;
   category?: TemplateCategory;
   visibility?: TemplateVisibility;
-  system_prompt?: string;
+  systemPrompt?: string;
   model?: string;
   provider?: string;
   temperature?: number;
-  max_tokens?: number;
+  maxTokens?: number;
   tools?: { server: string; tools?: string[] }[];
   settings?: Record<string, unknown>;
   metadata?: Record<string, unknown>;
@@ -89,7 +89,7 @@ export interface BrowseTemplatesParams {
 
 export interface InstallTemplateParams {
   name?: string;
-  space_ids?: string[];
+  spaceIds?: string[];
 }
 
 export interface CreateTemplateReviewParams {

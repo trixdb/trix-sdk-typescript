@@ -22,11 +22,11 @@ export interface PersonaGoal {
  * Persona space membership.
  */
 export interface PersonaSpace {
-  space_id: string;
+  spaceId: string;
   role: PersonaSpaceRole;
-  can_create_memories: boolean;
-  can_delete_memories: boolean;
-  granted_at: string;
+  canCreateMemories: boolean;
+  canDeleteMemories: boolean;
+  grantedAt: string;
 }
 
 /**
@@ -35,15 +35,15 @@ export interface PersonaSpace {
 export interface Persona extends BaseEntityWithMetadata {
   name: string;
   slug: string;
-  avatar_url?: string;
+  avatarUrl?: string;
   purpose?: string;
-  system_prompt?: string;
+  systemPrompt?: string;
   goals: PersonaGoal[];
   settings: Record<string, unknown>;
-  is_default: boolean;
-  can_create_spaces: boolean;
+  isDefault: boolean;
+  canCreateSpaces: boolean;
   spaces?: PersonaSpace[];
-  space_count?: number;
+  spaceCount?: number;
 }
 
 /**
@@ -52,14 +52,14 @@ export interface Persona extends BaseEntityWithMetadata {
 export interface CreatePersonaParams {
   name: string;
   slug?: string;
-  avatar_url?: string;
+  avatarUrl?: string;
   purpose?: string;
-  system_prompt?: string;
+  systemPrompt?: string;
   goals?: PersonaGoal[];
   settings?: Record<string, unknown>;
   metadata?: Record<string, unknown>;
-  is_default?: boolean;
-  can_create_spaces?: boolean;
+  isDefault?: boolean;
+  canCreateSpaces?: boolean;
 }
 
 /**
@@ -68,22 +68,22 @@ export interface CreatePersonaParams {
 export interface UpdatePersonaParams {
   name?: string;
   slug?: string;
-  avatar_url?: string | null;
+  avatarUrl?: string | null;
   purpose?: string | null;
-  system_prompt?: string | null;
+  systemPrompt?: string | null;
   goals?: PersonaGoal[];
   settings?: Record<string, unknown>;
   metadata?: Record<string, unknown>;
-  is_default?: boolean;
-  can_create_spaces?: boolean;
+  isDefault?: boolean;
+  canCreateSpaces?: boolean;
 }
 
 /**
  * Parameters for adding a space to a persona.
  */
 export interface AddPersonaSpaceParams {
-  space_id: string;
+  spaceId: string;
   role?: PersonaSpaceRole;
-  can_create_memories?: boolean;
-  can_delete_memories?: boolean;
+  canCreateMemories?: boolean;
+  canDeleteMemories?: boolean;
 }

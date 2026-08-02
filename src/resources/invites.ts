@@ -28,12 +28,12 @@ export interface Invite {
   email: string;
   role: InviteRole;
   token?: string; // Only returned on creation
-  expires_at: string;
-  accepted_at: string | null;
-  created_at: string;
-  invited_by: string;
-  invited_by_email?: string;
-  invited_by_name?: string;
+  expiresAt: string;
+  acceptedAt: string | null;
+  createdAt: string;
+  invitedBy: string;
+  invitedByEmail?: string;
+  invitedByName?: string;
 }
 
 /**
@@ -45,7 +45,7 @@ export interface CreateInviteParams {
   /** Role to assign to the invited user */
   role: InviteRole;
   /** Days until invitation expires (default: 7, max: 90) */
-  expires_in_days?: number;
+  expiresInDays?: number;
 }
 
 /**
@@ -86,7 +86,7 @@ export interface ListInvitesResponse {
   pagination: {
     limit: number;
     offset: number;
-    has_more: boolean;
+    hasMore: boolean;
   };
 }
 
@@ -157,7 +157,7 @@ export class Invites extends BaseResource {
    * const { invite } = await client.invites.create({
    *   email: 'newuser@example.com',
    *   role: 'member',
-   *   expires_in_days: 14,
+   *   expiresInDays: 14,
    * });
    * console.log(`Invitation token: ${invite.token}`);
    * ```
@@ -304,7 +304,7 @@ export class Invites extends BaseResource {
       throw new Error('Invitation not found');
     }
 
-    if (existing.accepted_at) {
+    if (existing.acceptedAt) {
       throw new Error('Cannot resend accepted invitation');
     }
 

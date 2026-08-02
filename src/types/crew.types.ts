@@ -5,14 +5,14 @@
 export type CrewStatus = 'active' | 'paused' | 'archived';
 
 export interface CrewMember {
-  bot_id: string;
+  botId: string;
   role?: string;
-  added_at: string;
+  addedAt: string;
 }
 
 export interface Crew {
   id: string;
-  account_id: string;
+  accountId: string;
   name: string;
   slug: string;
   description?: string;
@@ -20,8 +20,8 @@ export interface Crew {
   members: CrewMember[];
   settings: Record<string, unknown>;
   metadata: Record<string, unknown>;
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateCrewParams {
@@ -29,7 +29,7 @@ export interface CreateCrewParams {
   slug?: string;
   description?: string;
   status?: CrewStatus;
-  members?: { bot_id: string; role?: string }[];
+  members?: { botId: string; role?: string }[];
   settings?: Record<string, unknown>;
   metadata?: Record<string, unknown>;
 }
@@ -39,7 +39,7 @@ export interface UpdateCrewParams {
   slug?: string;
   description?: string | null;
   status?: CrewStatus;
-  members?: { bot_id: string; role?: string }[];
+  members?: { botId: string; role?: string }[];
   settings?: Record<string, unknown>;
   metadata?: Record<string, unknown>;
 }

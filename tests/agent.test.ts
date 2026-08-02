@@ -512,9 +512,9 @@ describe('Agent', () => {
   describe('summarizeSession', () => {
     it('should enqueue a session summary job', async () => {
       const response = {
-        session_id: 'sess_123',
+        sessionId: 'sess_123',
         enqueued: true,
-        job_id: 'job_abc',
+        jobId: 'job_abc',
         pipeline: null,
       };
       mockClient.request.mockResolvedValue(response);
@@ -527,13 +527,13 @@ describe('Agent', () => {
         body: {},
       });
       expect(result.enqueued).toBe(true);
-      expect(result.job_id).toBe('job_abc');
+      expect(result.jobId).toBe('job_abc');
     });
 
     it('should pass pipeline param when provided', async () => {
       mockClient.request.mockResolvedValue({
         enqueued: true,
-        job_id: 'job_xyz',
+        jobId: 'job_xyz',
         pipeline: 'longmem-v1',
       });
 
@@ -554,77 +554,77 @@ describe('Agent', () => {
   describe('triggerMegaSummary', () => {
     it('should enqueue a mega-summary job with defaults', async () => {
       const response = {
-        scope_id: 'acc_1',
-        scope_type: 'account',
+        scopeId: 'acc_1',
+        scopeType: 'account',
         enqueued: true,
-        job_id: 'job_mega',
+        jobId: 'job_mega',
         pipeline: null,
       };
       mockClient.request.mockResolvedValue(response);
 
-      const result = await agent.triggerMegaSummary({ scope_id: 'acc_1' });
+      const result = await agent.triggerMegaSummary({ scopeId: 'acc_1' });
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'POST',
         path: '/agent/mega-summary/trigger',
-        body: { scope_type: 'account', scope_id: 'acc_1' },
+        body: { scopeType: 'account', scopeId: 'acc_1' },
       });
       expect(result.enqueued).toBe(true);
     });
 
-    it('should allow overriding scope_type to space', async () => {
+    it('should allow overriding scopeType to space', async () => {
       mockClient.request.mockResolvedValue({
         enqueued: true,
-        job_id: 'job_sp',
+        jobId: 'job_sp',
         pipeline: null,
       });
 
       await agent.triggerMegaSummary({
-        scope_id: 'space_1',
-        scope_type: 'space',
+        scopeId: 'space_1',
+        scopeType: 'space',
       });
 
       const call = mockClient.request.mock.calls[0][0];
-      expect(call.body.scope_type).toBe('space');
+      expect(call.body.scopeType).toBe('space');
     });
   });
 
   describe('triggerScopedFacts', () => {
     it('should enqueue a scoped-facts job with defaults', async () => {
       const response = {
-        scope_id: 'sess_123',
-        scope_type: 'session',
+        scopeId: 'sess_123',
+        scopeType: 'session',
         enqueued: true,
-        job_id: 'job_facts',
+        jobId: 'job_facts',
         pipeline: null,
       };
       mockClient.request.mockResolvedValue(response);
 
-      const result = await agent.triggerScopedFacts({ scope_id: 'sess_123' });
+      const result = await agent.triggerScopedFacts({ scopeId: 'sess_123' });
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'POST',
         path: '/agent/scoped-facts/harvest',
-        body: { scope_type: 'session', scope_id: 'sess_123' },
+        body: { scopeType: 'session', scopeId: 'sess_123' },
       });
       expect(result.enqueued).toBe(true);
     });
 
-    it('should allow overriding scope_type to window', async () => {
+    it('should allow overriding scopeType to window', async () => {
       mockClient.request.mockResolvedValue({
         enqueued: true,
-        job_id: 'job_w',
+        jobId: 'job_w',
         pipeline: null,
       });
 
       await agent.triggerScopedFacts({
-        scope_id: 'win_1',
-        scope_type: 'window',
+        scopeId: 'win_1',
+        scopeType: 'window',
         pipeline: 'custom',
       });
 
       const call = mockClient.request.mock.calls[0][0];
-      expect(call.body.scope_type).toBe('window');
+      expect(call.body.scopeType).toBe('window');
       expect(call.body.pipeline).toBe('custom');
     });
   });

@@ -260,7 +260,8 @@ export class Agent {
     return this.client.request<TriggerJobResponse>({
       method: 'POST',
       path: '/agent/mega-summary/trigger',
-      body: { scope_type: 'account', ...params },
+      // camelCase body; outbound toSnakeCase renders `scopeType` → `scope_type`.
+      body: { scopeType: 'account', ...params },
     });
   }
 
@@ -272,7 +273,8 @@ export class Agent {
     return this.client.request<TriggerJobResponse>({
       method: 'POST',
       path: '/agent/scoped-facts/harvest',
-      body: { scope_type: 'session', ...params },
+      // camelCase body; outbound toSnakeCase renders `scopeType` → `scope_type`.
+      body: { scopeType: 'session', ...params },
     });
   }
 
@@ -372,22 +374,22 @@ export class Agent {
 // ==================== ADR-112 P10 — Trigger types ====================
 
 export interface TriggerJobResponse {
-  scope_id?: string;
-  session_id?: string;
-  scope_type?: string;
+  scopeId?: string;
+  sessionId?: string;
+  scopeType?: string;
   enqueued: boolean;
-  job_id: string | null;
+  jobId: string | null;
   pipeline: string | null;
 }
 
 export interface TriggerMegaSummaryParams {
-  scope_id: string;
-  scope_type?: 'account' | 'space';
+  scopeId: string;
+  scopeType?: 'account' | 'space';
   pipeline?: string;
 }
 
 export interface TriggerScopedFactsParams {
-  scope_id: string;
-  scope_type?: 'session' | 'space' | 'window';
+  scopeId: string;
+  scopeType?: 'session' | 'space' | 'window';
   pipeline?: string;
 }
