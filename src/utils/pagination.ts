@@ -2,7 +2,9 @@
  * Pagination utilities and async iterators
  */
 
-import type { PaginatedResponse } from '../types.js';
+// Import from the defining module (not the `../types.js` barrel) so multi-entry
+// dts chunking doesn't split this through the types/index cycle (#7).
+import type { PaginatedResponse } from '../types/common.types.js';
 
 /**
  * Options for pagination

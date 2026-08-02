@@ -6,7 +6,7 @@
  *
  * @example
  * ```typescript
- * import { MockTrix, createMockMemory } from '@trix/client/testing';
+ * import { MockTrix, createMockMemory } from '@trixdb/client/testing';
  *
  * const mockClient = new MockTrix();
  *
@@ -334,7 +334,7 @@ export class MockFactsResource extends MockResource<
  *
  * @example
  * ```typescript
- * import { MockTrix, createMockMemory } from '@trix/client/testing';
+ * import { MockTrix, createMockMemory } from '@trixdb/client/testing';
  *
  * describe('MyService', () => {
  *   let mockClient: MockTrix;

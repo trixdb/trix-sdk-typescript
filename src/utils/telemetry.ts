@@ -7,7 +7,7 @@
  * @example
  * ```typescript
  * import { trace } from '@opentelemetry/api';
- * import { Trix, configureTelemetry } from '@trix/client';
+ * import { Trix, configureTelemetry } from '@trixdb/client';
  *
  * // Configure with your tracer
  * configureTelemetry({

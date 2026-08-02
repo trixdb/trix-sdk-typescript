@@ -5,7 +5,7 @@
  *
  * @example
  * ```typescript
- * import { Trix } from '@trix/client';
+ * import { Trix } from '@trixdb/client';
  *
  * const client = new Trix({
  *   apiKey: 'your_api_key',
@@ -232,7 +232,7 @@ export type {
 } from './resources/github.js';
 
 // Re-export testing utilities for convenience
-// Users can also import directly from '@trix/client/testing'
+// Users can also import directly from '@trixdb/client/testing'
 export {
   MockTrix,
 
