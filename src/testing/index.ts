@@ -6,7 +6,7 @@
  *
  * @example
  * ```typescript
- * import { MockTrix, createMockMemory } from '@trix/client/testing';
+ * import { MockTrix, createMockMemory } from '@trixdb/client/testing';
  *
  * describe('MyService', () => {
  *   let mockClient: MockTrix;
