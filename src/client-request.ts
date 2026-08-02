@@ -18,6 +18,7 @@ import {
 import { redactSensitiveData } from './utils/security.js';
 import { retry, retryStream, StreamRetryOptions } from './utils/retry.js';
 import { toSnakeCase, isPlainObject } from './utils/case-conversion.js';
+import { SDK_VERSION } from './version.js';
 import type {
   RequestContext,
   ResponseContext,
@@ -26,8 +27,8 @@ import type {
   ErrorInterceptor,
 } from './client.js';
 
-/** SDK version */
-export const SDK_VERSION = '1.0.0';
+/** SDK version — single-sourced from package.json (see {@link ./version}). */
+export { SDK_VERSION };
 /** Current API version */
 export const API_VERSION = 'v1';
 /** Minimum supported API version */
