@@ -197,4 +197,44 @@ describe('Bots', () => {
       });
     });
   });
+
+  describe('buildContext', () => {
+    it('should POST to /search (transport adds /v1) and read `results` (#6)', async () => {
+      // Unified search returns `{ results, facets }`; the old code POSTed to the
+      // nonexistent /search/query and read `.data`, which 404'd.
+      mockClient.request.mockResolvedValue({
+        results: [
+          { type: 'memory', id: 'mem_1', score: 0.91, content: 'Relevant note' },
+          { type: 'memory', id: 'mem_2', score: 0.77, content: 'Another note' },
+        ],
+        facets: { memories: 2, audio_segments: 0 },
+      });
+
+      const context = await bots.buildContext({ query: 'project status', limit: 5 });
+
+      expect(mockClient.request).toHaveBeenCalledWith({
+        method: 'POST',
+        path: '/search',
+        body: { query: 'project status', limit: 5 },
+      });
+      // Must NOT hit the removed /search/query route.
+      expect(mockClient.request).not.toHaveBeenCalledWith(
+        expect.objectContaining({ path: '/search/query' })
+      );
+      expect(context.query).toBe('project status');
+      expect(context.totalFound).toBe(2);
+      expect(context.memories).toEqual([
+        { id: 'mem_1', content: 'Relevant note', similarity: 0.91 },
+        { id: 'mem_2', content: 'Another note', similarity: 0.77 },
+      ]);
+    });
+
+    it('should short-circuit without a request when includeMemories is false', async () => {
+      const context = await bots.buildContext({ query: 'x', includeMemories: false });
+
+      expect(mockClient.request).not.toHaveBeenCalled();
+      expect(context.memories).toEqual([]);
+      expect(context.totalFound).toBe(0);
+    });
+  });
 });

@@ -17,12 +17,14 @@ describe('Search', () => {
   });
 
   describe('query', () => {
-    it('should search with a query string', async () => {
+    // GET /v1/search returns `{ results, facets }` — not a `{ data }` wrapper.
+    it('should read the `results` array from the unified-search response', async () => {
       mockClient.request.mockResolvedValue({
-        data: [
-          { id: 'mem_1', content: 'Machine learning basics' },
-          { id: 'mem_2', content: 'Deep learning intro' },
+        results: [
+          { type: 'memory', id: 'mem_1', score: 0.9, content: 'Machine learning basics' },
+          { type: 'memory', id: 'mem_2', score: 0.8, content: 'Deep learning intro' },
         ],
+        facets: { memories: 2, audio_segments: 0 },
       });
 
       const result = await search.query('machine learning');
@@ -34,11 +36,13 @@ describe('Search', () => {
       });
       expect(result).toHaveLength(2);
       expect(result[0].id).toBe('mem_1');
+      expect(result[0].score).toBe(0.9);
     });
 
     it('should search with options', async () => {
       mockClient.request.mockResolvedValue({
-        data: [{ id: 'mem_1', content: 'Neural networks' }],
+        results: [{ type: 'memory', id: 'mem_1', score: 0.7, content: 'Neural networks' }],
+        facets: { memories: 1, audio_segments: 0 },
       });
 
       const result = await search.query('neural networks', {
@@ -54,12 +58,27 @@ describe('Search', () => {
       expect(result).toHaveLength(1);
     });
 
-    it('should return empty array when no results', async () => {
-      mockClient.request.mockResolvedValue({ data: [] });
+    it('should return empty array when there are no results', async () => {
+      mockClient.request.mockResolvedValue({ results: [], facets: { memories: 0 } });
 
       const result = await search.query('nonexistent topic');
 
       expect(result).toHaveLength(0);
+    });
+
+    it('should NOT read a legacy `data` field (regression for #6)', async () => {
+      // The old code returned `response.data`; the API has no such field, so a
+      // response with only `results` must still surface the results.
+      mockClient.request.mockResolvedValue({
+        data: undefined,
+        results: [{ type: 'memory', id: 'mem_9', score: 0.5, content: 'hi' }],
+        facets: { memories: 1 },
+      });
+
+      const result = await search.query('hi');
+
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe('mem_9');
     });
   });
 
