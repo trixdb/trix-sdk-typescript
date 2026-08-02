@@ -19,6 +19,7 @@ import { redactSensitiveData } from './utils/security.js';
 import { retry, retryStream, StreamRetryOptions } from './utils/retry.js';
 import { toSnakeCase, isPlainObject } from './utils/case-conversion.js';
 import { SDK_VERSION } from './version.js';
+import { MAX_RESPONSE_SIZE, readJsonWithCap, withInactivityTimeout } from './utils/response-limits.js';
 import type {
   RequestContext,
   ResponseContext,
@@ -213,7 +214,8 @@ export async function handleResponse<T>(response: Response): Promise<T> {
       return undefined as unknown as T;
     }
 
-    const MAX_RESPONSE_SIZE = 50 * 1024 * 1024; // 50MB
+    // Fast reject on a declared oversized length; the streaming read below also
+    // enforces the cap for chunked responses that omit content-length.
     const contentLength = response.headers.get('content-length');
     if (contentLength && parseInt(contentLength, 10) > MAX_RESPONSE_SIZE) {
       throw new APIError(`Response too large: ${contentLength} bytes`);
@@ -221,8 +223,7 @@ export async function handleResponse<T>(response: Response): Promise<T> {
 
     const contentType = response.headers.get('content-type');
     if (contentType?.includes('application/json')) {
-      const data = await response.json();
-      return data as T;
+      return (await readJsonWithCap(response, MAX_RESPONSE_SIZE)) as T;
     }
 
     return undefined as unknown as T;
@@ -446,7 +447,9 @@ export async function executeStreamRequest(
       throw new APIError('Response body is null');
     }
 
-    return response.body;
+    // Headers arrived (timeoutId cleared above); guard the body with a
+    // per-chunk inactivity timeout so a stalled stream can't hang forever.
+    return withInactivityTimeout(response.body, requestTimeout, () => controller.abort());
   } catch (error) {
     clearTimeout(timeoutId);
 
