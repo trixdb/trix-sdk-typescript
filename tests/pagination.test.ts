@@ -132,9 +132,10 @@ describe('paginateIterator', () => {
     });
   });
 
-  describe('snake_case has_more from the API (#5)', () => {
-    // The API sends `has_more` (snake_case). The iterator must not truncate
-    // after page 1 when only `has_more` is present.
+  describe('has_more normalized to hasMore (#5, #4)', () => {
+    // The API sends `has_more` (snake_case), but responses are camelCased
+    // centrally in handleResponse (#4) before the paginator sees them, so the
+    // iterator reads `hasMore` and must not truncate after page 1.
     function createSnakeFetcher<T>(pages: T[][]) {
       return jest.fn().mockImplementation(
         (params: { limit: number; page: number }) => {
@@ -146,15 +147,15 @@ describe('paginateIterator', () => {
               total: pages.flat().length,
               page: params.page,
               limit: params.limit,
-              // NOTE: snake_case only — no `hasMore` alias.
-              has_more: pageIndex < pages.length - 1,
+              // Post-conversion shape (the wire's `has_more` arrives as `hasMore`).
+              hasMore: pageIndex < pages.length - 1,
             },
           });
         }
       );
     }
 
-    it('paginateIterator yields items from BOTH pages when API sends has_more', async () => {
+    it('paginateIterator yields items from BOTH pages when hasMore is true', async () => {
       const page1 = [{ id: 1 }, { id: 2 }];
       const page2 = [{ id: 3 }, { id: 4 }];
       const fetcher = createSnakeFetcher([page1, page2]);

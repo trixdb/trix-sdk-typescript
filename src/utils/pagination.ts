@@ -99,9 +99,9 @@ export async function* paginateIterator<T, P extends PaginationOptions>(
       consecutiveDuplicatePages = 0;
     }
 
-    // The API sends snake_case `has_more`; fall back to the camelCased alias so
-    // pagination doesn't truncate after page 1 (#5).
-    hasMore = response.pagination.has_more ?? response.pagination.hasMore;
+    // Responses are camelCased centrally in handleResponse (#4), so the wire's
+    // `has_more` arrives as `hasMore`.
+    hasMore = response.pagination.hasMore;
     page++;
     pagesIterated++;
 

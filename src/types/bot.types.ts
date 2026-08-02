@@ -14,50 +14,50 @@ export interface BotTool {
 }
 
 export interface BotSpace {
-  space_id: string;
+  spaceId: string;
   permission: BotSpacePermission;
-  space_name?: string;
+  spaceName?: string;
 }
 
 export interface BotTrigger {
   id: string;
-  bot_id: string;
+  botId: string;
   type: TriggerType;
-  cron_expression?: string;
+  cronExpression?: string;
   timezone?: string;
-  event_types?: string[];
-  event_filter?: Record<string, unknown>;
+  eventTypes?: string[];
+  eventFilter?: Record<string, unknown>;
   enabled: boolean;
-  last_triggered_at?: string;
-  created_at: string;
+  lastTriggeredAt?: string;
+  createdAt: string;
 }
 
 export interface Bot {
   id: string;
-  account_id: string;
-  persona_id?: string;
+  accountId: string;
+  personaId?: string;
   name: string;
   slug: string;
   description?: string;
-  avatar_url?: string;
+  avatarUrl?: string;
   status: BotStatus;
   model: string;
   provider: string;
   temperature: number;
-  max_tokens: number;
-  system_prompt: string;
-  memory_strategy: MemoryStrategy;
-  search_limit: number;
+  maxTokens: number;
+  systemPrompt: string;
+  memoryStrategy: MemoryStrategy;
+  searchLimit: number;
   tools: BotTool[];
-  max_turns_per_run: number;
-  require_approval: string[];
+  maxTurnsPerRun: number;
+  requireApproval: string[];
   settings: Record<string, unknown>;
   metadata: Record<string, unknown>;
-  is_builtin: boolean;
+  isBuiltin: boolean;
   spaces?: BotSpace[];
   triggers?: BotTrigger[];
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface BotAction {
@@ -68,43 +68,43 @@ export interface BotAction {
 
 export interface BotRun {
   id: string;
-  bot_id: string;
-  account_id: string;
-  trigger_type: string;
-  trigger_id?: string;
+  botId: string;
+  accountId: string;
+  triggerType: string;
+  triggerId?: string;
   status: BotRunStatus;
-  input_message?: string;
-  input_context?: Record<string, unknown>;
-  output_message?: string;
-  output_actions: BotAction[];
-  memories_stored: number;
-  memories_searched: number;
-  llm_tokens_used?: number;
-  llm_model?: string;
-  duration_ms?: number;
-  error_message?: string;
+  inputMessage?: string;
+  inputContext?: Record<string, unknown>;
+  outputMessage?: string;
+  outputActions: BotAction[];
+  memoriesStored: number;
+  memoriesSearched: number;
+  llmTokensUsed?: number;
+  llmModel?: string;
+  durationMs?: number;
+  errorMessage?: string;
   metadata: Record<string, unknown>;
-  started_at?: string;
-  completed_at?: string;
-  created_at: string;
+  startedAt?: string;
+  completedAt?: string;
+  createdAt: string;
 }
 
 export interface CreateBotParams {
   name: string;
   slug?: string;
   description?: string;
-  avatar_url?: string;
+  avatarUrl?: string;
   model?: string;
   provider?: string;
   temperature?: number;
-  max_tokens?: number;
-  system_prompt: string;
-  memory_strategy?: MemoryStrategy;
-  search_limit?: number;
+  maxTokens?: number;
+  systemPrompt: string;
+  memoryStrategy?: MemoryStrategy;
+  searchLimit?: number;
   tools?: BotTool[];
-  max_turns_per_run?: number;
-  require_approval?: string[];
-  persona_id?: string;
+  maxTurnsPerRun?: number;
+  requireApproval?: string[];
+  personaId?: string;
   settings?: Record<string, unknown>;
   metadata?: Record<string, unknown>;
 }
@@ -113,19 +113,19 @@ export interface UpdateBotParams {
   name?: string;
   slug?: string;
   description?: string | null;
-  avatar_url?: string | null;
+  avatarUrl?: string | null;
   status?: BotStatus;
   model?: string;
   provider?: string;
   temperature?: number;
-  max_tokens?: number;
-  system_prompt?: string;
-  memory_strategy?: MemoryStrategy;
-  search_limit?: number;
+  maxTokens?: number;
+  systemPrompt?: string;
+  memoryStrategy?: MemoryStrategy;
+  searchLimit?: number;
   tools?: BotTool[];
-  max_turns_per_run?: number;
-  require_approval?: string[];
-  persona_id?: string | null;
+  maxTurnsPerRun?: number;
+  requireApproval?: string[];
+  personaId?: string | null;
   settings?: Record<string, unknown>;
   metadata?: Record<string, unknown>;
 }
@@ -135,25 +135,25 @@ export interface ListBotsParams {
 }
 
 export interface AddBotSpaceParams {
-  space_id: string;
+  spaceId: string;
   permission?: BotSpacePermission;
 }
 
 export interface CreateTriggerParams {
   type: TriggerType;
-  cron_expression?: string;
+  cronExpression?: string;
   timezone?: string;
-  event_types?: string[];
-  event_filter?: Record<string, unknown>;
+  eventTypes?: string[];
+  eventFilter?: Record<string, unknown>;
   enabled?: boolean;
 }
 
 export interface UpdateTriggerParams {
   type?: TriggerType;
-  cron_expression?: string;
+  cronExpression?: string;
   timezone?: string;
-  event_types?: string[];
-  event_filter?: Record<string, unknown>;
+  eventTypes?: string[];
+  eventFilter?: Record<string, unknown>;
   enabled?: boolean;
 }
 

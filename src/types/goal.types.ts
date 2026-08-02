@@ -193,14 +193,14 @@ export interface PaceAnalysis {
 export type GoalMemoryLinkType = 'related' | 'evidence' | 'blocker' | 'note';
 
 export interface GoalMemoryLink {
-  goal_id: string;
-  memory_id: string;
-  link_type: GoalMemoryLinkType;
+  goalId: string;
+  memoryId: string;
+  linkType: GoalMemoryLinkType;
   content?: string;
   type?: string;
   tags?: string[];
-  memory_created_at?: string;
-  created_at: string;
+  memoryCreatedAt?: string;
+  createdAt: string;
 }
 
 export interface GoalMemoryListResponse {

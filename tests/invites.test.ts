@@ -256,10 +256,10 @@ describe('Invites', () => {
             id: 'invite-123',
             email: 'test@example.com',
             role: 'member' as const,
-            accepted_at: null,
+            acceptedAt: null,
           },
         ],
-        pagination: { limit: 50, offset: 0, has_more: false },
+        pagination: { limit: 50, offset: 0, hasMore: false },
       };
 
       const createResponse = {
@@ -269,10 +269,10 @@ describe('Invites', () => {
           email: 'test@example.com',
           role: 'member' as const,
           token: 'new-token',
-          expires_at: '2025-01-05T00:00:00Z',
-          created_at: '2024-12-28T00:00:00Z',
-          invited_by: 'user-123',
-          accepted_at: null,
+          expiresAt: '2025-01-05T00:00:00Z',
+          createdAt: '2024-12-28T00:00:00Z',
+          invitedBy: 'user-123',
+          acceptedAt: null,
         },
       };
 
@@ -289,7 +289,7 @@ describe('Invites', () => {
     it('should throw error if invitation not found', async () => {
       mockClient.request.mockResolvedValue({
         invites: [],
-        pagination: { limit: 50, offset: 0, has_more: false },
+        pagination: { limit: 50, offset: 0, hasMore: false },
       });
 
       await expect(invites.resend('nonexistent')).rejects.toThrow('Invitation not found');
@@ -302,10 +302,10 @@ describe('Invites', () => {
             id: 'invite-123',
             email: 'test@example.com',
             role: 'member',
-            accepted_at: '2024-12-27T00:00:00Z',
+            acceptedAt: '2024-12-27T00:00:00Z',
           },
         ],
-        pagination: { limit: 50, offset: 0, has_more: false },
+        pagination: { limit: 50, offset: 0, hasMore: false },
       });
 
       await expect(invites.resend('invite-123')).rejects.toThrow(

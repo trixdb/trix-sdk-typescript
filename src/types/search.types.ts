@@ -58,16 +58,16 @@ export interface UnifiedSearchResult {
   match?: 'semantic' | 'keyword' | 'hybrid';
   // Memory fields
   content?: string;
-  content_type?: string;
+  contentType?: string;
   tags?: string[];
   metadata?: Record<string, unknown>;
   // Audio-segment fields
-  audio_file_id?: string;
+  audioFileId?: string;
   text?: string;
   highlight?: string;
-  start_time?: number;
-  end_time?: number;
-  clip_url?: string | null;
+  startTime?: number;
+  endTime?: number;
+  clipUrl?: string | null;
   /** Forward-compatible: additional modality-specific fields. */
   [key: string]: unknown;
 }
@@ -107,25 +107,25 @@ export interface BatchSearchConfig {
   query: string;
   limit?: number;
   threshold?: number;
-  space_id?: string;
+  spaceId?: string;
   tags?: string[];
-  group_by?: 'tags' | 'clusters' | 'content_type' | 'priority';
+  groupBy?: 'tags' | 'clusters' | 'content_type' | 'priority';
 }
 
 /**
  * Result from a batch search operation.
  */
 export interface BatchSearchResult {
-  total_results: number;
+  totalResults: number;
   strategies: Array<{
     strategy: string;
     status: string;
     count: number;
-    duration_ms: number;
+    durationMs: number;
     error?: string;
   }>;
   memories: Array<Record<string, unknown>>;
-  duration_ms: number;
+  durationMs: number;
 }
 
 // ============================================================================
@@ -137,11 +137,11 @@ export interface BatchSearchResult {
  */
 export interface StrategyRecommendation {
   query: string;
-  recommended_strategy: string;
+  recommendedStrategy: string;
   confidence: number;
   reason: string;
   alternatives: Array<{ strategy: string; reason: string }>;
-  usage_hint: string;
+  usageHint: string;
 }
 
 // ============================================================================
@@ -154,8 +154,8 @@ export interface StrategyRecommendation {
 export interface StoreAndOrganizeOptions {
   tags?: string[];
   metadata?: Record<string, unknown>;
-  space_id?: string;
-  detect_contradictions?: boolean;
+  spaceId?: string;
+  detectContradictions?: boolean;
 }
 
 /**
@@ -163,6 +163,9 @@ export interface StoreAndOrganizeOptions {
  */
 export interface StoreAndOrganizeResult {
   memory: { id: string; content: string } | null;
+  // `stages` is an opaque map (arbitrary stage-name keys) — the inbound
+  // converter does not recurse into it, so its inner value stays wire-shaped
+  // (`duration_ms`), unlike the typed `strategies[]` array above.
   stages: Record<string, { status: string; duration_ms: number }>;
   summary: string;
 }
@@ -176,14 +179,14 @@ export interface StoreAndOrganizeResult {
  */
 export interface KnowledgeSummaryResult {
   topic: string;
-  total_memories: number;
+  totalMemories: number;
   groups: Array<{
     label: string;
     count: number;
-    memories: Array<{ id: string; content_preview: string }>;
+    memories: Array<{ id: string; contentPreview: string }>;
   }>;
   summary: string;
-  knowledge_gaps: string[];
+  knowledgeGaps: string[];
 }
 
 /**
@@ -191,6 +194,6 @@ export interface KnowledgeSummaryResult {
  */
 export interface ToNoteResult {
   note: { id: string; title: string } | null;
-  memories_included: number;
+  memoriesIncluded: number;
   message: string;
 }

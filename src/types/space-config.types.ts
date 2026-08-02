@@ -78,13 +78,13 @@ export interface SpaceConfigValidation {
  */
 export interface SpaceConfigAuditEvent {
   id: string;
-  space_id: string;
+  spaceId: string;
   category: string;
-  actor_user_id: string | null;
+  actorUserId: string | null;
   source: string;
   patch: Record<string, unknown>;
-  previous_value: Record<string, unknown>;
-  created_at: string;
+  previousValue: Record<string, unknown>;
+  createdAt: string;
 }
 
 /**
