@@ -32,7 +32,7 @@ import type {
   BotContext,
   BotRunBatchRequest,
   BotRunBatchResult,
-  Memory,
+  UnifiedSearchResponse,
 } from '../types.js';
 import { BaseResource, buildParams } from './base.js';
 import { validateId } from '../utils/security.js';
@@ -186,18 +186,18 @@ export class Bots extends BaseResource {
       return { query: params.query, memories: [], totalFound: 0, sessionId: params.sessionId };
     }
 
-    const results = await this.client.request<{ data: Memory[] }>({
+    // Unified search lives at POST /v1/search and returns `{ results, facets }`
+    // (the old POST /search/query path 404'd). The transport prefixes `/v1`.
+    const response = await this.client.request<UnifiedSearchResponse>({
       method: 'POST',
-      path: '/search/query',
+      path: '/search',
       body: { query: params.query, limit },
     });
 
-    const memories = (results.data ?? []).map((m) => ({
+    const memories = (response.results ?? []).map((m) => ({
       id: m.id,
-      content: m.content,
-      similarity: typeof (m as unknown as Record<string, unknown>).similarity === 'number'
-        ? (m as unknown as Record<string, unknown>).similarity as number
-        : undefined,
+      content: m.content ?? m.text ?? '',
+      similarity: typeof m.score === 'number' ? m.score : undefined,
     }));
 
     return {

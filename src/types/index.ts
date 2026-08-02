@@ -46,6 +46,7 @@ export type {
 
 export type {
   SearchConfig, SearchOptions, SearchByTopicOptions,
+  UnifiedSearchResult, UnifiedSearchResponse,
   BatchSearchConfig, BatchSearchResult, StrategyRecommendation,
   StoreAndOrganizeOptions, StoreAndOrganizeResult,
   KnowledgeSummaryResult, ToNoteResult,

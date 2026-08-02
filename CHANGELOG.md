@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Search contract breaks (#6):** `client.search.query()` now reads `results`
+  from the unified-search response (`GET /v1/search` returns `{ results, facets }`,
+  never a `data` wrapper) and returns `UnifiedSearchResult[]` instead of `Memory[]`.
+  `client.bots.buildContext()` now calls `POST /v1/search` (the removed
+  `POST /search/query` route 404'd) and maps each result's `score` to `similarity`.
+
+### Added
+- `UnifiedSearchResult` and `UnifiedSearchResponse` types describing the
+  `GET`/`POST /v1/search` response shape.
+
 ## [0.1.1] - 2025-12-30
 
 ### Changed

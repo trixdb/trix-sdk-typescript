@@ -9,9 +9,9 @@ import type {
   EmbedResult,
   EmbedAllResult,
   SearchConfig,
-  Memory,
   SearchOptions,
-  PaginatedResponse,
+  UnifiedSearchResult,
+  UnifiedSearchResponse,
   BatchSearchConfig,
   BatchSearchResult,
   StrategyRecommendation,
@@ -136,7 +136,7 @@ export class Search {
    *
    * @param query - Search query text
    * @param options - Search options including cluster scale
-   * @returns Array of matching memories
+   * @returns Array of unified search results (memory / audio / video)
    *
    * @example
    * ```typescript
@@ -156,8 +156,9 @@ export class Search {
    * });
    * ```
    */
-  async query(query: string, options?: SearchOptions): Promise<Memory[]> {
-    const response = await this.client.request<PaginatedResponse<Memory>>({
+  async query(query: string, options?: SearchOptions): Promise<UnifiedSearchResult[]> {
+    // GET /v1/search returns `{ results, facets }` — there is no `data` wrapper.
+    const response = await this.client.request<UnifiedSearchResponse>({
       method: 'GET',
       path: '/search',
       query: {
@@ -165,7 +166,7 @@ export class Search {
         ...options,
       },
     });
-    return response.data;
+    return response.results;
   }
 
   /**
