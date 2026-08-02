@@ -46,6 +46,109 @@ export function validateId(resourceId: string, resourceType = 'resource'): strin
   return resourceId;
 }
 
+// ============================================================================
+// SSRF blocklist — shared by validateBaseUrl and validateWebhookUrl
+// ============================================================================
+
+/**
+ * Normalize a URL hostname for blocklist matching: lowercase and strip the
+ * brackets WHATWG URL keeps around IPv6 literals (`[::1]` → `::1`).
+ */
+function normalizeHost(hostname: string): string {
+  return hostname.toLowerCase().replace(/^\[|\]$/g, '');
+}
+
+/** True for the RFC-1918 172.16.0.0/12 block (172.16.x.x – 172.31.x.x). */
+function isPrivate172(ip: string): boolean {
+  if (!ip.startsWith('172.')) return false;
+  const secondOctet = parseInt(ip.split('.')[1], 10);
+  return secondOctet >= 16 && secondOctet <= 31;
+}
+
+/** Loopback, zero, RFC-1918 private and link-local (incl. cloud metadata) IPv4. */
+function assertNotLoopbackOrPrivateV4(host: string, label: string): void {
+  if (host === 'localhost' || host === '0.0.0.0' || host.startsWith('127.') || host === '::1') {
+    throw new Error(`${label} cannot point to localhost`);
+  }
+  if (host === '::' || host === '0:0:0:0:0:0:0:0') {
+    throw new Error(`${label} cannot point to the zero address`);
+  }
+  if (host.startsWith('10.') || host.startsWith('192.168.') || isPrivate172(host)) {
+    throw new Error(`${label} cannot point to private IP addresses`);
+  }
+  // 169.254.0.0/16 link-local — also covers the 169.254.169.254 metadata endpoint.
+  if (host.startsWith('169.254.')) {
+    throw new Error(`${label} cannot point to link-local addresses`);
+  }
+}
+
+/** Private (fc00::/7), link-local (fe80::/10) and deprecated site-local (fec0::/10) IPv6. */
+function assertNotPrivateV6(host: string, label: string): void {
+  if (host.startsWith('fc') || host.startsWith('fd')) {
+    throw new Error(`${label} cannot point to private IPv6 addresses`);
+  }
+  if (/^fe[89ab]/.test(host)) {
+    throw new Error(`${label} cannot point to IPv6 link-local addresses`);
+  }
+  if (/^fe[cdef]/.test(host)) {
+    throw new Error(`${label} cannot point to deprecated IPv6 site-local addresses`);
+  }
+}
+
+/** True if a dotted-decimal IPv4 is loopback/private/link-local/zero. */
+function isBlockedV4Dotted(ip: string): boolean {
+  if (ip.startsWith('127.') || ip.startsWith('10.') || ip.startsWith('192.168.') ||
+      ip.startsWith('169.254.') || ip === '0.0.0.0') {
+    return true;
+  }
+  return isPrivate172(ip);
+}
+
+/** True if the two 16-bit halves of an IPv4-mapped IPv6 tail decode to a blocked IPv4. */
+function isBlockedV4Hex(firstPart: number, secondPart: number): boolean {
+  const firstOctet = (firstPart >> 8) & 0xff;
+  const secondOctet = firstPart & 0xff;
+  if (firstOctet === 127 || firstOctet === 10) return true;
+  if (firstOctet === 192 && secondOctet === 168) return true;
+  if (firstOctet === 172 && secondOctet >= 16 && secondOctet <= 31) return true;
+  if (firstOctet === 169 && secondOctet === 254) return true;
+  return firstPart === 0 && secondPart === 0;
+}
+
+/**
+ * Block IPv4-mapped IPv6 addresses (`::ffff:x.x.x.x`, or Node's normalized hex
+ * form `::ffff:7f00:1`) that tunnel to a private/loopback IPv4 and would bypass
+ * the IPv4 checks above.
+ */
+function assertNotMappedV4(host: string, label: string): void {
+  if (!host.startsWith('::ffff:') && !host.includes(':ffff:')) return;
+  const message = `${label} cannot point to private IPv4-mapped IPv6 addresses`;
+  const dotted = host.match(/:ffff:(\d+\.\d+\.\d+\.\d+)$/i);
+  if (dotted) {
+    if (isBlockedV4Dotted(dotted[1])) throw new Error(message);
+    return;
+  }
+  const hex = host.match(/:ffff:([0-9a-f]+):([0-9a-f]+)$/i);
+  if (hex && isBlockedV4Hex(parseInt(hex[1], 16), parseInt(hex[2], 16))) {
+    throw new Error(message);
+  }
+}
+
+/**
+ * Reject hosts in internal/private address space (SSRF blocklist): loopback,
+ * RFC-1918 private, link-local + the 169.254.169.254 cloud-metadata endpoint,
+ * and the IPv6 equivalents including IPv4-mapped forms.
+ *
+ * Shared by {@link validateBaseUrl} and {@link validateWebhookUrl} so the two
+ * validators can never drift. `label` prefixes the thrown error message.
+ */
+function assertPublicHost(hostname: string, label: string): void {
+  const host = normalizeHost(hostname);
+  assertNotLoopbackOrPrivateV4(host, label);
+  assertNotPrivateV6(host, label);
+  assertNotMappedV4(host, label);
+}
+
 /**
  * Validate a base URL for the API.
  *
@@ -83,18 +186,11 @@ export function validateBaseUrl(url: string, allowHttp = false): string {
     throw new Error('URL must include a host');
   }
 
-  // Block localhost in production (unless allowHttp is set)
+  // Block internal/private address space in production (SSRF defense-in-depth,
+  // matching validateWebhookUrl). The allowInsecure escape hatch (allowHttp)
+  // skips this so localhost/private hosts still work for local development.
   if (!allowHttp) {
-    const host = parsed.hostname.toLowerCase();
-    // Remove brackets from IPv6 addresses
-    const normalizedHost = host.replace(/^\[|\]$/g, '');
-    if (normalizedHost === 'localhost' || normalizedHost === '127.0.0.1' ||
-        normalizedHost === '::1' || normalizedHost === '0.0.0.0') {
-      throw new Error(
-        'Localhost URLs are not allowed in production. ' +
-        'Set allowInsecure option for local development.'
-      );
-    }
+    assertPublicHost(parsed.hostname, 'Base URL');
   }
 
   return url.replace(/\/+$/, '');
@@ -128,133 +224,8 @@ export function validateWebhookUrl(url: string): string {
     throw new Error('Webhook URL must include a host');
   }
 
-  // Block internal/private IPs
-  const host = parsed.hostname.toLowerCase();
-
-  // Normalize IPv6 - remove brackets if present
-  const normalizedHost = host.replace(/^\[|\]$/g, '');
-
-  // Block localhost variants
-  if (normalizedHost === 'localhost' || normalizedHost === '0.0.0.0') {
-    throw new Error('Webhook URL cannot point to localhost');
-  }
-
-  // Block IPv4 loopback (127.0.0.0/8)
-  if (normalizedHost.startsWith('127.')) {
-    throw new Error('Webhook URL cannot point to localhost');
-  }
-
-  // Block IPv6 loopback (::1)
-  if (normalizedHost === '::1') {
-    throw new Error('Webhook URL cannot point to localhost');
-  }
-
-  // Block IPv6 zero address (::)
-  if (normalizedHost === '::' || normalizedHost === '0:0:0:0:0:0:0:0') {
-    throw new Error('Webhook URL cannot point to the zero address');
-  }
-
-  // Block private IPv4 ranges
-  // 10.0.0.0/8
-  if (normalizedHost.startsWith('10.')) {
-    throw new Error('Webhook URL cannot point to private IP addresses');
-  }
-  // 192.168.0.0/16
-  if (normalizedHost.startsWith('192.168.')) {
-    throw new Error('Webhook URL cannot point to private IP addresses');
-  }
-  // 172.16.0.0/12 (172.16.0.0 - 172.31.255.255)
-  if (normalizedHost.startsWith('172.')) {
-    const secondOctet = parseInt(normalizedHost.split('.')[1], 10);
-    if (secondOctet >= 16 && secondOctet <= 31) {
-      throw new Error('Webhook URL cannot point to private IP addresses');
-    }
-  }
-
-  // Block link-local addresses (169.254.0.0/16)
-  if (normalizedHost.startsWith('169.254.')) {
-    throw new Error('Webhook URL cannot point to link-local addresses');
-  }
-
-  // Block AWS/cloud metadata service
-  if (normalizedHost === '169.254.169.254') {
-    throw new Error('Webhook URL cannot point to metadata service');
-  }
-
-  // Block IPv6 private/link-local ranges
-  // fc00::/7 (Unique Local Addresses - includes fc and fd prefixes)
-  if (normalizedHost.startsWith('fc') || normalizedHost.startsWith('fd')) {
-    throw new Error('Webhook URL cannot point to private IPv6 addresses');
-  }
-  // fe80::/10 (Link-local addresses)
-  if (normalizedHost.startsWith('fe8') || normalizedHost.startsWith('fe9') ||
-      normalizedHost.startsWith('fea') || normalizedHost.startsWith('feb')) {
-    throw new Error('Webhook URL cannot point to IPv6 link-local addresses');
-  }
-
-  // Block IPv4-mapped IPv6 addresses (::ffff:x.x.x.x or ::ffff:XXYY:ZZWW in hex)
-  // These could be used to bypass IPv4 checks
-  // Node.js normalizes IPv4-mapped addresses to hex format: ::ffff:127.0.0.1 → ::ffff:7f00:1
-  if (normalizedHost.startsWith('::ffff:') || normalizedHost.includes(':ffff:')) {
-    // Try dotted decimal format first
-    const ipv4Match = normalizedHost.match(/::ffff:(\d+\.\d+\.\d+\.\d+)$/i) ||
-                      normalizedHost.match(/:ffff:(\d+\.\d+\.\d+\.\d+)$/i);
-    if (ipv4Match) {
-      const ipv4 = ipv4Match[1];
-      if (ipv4.startsWith('127.') || ipv4.startsWith('10.') ||
-          ipv4.startsWith('192.168.') || ipv4.startsWith('169.254.') ||
-          ipv4 === '0.0.0.0') {
-        throw new Error('Webhook URL cannot point to private IPv4-mapped IPv6 addresses');
-      }
-      if (ipv4.startsWith('172.')) {
-        const secondOctet = parseInt(ipv4.split('.')[1], 10);
-        if (secondOctet >= 16 && secondOctet <= 31) {
-          throw new Error('Webhook URL cannot point to private IPv4-mapped IPv6 addresses');
-        }
-      }
-    } else {
-      // Try hex format (Node.js normalized): ::ffff:7f00:1 for 127.0.0.1
-      const hexMatch = normalizedHost.match(/::ffff:([0-9a-f]+):([0-9a-f]+)$/i) ||
-                       normalizedHost.match(/:ffff:([0-9a-f]+):([0-9a-f]+)$/i);
-      if (hexMatch) {
-        const firstPart = parseInt(hexMatch[1], 16);
-        // Decode first part to get first two octets of IPv4
-        const firstOctet = (firstPart >> 8) & 0xff;
-        const secondOctet = firstPart & 0xff;
-
-        // 127.x.x.x (loopback)
-        if (firstOctet === 127) {
-          throw new Error('Webhook URL cannot point to private IPv4-mapped IPv6 addresses');
-        }
-        // 10.x.x.x (private)
-        if (firstOctet === 10) {
-          throw new Error('Webhook URL cannot point to private IPv4-mapped IPv6 addresses');
-        }
-        // 192.168.x.x (private)
-        if (firstOctet === 192 && secondOctet === 168) {
-          throw new Error('Webhook URL cannot point to private IPv4-mapped IPv6 addresses');
-        }
-        // 172.16-31.x.x (private)
-        if (firstOctet === 172 && secondOctet >= 16 && secondOctet <= 31) {
-          throw new Error('Webhook URL cannot point to private IPv4-mapped IPv6 addresses');
-        }
-        // 169.254.x.x (link-local)
-        if (firstOctet === 169 && secondOctet === 254) {
-          throw new Error('Webhook URL cannot point to private IPv4-mapped IPv6 addresses');
-        }
-        // 0.0.0.0 - check if both parts are 0
-        if (firstPart === 0 && parseInt(hexMatch[2], 16) === 0) {
-          throw new Error('Webhook URL cannot point to private IPv4-mapped IPv6 addresses');
-        }
-      }
-    }
-  }
-
-  // Block site-local addresses (deprecated but still valid: fec0::/10)
-  if (normalizedHost.startsWith('fec') || normalizedHost.startsWith('fed') ||
-      normalizedHost.startsWith('fee') || normalizedHost.startsWith('fef')) {
-    throw new Error('Webhook URL cannot point to deprecated IPv6 site-local addresses');
-  }
+  // Block internal/private IPs, loopback, link-local, metadata and IPv6 equivalents.
+  assertPublicHost(parsed.hostname, 'Webhook URL');
 
   return url;
 }
