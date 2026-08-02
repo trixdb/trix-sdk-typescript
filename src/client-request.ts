@@ -167,6 +167,26 @@ function normalizeBody(body: unknown): unknown {
   return toSnakeCase(body);
 }
 
+/** HTTP methods the API treats as mutating (and that we auto-retry). These are
+ * the same methods trix-api's idempotency plugin honors an Idempotency-Key for. */
+const MUTATING_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
+
+/** Generate a UUID v4 for use as an Idempotency-Key.
+ *
+ * Uses Web Crypto (`globalThis.crypto`), available in Node 19+, Deno, Bun,
+ * browsers, and edge runtimes — consistent with the SDK's existing reliance on
+ * web globals (`fetch`, `Headers`, `ReadableStream`). Never `Math.random`:
+ * this value must be collision-free so it cannot alias another write's key. */
+function generateIdempotencyKey(): string {
+  return globalThis.crypto.randomUUID();
+}
+
+/** Case-insensitive check for an existing Idempotency-Key so a caller-supplied
+ * key (in any casing) is never overwritten. */
+function hasIdempotencyKey(headers: Record<string, string>): boolean {
+  return Object.keys(headers).some((k) => k.toLowerCase() === 'idempotency-key');
+}
+
 /** Build request headers */
 export function buildHeaders(
   apiKey: string,
@@ -302,6 +322,17 @@ export async function executeRequest<T>(
   const url = buildUrl(config.baseUrl, options.path, options.query);
   const headers = buildHeaders(config.apiKey, config.personaId, options.headers);
   const requestTimeout = options.timeout ?? config.timeout;
+
+  // Generate ONE Idempotency-Key per logical mutating request, BEFORE the
+  // retry() closure below, so every retry attempt sends the SAME key. The
+  // retry wrapper replays POST/PUT/PATCH/DELETE on transient 5xx/network/
+  // timeout errors; without a stable key that turns a single logical write
+  // into duplicate writes. trix-api's idempotency plugin (plugins/idempotency.js)
+  // replays the first response for a repeated key instead of re-executing.
+  // GETs are safe to replay and get no key; a caller-supplied key wins.
+  if (MUTATING_METHODS.has(options.method.toUpperCase()) && !hasIdempotencyKey(headers)) {
+    headers['Idempotency-Key'] = generateIdempotencyKey();
+  }
 
   let requestContext: RequestContext = {
     method: options.method,
