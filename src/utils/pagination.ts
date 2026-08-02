@@ -97,7 +97,9 @@ export async function* paginateIterator<T, P extends PaginationOptions>(
       consecutiveDuplicatePages = 0;
     }
 
-    hasMore = response.pagination.hasMore;
+    // The API sends snake_case `has_more`; fall back to the camelCased alias so
+    // pagination doesn't truncate after page 1 (#5).
+    hasMore = response.pagination.has_more ?? response.pagination.hasMore;
     page++;
     pagesIterated++;
 

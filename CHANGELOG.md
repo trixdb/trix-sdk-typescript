@@ -24,6 +24,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   idempotency guard, causing duplicate writes; trix-api now replays the first
   response instead. GET requests are unaffected, and a caller-supplied
   `Idempotency-Key` (any casing) is preserved.
+- **Auto-pagination truncated after page 1 (#5):** `paginateIterator` /
+  `paginateAll` read `response.pagination.hasMore`, but the API sends
+  `has_more` (snake_case), so `hasMore` was always `undefined` and iteration
+  stopped after the first page. Now reads `has_more ?? hasMore`, tolerating
+  either shape.
 
 ## [0.1.1] - 2025-12-30
 

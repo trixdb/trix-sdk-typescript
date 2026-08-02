@@ -132,6 +132,65 @@ describe('paginateIterator', () => {
     });
   });
 
+  describe('snake_case has_more from the API (#5)', () => {
+    // The API sends `has_more` (snake_case). The iterator must not truncate
+    // after page 1 when only `has_more` is present.
+    function createSnakeFetcher<T>(pages: T[][]) {
+      return jest.fn().mockImplementation(
+        (params: { limit: number; page: number }) => {
+          const pageIndex = params.page - 1;
+          const data = pages[pageIndex] || [];
+          return Promise.resolve({
+            data,
+            pagination: {
+              total: pages.flat().length,
+              page: params.page,
+              limit: params.limit,
+              // NOTE: snake_case only — no `hasMore` alias.
+              has_more: pageIndex < pages.length - 1,
+            },
+          });
+        }
+      );
+    }
+
+    it('paginateIterator yields items from BOTH pages when API sends has_more', async () => {
+      const page1 = [{ id: 1 }, { id: 2 }];
+      const page2 = [{ id: 3 }, { id: 4 }];
+      const fetcher = createSnakeFetcher([page1, page2]);
+      const results: Array<{ id: number }> = [];
+
+      for await (const item of paginateIterator(fetcher, { limit: 2 })) {
+        results.push(item);
+      }
+
+      expect(results).toEqual([...page1, ...page2]);
+      expect(fetcher).toHaveBeenCalledTimes(2);
+    });
+
+    it('paginateAll collects both pages when API sends has_more', async () => {
+      const page1 = [{ id: 'a' }];
+      const page2 = [{ id: 'b' }];
+      const fetcher = createSnakeFetcher([page1, page2]);
+
+      const results = await paginateAll(fetcher, { limit: 1 });
+
+      expect(results).toEqual([{ id: 'a' }, { id: 'b' }]);
+    });
+
+    it('stops after the last page when has_more is false', async () => {
+      const fetcher = createSnakeFetcher([[{ id: 1 }]]);
+      const results: Array<{ id: number }> = [];
+
+      for await (const item of paginateIterator(fetcher, { limit: 10 })) {
+        results.push(item);
+      }
+
+      expect(results).toEqual([{ id: 1 }]);
+      expect(fetcher).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe('pagination safety', () => {
     it('should stop when hasMore is false', async () => {
       // Create a fetcher that always returns hasMore: false
