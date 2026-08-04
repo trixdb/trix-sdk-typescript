@@ -72,7 +72,7 @@ export interface TranscriptEntity {
   startTime: number;
   endTime: number;
   confidence: number;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 /**
@@ -105,7 +105,7 @@ export interface Transcript {
   provider?: string;
   summary?: string;
   contentSafetyLabels?: ContentSafetyLabel[];
-  providerMetadata?: Record<string, any>;
+  providerMetadata?: Record<string, unknown>;
   segments?: TranscriptSegment[];
   entities?: TranscriptEntity[];
   chapters?: TranscriptChapter[];

@@ -146,8 +146,8 @@ describe('GitHubResource', () => {
       await github.getActivity(PROJECT_ID, { type: 'pull_request', limit: 5 });
 
       const call = mockClient.request.mock.calls[0][0];
-      expect(call.params.get('type')).toBe('pull_request');
-      expect(call.params.get('limit')).toBe('5');
+      expect(call.query.type).toBe('pull_request');
+      expect(call.query.limit).toBe(5);
     });
   });
 
@@ -188,8 +188,8 @@ describe('GitHubResource', () => {
       await github.getFileComplexity(PROJECT_ID, { file: 'src/auth.ts', repo: 'acme/api' });
 
       const call = mockClient.request.mock.calls[0][0];
-      expect(call.params.get('file')).toBe('src/auth.ts');
-      expect(call.params.get('repo')).toBe('acme/api');
+      expect(call.query.file).toBe('src/auth.ts');
+      expect(call.query.repo).toBe('acme/api');
     });
 
     it('should return empty list when no files analyzed yet', async () => {
@@ -356,7 +356,7 @@ describe('GitHubResource', () => {
       const call = mockClient.request.mock.calls[0][0];
       expect(call.method).toBe('GET');
       expect(call.path).toBe(`/projects/${PROJECT_ID}/github/symbols`);
-      expect(call.params.get('q')).toBe('AuthService');
+      expect(call.query.q).toBe('AuthService');
     });
   });
 
@@ -367,7 +367,7 @@ describe('GitHubResource', () => {
       await github.getFileSymbols(PROJECT_ID, { file_path: 'src/auth/service.ts' });
 
       const call = mockClient.request.mock.calls[0][0];
-      expect(call.params.get('file')).toBe('src/auth/service.ts');
+      expect(call.query.file).toBe('src/auth/service.ts');
     });
   });
 
