@@ -13,7 +13,7 @@ Thank you for your interest in contributing to the Trix TypeScript SDK! This doc
 
 ### Prerequisites
 
-- Node.js 18 or higher
+- Node.js 20 or higher
 - npm, yarn, or pnpm
 
 ### Installation

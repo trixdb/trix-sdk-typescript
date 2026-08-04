@@ -11,7 +11,7 @@ Official TypeScript SDK for Trix - A memory and knowledge management API.
 - **Automatic Retry** - Built-in retry logic with exponential backoff for rate limits
 - **Pagination Helpers** - Async iterators for easy pagination
 - **Tree-shakeable** - ESM and CJS builds for optimal bundle size
-- **Zero Dependencies** - Uses native fetch (Node.js 18+)
+- **Zero Dependencies** - Uses native fetch and Web Crypto (Node.js 20+)
 - **Resource-based API** - Clean, organized API structure
 - **Works Everywhere** - Node.js and browser support
 
