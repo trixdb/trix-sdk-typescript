@@ -208,6 +208,24 @@ describe('paginateIterator', () => {
       expect(fetcher).toHaveBeenCalledTimes(1);
     });
 
+    it('should stop cleanly on a malformed envelope (missing data/pagination)', async () => {
+      // A truncated/malformed page must terminate iteration, not throw a
+      // TypeError on `response.data`/`response.pagination` (defensive #13).
+      const fetcher = jest.fn().mockResolvedValue({} as never);
+
+      const results: unknown[] = [];
+      await expect(
+        (async () => {
+          for await (const item of paginateIterator(fetcher, {})) {
+            results.push(item);
+          }
+        })(),
+      ).resolves.toBeUndefined();
+
+      expect(results).toHaveLength(0);
+      expect(fetcher).toHaveBeenCalledTimes(1);
+    });
+
     it('should stop when receiving empty data', async () => {
       // Create a fetcher that returns empty data but hasMore: true (buggy API)
       let callCount = 0;

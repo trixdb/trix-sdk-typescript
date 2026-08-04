@@ -37,6 +37,7 @@ import type {
 import { BaseResource, buildParams } from './base.js';
 import { validateId } from '../utils/security.js';
 import { ValidationError, TimeoutError } from '../errors.js';
+import { debug } from '../client-request.js';
 
 export class Bots extends BaseResource {
   constructor(client: Trix) {
@@ -374,10 +375,9 @@ function extractSSEEvents(buffer: string): SSEParseResult {
       const event = JSON.parse(dataLine.slice(6)) as BotRunStep;
       parsed.push(event);
     } catch {
-      // Log malformed SSE events for debugging
-      if (typeof console !== 'undefined') {
-        console.debug?.('[trix-sse] Failed to parse SSE event:', dataLine?.slice(0, 100));
-      }
+      // Log malformed SSE events through the gated, secret-redacting debug
+      // helper so nothing is written to console unless debug logging is on.
+      debug('[trix-sse] Failed to parse SSE event', dataLine?.slice(0, 100));
     }
   }
 

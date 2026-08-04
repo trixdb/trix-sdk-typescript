@@ -46,14 +46,14 @@ describe('Search', () => {
       });
 
       const result = await search.query('neural networks', {
-        clusterScale: 'fine',
+        spaceId: 'space_123',
         limit: 10,
       });
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'GET',
         path: '/search',
-        query: { q: 'neural networks', clusterScale: 'fine', limit: 10 },
+        query: { q: 'neural networks', spaceId: 'space_123', limit: 10 },
       });
       expect(result).toHaveLength(1);
     });
