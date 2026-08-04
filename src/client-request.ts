@@ -50,7 +50,10 @@ export function disableDebugLogging(): void {
   debugLogger = null;
 }
 
-function debug(message: string, data?: unknown): void {
+/** Gated, secret-redacting debug log. No-op unless {@link enableDebugLogging}
+ * has been called. Shared with resources (e.g. SSE parsers) so they don't log
+ * unconditionally to `console`. @internal */
+export function debug(message: string, data?: unknown): void {
   if (debugLogger) {
     if (data !== undefined) {
       const safeData = redactSensitiveData(data);

@@ -129,13 +129,13 @@ export class Search {
   }
 
   /**
-   * Search memories by query text with optional cluster scale filtering
+   * Search memories by query text.
    *
-   * This method performs semantic search across memories, with support for
-   * multi-scale clustering to narrow down search scope.
+   * Performs unified semantic search across memories (and audio/video),
+   * returning the top matches with their scores.
    *
    * @param query - Search query text
-   * @param options - Search options including cluster scale
+   * @param options - Search options (limit, threshold, spaceId)
    * @returns Array of unified search results (memory / audio / video)
    *
    * @example
@@ -143,16 +143,11 @@ export class Search {
    * // Basic semantic search
    * const results = await client.search.query('machine learning algorithms');
    *
-   * // Search with cluster scale filter
-   * const fineClusters = await client.search.query('neural networks', {
-   *   clusterScale: 'fine',
-   *   limit: 10
-   * });
-   *
-   * // Search within coarse clusters for broader results
-   * const broadResults = await client.search.query('artificial intelligence', {
-   *   clusterScale: 'coarse',
-   *   limit: 50
+   * // Scope to a space and cap the result count
+   * const scoped = await client.search.query('neural networks', {
+   *   spaceId: 'space_123',
+   *   limit: 10,
+   *   threshold: 0.7,
    * });
    * ```
    */
@@ -191,7 +186,7 @@ export class Search {
   ): Promise<BatchSearchResult> {
     return this.client.request<BatchSearchResult>({
       method: 'POST',
-      path: '/v1/search/batch',
+      path: '/search/batch',
       body: { searches, deduplicate: options?.deduplicate ?? true },
     });
   }
@@ -211,7 +206,7 @@ export class Search {
   async suggestStrategy(query: string): Promise<StrategyRecommendation> {
     return this.client.request<StrategyRecommendation>({
       method: 'POST',
-      path: '/v1/search/suggest-strategy',
+      path: '/search/suggest-strategy',
       body: { query },
     });
   }

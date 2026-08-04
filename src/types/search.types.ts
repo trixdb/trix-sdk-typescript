@@ -2,8 +2,6 @@
  * Search type definitions for the Trix SDK.
  */
 
-import type { ClusterScale } from './cluster.types.js';
-
 // ============================================================================
 // Search Configuration
 // ============================================================================
@@ -22,15 +20,13 @@ export interface SearchConfig {
 // ============================================================================
 
 /**
- * Extended search options with cluster scale support.
+ * Options for {@link Search.query} against the unified `GET /search` endpoint.
  */
 export interface SearchOptions {
   /** Maximum number of results to return */
   limit?: number;
   /** Minimum similarity threshold */
   threshold?: number;
-  /** Cluster scale to search within */
-  clusterScale?: ClusterScale;
   /** Space ID to search within */
   spaceId?: string;
 }

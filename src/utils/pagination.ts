@@ -66,10 +66,14 @@ export async function* paginateIterator<T, P extends PaginationOptions>(
   while (hasMore && pagesIterated < maxPages) {
     const response = await fetchPage({ ...params, page, limit } as P);
 
+    // Defensive: a malformed or truncated envelope (missing `data`/`pagination`)
+    // should terminate iteration cleanly rather than throw a TypeError mid-stream.
+    const items = response?.data ?? [];
+
     // Track duplicates in this page
     let duplicatesInPage = 0;
 
-    for (const item of response.data) {
+    for (const item of items) {
       const itemId = getItemId(item);
 
       // Check for duplicate
@@ -87,7 +91,7 @@ export async function* paginateIterator<T, P extends PaginationOptions>(
     }
 
     // Detect if entire page was duplicates (infinite loop condition)
-    if (response.data.length > 0 && duplicatesInPage === response.data.length) {
+    if (items.length > 0 && duplicatesInPage === items.length) {
       consecutiveDuplicatePages++;
       if (consecutiveDuplicatePages >= 3) {
         throw new Error(
@@ -100,13 +104,14 @@ export async function* paginateIterator<T, P extends PaginationOptions>(
     }
 
     // Responses are camelCased centrally in handleResponse (#4), so the wire's
-    // `has_more` arrives as `hasMore`.
-    hasMore = response.pagination.hasMore;
+    // `has_more` arrives as `hasMore`. A missing `pagination` envelope stops
+    // iteration rather than throwing.
+    hasMore = response?.pagination?.hasMore ?? false;
     page++;
     pagesIterated++;
 
     // Safety check: if we receive no data, stop iterating
-    if (response.data.length === 0) {
+    if (items.length === 0) {
       break;
     }
   }

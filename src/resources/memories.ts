@@ -1208,7 +1208,7 @@ export class Memories extends BaseResource {
   ): Promise<StoreAndOrganizeResult> {
     return this.request<StoreAndOrganizeResult>({
       method: 'POST',
-      path: '/v1/memories/store-organize',
+      path: '/memories/store-organize',
       body: { content, ...options },
     });
   }
