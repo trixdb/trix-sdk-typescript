@@ -56,7 +56,7 @@ const results = await client.memories.list({
 // Create a relationship
 const rel = await client.relationships.create(memory.id, otherMemory.id, {
   relationshipType: 'related_to',
-  strength: 0.8
+  weight: 0.8
 });
 ```
 
@@ -131,29 +131,28 @@ const relationship = await client.relationships.create(
   targetMemoryId,
   {
     relationshipType: 'supports',
-    strength: 0.9,
+    weight: 0.9,
     metadata: { context: 'research' }
   }
 );
 
-// Get incoming relationships
-const incoming = await client.relationships.getIncoming(memoryId);
+// Relationships are addressed by their (sourceId, targetId, type) key:
+const { sourceId, targetId, relationshipType } = relationship;
 
-// Get outgoing relationships
+// Get incoming / outgoing relationships for a memory
+const incoming = await client.relationships.getIncoming(memoryId);
 const outgoing = await client.relationships.getOutgoing(memoryId);
 
 // Update a relationship
-const updated = await client.relationships.update(relationship.id, {
-  strength: 0.95
+const updated = await client.relationships.update(sourceId, targetId, relationshipType, {
+  weight: 0.95
 });
 
-// Reinforce a relationship
-const reinforced = await client.relationships.reinforce(relationship.id, {
-  amount: 0.1
+// Reinforce (increase weight) / delete
+const reinforced = await client.relationships.reinforce(sourceId, targetId, relationshipType, {
+  boost: 0.1
 });
-
-// Delete a relationship
-await client.relationships.delete(relationship.id);
+await client.relationships.delete(sourceId, targetId, relationshipType);
 ```
 
 ### Clusters

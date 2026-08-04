@@ -33,11 +33,14 @@ export interface CreateRelationshipParams {
 }
 
 /**
- * Parameters for updating a relationship.
+ * Parameters for updating a relationship. The relationship's key
+ * (source, target, type) is addressed via the path, not the body — the type
+ * itself is immutable, so it is not settable here.
  */
 export interface UpdateRelationshipParams {
-  relationshipType?: string;
+  description?: string;
   weight?: number;
+  rules?: Record<string, unknown>;
   metadata?: Record<string, unknown>;
 }
 
@@ -45,7 +48,10 @@ export interface UpdateRelationshipParams {
  * Parameters for reinforcing a relationship.
  */
 export interface ReinforceParams {
-  amount?: number;
+  /** Amount added to the relationship weight (server default: 0.1). */
+  boost?: number;
+  /** Free-form note stored as `last_reinforcement` in the metadata. */
+  context?: unknown;
 }
 
 /**

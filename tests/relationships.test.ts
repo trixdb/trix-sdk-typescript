@@ -86,21 +86,22 @@ describe('Relationships', () => {
   });
 
   describe('getIncoming', () => {
-    it('should get incoming relationships', async () => {
-      mockClient.request.mockResolvedValue([RELATIONSHIP]);
+    it('should get incoming relationships and unwrap the envelope', async () => {
+      mockClient.request.mockResolvedValue({ relationships: [RELATIONSHIP], count: 1 });
 
       const result = await relationships.getIncoming('mem_2');
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'GET',
-        path: '/memories/mem_2/relationships/incoming',
+        path: '/relationships/mem_2',
+        query: { direction: 'incoming' },
       });
       expect(result).toHaveLength(1);
       expect(result[0].id).toBe('rel_123');
     });
 
     it('should return empty array when none exist', async () => {
-      mockClient.request.mockResolvedValue([]);
+      mockClient.request.mockResolvedValue({ relationships: [], count: 0 });
 
       const result = await relationships.getIncoming('mem_999');
 
@@ -113,14 +114,15 @@ describe('Relationships', () => {
   });
 
   describe('getOutgoing', () => {
-    it('should get outgoing relationships', async () => {
-      mockClient.request.mockResolvedValue([RELATIONSHIP]);
+    it('should get outgoing relationships and unwrap the envelope', async () => {
+      mockClient.request.mockResolvedValue({ relationships: [RELATIONSHIP], count: 1 });
 
       const result = await relationships.getOutgoing('mem_1');
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'GET',
-        path: '/memories/mem_1/relationships/outgoing',
+        path: '/relationships/mem_1',
+        query: { direction: 'outgoing' },
       });
       expect(result).toHaveLength(1);
     });
@@ -131,114 +133,114 @@ describe('Relationships', () => {
   });
 
   describe('update', () => {
-    it('should update a relationship', async () => {
-      mockClient.request.mockResolvedValue({
-        ...RELATIONSHIP,
-        weight: 0.95,
-      });
+    it('should update a relationship by its triple key', async () => {
+      mockClient.request.mockResolvedValue({ ...RELATIONSHIP, weight: 0.95 });
 
-      const result = await relationships.update('rel_123', {
+      const result = await relationships.update('mem_1', 'mem_2', 'supports', {
         weight: 0.95,
       });
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'PATCH',
-        path: '/relationships/rel_123',
+        path: '/relationships/mem_1/mem_2/supports',
         body: { weight: 0.95 },
       });
       expect(result.weight).toBe(0.95);
     });
 
     it('should update with metadata', async () => {
-      mockClient.request.mockResolvedValue({
-        ...RELATIONSHIP,
-        metadata: { verified: true },
-      });
+      mockClient.request.mockResolvedValue({ ...RELATIONSHIP, metadata: { verified: true } });
 
-      await relationships.update('rel_123', {
+      await relationships.update('mem_1', 'mem_2', 'supports', {
         metadata: { verified: true },
       });
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'PATCH',
-        path: '/relationships/rel_123',
+        path: '/relationships/mem_1/mem_2/supports',
         body: { metadata: { verified: true } },
       });
     });
 
-    it('should throw for empty relationship ID', async () => {
+    it('should throw for empty source ID', async () => {
       await expect(
-        relationships.update('', { weight: 0.5 })
+        relationships.update('', 'mem_2', 'supports', { weight: 0.5 })
+      ).rejects.toThrow();
+    });
+
+    it('should throw for empty type', async () => {
+      await expect(
+        relationships.update('mem_1', 'mem_2', '', { weight: 0.5 })
       ).rejects.toThrow();
     });
   });
 
   describe('delete', () => {
-    it('should delete a relationship', async () => {
+    it('should delete a relationship by its triple key', async () => {
       mockClient.request.mockResolvedValue(undefined);
 
-      await relationships.delete('rel_123');
+      await relationships.delete('mem_1', 'mem_2', 'supports');
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'DELETE',
-        path: '/relationships/rel_123',
+        path: '/relationships/mem_1/mem_2/supports',
       });
     });
 
-    it('should throw for empty relationship ID', async () => {
-      await expect(relationships.delete('')).rejects.toThrow();
+    it('should throw for empty source ID', async () => {
+      await expect(relationships.delete('', 'mem_2', 'supports')).rejects.toThrow();
     });
   });
 
   describe('reinforce', () => {
-    it('should reinforce a relationship', async () => {
+    it('should reinforce a relationship and unwrap the result', async () => {
       mockClient.request.mockResolvedValue({
-        ...RELATIONSHIP,
-        weight: 0.9,
+        message: 'Relationship reinforced',
+        relationship: { ...RELATIONSHIP, weight: 0.9 },
       });
 
-      const result = await relationships.reinforce('rel_123', {
-        amount: 0.1,
+      const result = await relationships.reinforce('mem_1', 'mem_2', 'supports', {
+        boost: 0.1,
       });
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'POST',
-        path: '/relationships/rel_123/reinforce',
-        body: { amount: 0.1 },
+        path: '/relationships/mem_1/mem_2/supports/reinforce',
+        body: { boost: 0.1 },
       });
       expect(result.weight).toBe(0.9);
     });
 
     it('should reinforce without params', async () => {
       mockClient.request.mockResolvedValue({
-        ...RELATIONSHIP,
-        weight: 0.85,
+        message: 'Relationship reinforced',
+        relationship: { ...RELATIONSHIP, weight: 0.85 },
       });
 
-      await relationships.reinforce('rel_123');
+      await relationships.reinforce('mem_1', 'mem_2', 'supports');
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'POST',
-        path: '/relationships/rel_123/reinforce',
+        path: '/relationships/mem_1/mem_2/supports/reinforce',
         body: undefined,
       });
     });
   });
 
   describe('weaken', () => {
-    it('should weaken a relationship', async () => {
+    it('should weaken a relationship and unwrap the result', async () => {
       mockClient.request.mockResolvedValue({
-        ...RELATIONSHIP,
-        weight: 0.5,
+        message: 'Relationship weakened',
+        relationship: { ...RELATIONSHIP, weight: 0.5 },
       });
 
-      const result = await relationships.weaken('rel_123', {
+      const result = await relationships.weaken('mem_1', 'mem_2', 'supports', {
         amount: 0.3,
       });
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'POST',
-        path: '/relationships/rel_123/weaken',
+        path: '/relationships/mem_1/mem_2/supports/weaken',
         body: { amount: 0.3 },
       });
       expect(result.weight).toBe(0.5);
@@ -246,15 +248,15 @@ describe('Relationships', () => {
 
     it('should weaken without params', async () => {
       mockClient.request.mockResolvedValue({
-        ...RELATIONSHIP,
-        weight: 0.7,
+        message: 'Relationship weakened',
+        relationship: { ...RELATIONSHIP, weight: 0.7 },
       });
 
-      await relationships.weaken('rel_123');
+      await relationships.weaken('mem_1', 'mem_2', 'supports');
 
       expect(mockClient.request).toHaveBeenCalledWith({
         method: 'POST',
-        path: '/relationships/rel_123/weaken',
+        path: '/relationships/mem_1/mem_2/supports/weaken',
         body: undefined,
       });
     });
