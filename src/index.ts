@@ -69,56 +69,6 @@ export {
   maskCredential,
 } from './utils/security.js';
 
-// Export logging utilities
-export {
-  Logger,
-  LogLevel,
-  LogFormat,
-  setupLogging,
-  getLogger,
-  getRequestId,
-  setRequestId,
-  withRequestId,
-  logRequest,
-  logResponse,
-  logError,
-} from './utils/logging.js';
-export type { LogConfig, LogEntry } from './utils/logging.js';
-
-// Export metrics utilities
-export {
-  InMemoryCollector,
-  NoOpCollector,
-  CompositeCollector,
-  CallbackCollector,
-  RequestTimer,
-  getMetricsCollector,
-  setMetricsCollector,
-  startRequestTimer,
-  recordRetry,
-  createRequestMetrics,
-} from './utils/metrics.js';
-export type { MetricsCollector, RequestMetrics } from './utils/metrics.js';
-
-// Export telemetry utilities (OpenTelemetry integration)
-export {
-  configureTelemetry,
-  getTelemetryConfig,
-  isTelemetryEnabled,
-  createRequestSpan,
-  SpanStatusCode,
-  SpanKind,
-  traced,
-  withTracing,
-} from './utils/telemetry.js';
-export type {
-  TelemetryConfig,
-  Span,
-  Tracer,
-  SpanOptions,
-  RequestSpan,
-} from './utils/telemetry.js';
-
 // Export resources for type declarations
 export type {
   Memories,
