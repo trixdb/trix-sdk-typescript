@@ -15,9 +15,13 @@ import type {
   ReinforceGroupResult,
 } from '../types.js';
 import { validateId } from '../utils/security.js';
+import { ValidationError } from '../errors.js';
 
 /**
- * Relationships resource for managing connections between memories
+ * Relationships resource for managing connections between memories.
+ *
+ * A relationship is keyed by the triple `(sourceId, targetId, type)` — the
+ * same composite key the REST API uses — not by a standalone id.
  *
  * @example
  * ```typescript
@@ -29,6 +33,15 @@ import { validateId } from '../utils/security.js';
  */
 export class Relationships {
   constructor(private readonly client: Trix) {}
+
+  /** Validate the composite key and build the `/relationships/:s/:t/:type` path. */
+  private tripleKeyPath(sourceId: string, targetId: string, type: string): string {
+    validateId(sourceId, 'source memory');
+    validateId(targetId, 'target memory');
+    if (!type) throw new ValidationError('relationship type is required');
+    const [s, t, ty] = [sourceId, targetId, type].map(encodeURIComponent);
+    return `/relationships/${s}/${t}/${ty}`;
+  }
 
   /**
    * Create a relationship between two memories (ADR-145 wire contract).
@@ -89,10 +102,12 @@ export class Relationships {
    */
   async getIncoming(memoryId: string): Promise<Relationship[]> {
     validateId(memoryId, 'memory');
-    return this.client.request<Relationship[]>({
+    const res = await this.client.request<{ relationships: Relationship[] }>({
       method: 'GET',
-      path: `/memories/${memoryId}/relationships/incoming`,
+      path: `/relationships/${encodeURIComponent(memoryId)}`,
+      query: { direction: 'incoming' },
     });
+    return res.relationships;
   }
 
   /**
@@ -109,82 +124,93 @@ export class Relationships {
    */
   async getOutgoing(memoryId: string): Promise<Relationship[]> {
     validateId(memoryId, 'memory');
-    return this.client.request<Relationship[]>({
+    const res = await this.client.request<{ relationships: Relationship[] }>({
       method: 'GET',
-      path: `/memories/${memoryId}/relationships/outgoing`,
+      path: `/relationships/${encodeURIComponent(memoryId)}`,
+      query: { direction: 'outgoing' },
     });
+    return res.relationships;
   }
 
   /**
-   * Update a relationship
+   * Update a relationship, identified by its `(sourceId, targetId, type)` key.
    *
-   * @param relationshipId - Relationship ID
-   * @param params - Update parameters
+   * @param sourceId - Source memory ID
+   * @param targetId - Target memory ID
+   * @param type - Relationship type (e.g. `related_to`)
+   * @param params - Fields to update (weight, description, rules, metadata)
    * @returns Updated relationship
    *
    * @example
    * ```typescript
-   * const updated = await client.relationships.update('rel_123', {
+   * const updated = await client.relationships.update('mem_1', 'mem_2', 'supports', {
    *   weight: 0.95,
    *   metadata: { verified: true }
    * });
    * ```
    */
   async update(
-    relationshipId: string,
+    sourceId: string,
+    targetId: string,
+    type: string,
     params: UpdateRelationshipParams
   ): Promise<Relationship> {
-    validateId(relationshipId, 'relationship');
     return this.client.request<Relationship>({
       method: 'PATCH',
-      path: `/relationships/${relationshipId}`,
+      path: this.tripleKeyPath(sourceId, targetId, type),
       body: params,
     });
   }
 
   /**
-   * Delete a relationship
+   * Delete a relationship, identified by its `(sourceId, targetId, type)` key.
    *
-   * @param relationshipId - Relationship ID
+   * @param sourceId - Source memory ID
+   * @param targetId - Target memory ID
+   * @param type - Relationship type (e.g. `related_to`)
    *
    * @example
    * ```typescript
-   * await client.relationships.delete('rel_123');
+   * await client.relationships.delete('mem_1', 'mem_2', 'supports');
    * ```
    */
-  async delete(relationshipId: string): Promise<void> {
-    validateId(relationshipId, 'relationship');
+  async delete(sourceId: string, targetId: string, type: string): Promise<void> {
     return this.client.request<void>({
       method: 'DELETE',
-      path: `/relationships/${relationshipId}`,
+      path: this.tripleKeyPath(sourceId, targetId, type),
     });
   }
 
   /**
-   * Reinforce a relationship (increase its strength)
+   * Reinforce a relationship (increase its weight), identified by its
+   * `(sourceId, targetId, type)` key.
    *
-   * @param relationshipId - Relationship ID
-   * @param params - Reinforce parameters
+   * @param sourceId - Source memory ID
+   * @param targetId - Target memory ID
+   * @param type - Relationship type (e.g. `related_to`)
+   * @param params - Reinforce parameters (`boost`, `context`)
    * @returns Updated relationship
    *
    * @example
    * ```typescript
-   * const reinforced = await client.relationships.reinforce('rel_123', {
-   *   amount: 0.1
+   * const reinforced = await client.relationships.reinforce('mem_1', 'mem_2', 'supports', {
+   *   boost: 0.1
    * });
    * console.log(`New weight: ${reinforced.weight}`);
    * ```
    */
   async reinforce(
-    relationshipId: string,
+    sourceId: string,
+    targetId: string,
+    type: string,
     params?: ReinforceParams
   ): Promise<Relationship> {
-    validateId(relationshipId, 'relationship');
-    return this.client.request<Relationship>({
+    const res = await this.client.request<{ relationship: Relationship }>({
       method: 'POST',
-      path: `/relationships/${relationshipId}/reinforce`,
+      path: `${this.tripleKeyPath(sourceId, targetId, type)}/reinforce`,
       body: params,
     });
+    return res.relationship;
   }
 
   /**
@@ -201,19 +227,27 @@ export class Relationships {
   }
 
   /**
-   * Weaken a relationship (decrease its strength)
+   * Weaken a relationship (decrease its weight), identified by its
+   * `(sourceId, targetId, type)` key.
    *
-   * @param relationshipId - Relationship ID
-   * @param params - Weaken parameters
+   * @param sourceId - Source memory ID
+   * @param targetId - Target memory ID
+   * @param type - Relationship type (e.g. `related_to`)
+   * @param params - Weaken parameters (`amount`)
    * @returns Updated relationship
    */
-  async weaken(relationshipId: string, params?: WeakenParams): Promise<Relationship> {
-    validateId(relationshipId, 'relationship');
-    return this.client.request<Relationship>({
+  async weaken(
+    sourceId: string,
+    targetId: string,
+    type: string,
+    params?: WeakenParams
+  ): Promise<Relationship> {
+    const res = await this.client.request<{ relationship: Relationship }>({
       method: 'POST',
-      path: `/relationships/${relationshipId}/weaken`,
+      path: `${this.tripleKeyPath(sourceId, targetId, type)}/weaken`,
       body: params,
     });
+    return res.relationship;
   }
 
   /**
