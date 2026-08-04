@@ -62,13 +62,5 @@
     "typedoc": "^0.28.0",
     "typedoc-plugin-markdown": "^4.0.0",
     "typescript": "^5.3.3"
-  },
-  "peerDependencies": {
-    "@opentelemetry/api": "^1.0.0"
-  },
-  "peerDependenciesMeta": {
-    "@opentelemetry/api": {
-      "optional": true
-    }
   }
 }
