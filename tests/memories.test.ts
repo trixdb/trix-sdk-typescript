@@ -136,6 +136,41 @@ describe('Memories', () => {
     });
   });
 
+  describe('query (MQL)', () => {
+    it('sends ?mql= and returns a paginated list', async () => {
+      mockClient.request.mockResolvedValue({
+        data: [MEMORY],
+        pagination: { total: 1, page: 1, limit: 25, hasMore: false },
+      });
+
+      const result = await memories.query({ mql: 'type:fact quality>0.8', limit: 25, offset: 5 });
+
+      expect(mockClient.request).toHaveBeenCalledWith({
+        method: 'GET',
+        path: '/memories',
+        query: { mql: 'type:fact quality>0.8', limit: 25, offset: 5 },
+      });
+      expect('data' in result && result.data).toHaveLength(1);
+    });
+
+    it('returns the aggregate shape for a group by query', async () => {
+      const agg = {
+        aggregate: [{ group: 'fact', count: 3 }],
+        group_by: 'type',
+        metrics: ['count'],
+      };
+      mockClient.request.mockResolvedValue(agg);
+
+      const result = await memories.query({ mql: 'group by type count' });
+
+      expect('aggregate' in result).toBe(true);
+      if ('aggregate' in result) {
+        expect(result.group_by).toBe('type');
+        expect(result.aggregate).toHaveLength(1);
+      }
+    });
+  });
+
   describe('update', () => {
     it('should update a memory', async () => {
       const updated = { ...MEMORY, content: 'Updated content', tags: ['updated'] };

@@ -115,6 +115,23 @@ export interface UpdateMemoryParams extends Partial<MemoryOriginContext>, Memory
 /**
  * Parameters for listing memories.
  */
+/** Parameters for {@link MemoriesResource.query} — an MQL query. */
+export interface QueryMemoriesParams {
+  /** The MQL query string, compiled to SQL server-side. */
+  mql: string;
+  /** Maximum rows to return (ignored for aggregations). */
+  limit?: number;
+  /** Rows to skip (pagination). */
+  offset?: number;
+}
+
+/** Response shape when an MQL `group by … count avg …` query aggregates. */
+export interface MqlAggregateResult {
+  aggregate: Array<Record<string, string | number | null>>;
+  group_by: string | null;
+  metrics: string[];
+}
+
 export interface ListMemoriesParams extends PaginationParams, SortParams<'createdAt' | 'updatedAt' | 'relevance'>, MemoryOriginContext {
   q?: string;
   mode?: 'semantic' | 'keyword' | 'hybrid';
