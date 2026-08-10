@@ -1,20 +1,23 @@
 # Trix TypeScript SDK
 
-Official TypeScript SDK for Trix - A memory and knowledge management API.
+Official TypeScript SDK for Trix — a memory and knowledge management API.
 
 [![npm version](https://img.shields.io/npm/v/@trixdb/client.svg)](https://www.npmjs.com/package/@trixdb/client)
+[![version](https://img.shields.io/badge/version-0.6.0-blue.svg)](https://www.npmjs.com/package/@trixdb/client)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
 ## Features
 
-- **Full TypeScript Support** - Complete type definitions for all API endpoints
-- **Promise-based API** - Modern async/await support
-- **Automatic Retry** - Built-in retry logic with exponential backoff for rate limits
-- **Pagination Helpers** - Async iterators for easy pagination
-- **Tree-shakeable** - ESM and CJS builds for optimal bundle size
-- **Zero Dependencies** - Uses native fetch and Web Crypto (Node.js 20+)
-- **Resource-based API** - Clean, organized API structure
-- **Works Everywhere** - Node.js and browser support
+- **Full TypeScript support** — complete type definitions for every endpoint
+- **Promise-based API** — modern `async`/`await` throughout
+- **Automatic retries** — exponential backoff with jitter, honoring `Retry-After`
+- **Automatic idempotency** — a per-request `Idempotency-Key` on every write, so a retried mutation never double-applies
+- **Pagination helpers** — async iterators (`for await`) that fetch every page for you
+- **SSE streaming** — stream bot runs step-by-step with `bots.runStream`
+- **File uploads** — multipart upload and signed downloads
+- **Inbound webhook verification** — constant-time HMAC-SHA256 signature checks, built in
+- **Testing utilities** — a shipped `MockTrix` under `@trixdb/client/testing`
+- **Zero dependencies** — native `fetch` and Web Crypto (Node.js 20+, Deno, Bun, workers, browser)
 
 ## Installation
 
@@ -37,42 +40,72 @@ import { Trix } from '@trixdb/client';
 
 const client = new Trix({
   apiKey: 'your_api_key',
-  baseUrl: 'https://api.trixdb.com' // optional, defaults to production API
+  baseUrl: 'https://api.trixdb.com', // optional, defaults to the production API
 });
 
 // Create a memory
 const memory = await client.memories.create({
   content: 'Important information to remember',
   tags: ['important', 'note'],
-  metadata: { source: 'user_input' }
+  metadata: { source: 'user_input' },
 });
 
 // Search memories
 const results = await client.memories.list({
   q: 'important',
   mode: 'hybrid',
-  limit: 10
+  limit: 10,
 });
 
-// Create a relationship
+// Relate two memories
 const rel = await client.relationships.create(memory.id, otherMemory.id, {
   relationshipType: 'related_to',
-  weight: 0.8
+  weight: 0.8,
 });
 ```
+
+## Authentication
+
+Provide your API key to the constructor, or read it from the environment.
+
+```typescript
+import { Trix } from '@trixdb/client';
+
+// 1. Pass the key explicitly
+const client = new Trix({ apiKey: 'your_api_key' });
+
+// 2. Or read TRIX_API_KEY (and optional TRIX_BASE_URL) from the environment
+const fromEnv = Trix.fromEnv();
+```
+
+`Trix.fromEnv()` throws if `TRIX_API_KEY` is not set.
 
 ## Configuration
 
 ```typescript
 const client = new Trix({
-  apiKey: 'your_api_key',        // Required: Your Trix API key
-  baseUrl: 'https://api.trixdb.com', // Optional: API base URL
-  maxRetries: 3,                 // Optional: Max retry attempts (default: 3)
-  timeout: 30000,                // Optional: Request timeout in ms (default: 30000)
+  apiKey: 'your_api_key',            // Required
+  baseUrl: 'https://api.trixdb.com', // Optional, default shown
+  maxRetries: 3,                     // Optional (default: 3)
+  timeout: 30000,                    // Optional request timeout in ms (default: 30000)
+  fetch: customFetch,                // Optional custom fetch / HTTP client
+  allowInsecure: false,              // Optional: permit non-HTTPS base URLs (default: false)
 });
 ```
 
-## Usage Examples
+Add custom headers (or observe requests/responses/errors) with interceptors:
+
+```typescript
+const remove = client.addRequestInterceptor((req) => {
+  req.headers['X-Tenant-Id'] = 'acme';
+  return req;
+});
+// ...later: remove(); to detach it
+```
+
+`addResponseInterceptor` and `addErrorInterceptor` are available too.
+
+## Usage
 
 ### Memories
 
@@ -81,46 +114,42 @@ const client = new Trix({
 const memory = await client.memories.create({
   content: 'Remember to buy milk',
   type: 'text',
-  tags: ['shopping', 'personal']
+  tags: ['shopping', 'personal'],
 });
 
 // Create a markdown memory
 const mdMemory = await client.memories.create({
   content: '# Meeting Notes\n\n- Discussed project timeline',
   type: 'markdown',
-  tags: ['meeting', 'work']
+  tags: ['meeting', 'work'],
 });
 
-// Get a memory
+// Get / update / delete
 const retrieved = await client.memories.get(memory.id);
-
-// Update a memory
 const updated = await client.memories.update(memory.id, {
   content: 'Updated content',
-  tags: ['updated', 'important']
+  tags: ['updated', 'important'],
 });
+await client.memories.delete(memory.id);
 
-// List memories with search
+// List with search
 const results = await client.memories.list({
   q: 'meeting',
   mode: 'hybrid',
   limit: 20,
-  tags: ['work']
+  tags: ['work'],
 });
 
-// Iterate through all memories
-for await (const memory of client.memories.listAll({ limit: 100 })) {
-  console.log(memory.content);
+// Iterate through every memory
+for await (const m of client.memories.listAll({ limit: 100 })) {
+  console.log(m.content);
 }
 
-// Bulk operations
+// Bulk create
 const bulkResult = await client.memories.bulkCreate([
   { content: 'Memory 1', tags: ['bulk'] },
-  { content: 'Memory 2', tags: ['bulk'] }
+  { content: 'Memory 2', tags: ['bulk'] },
 ]);
-
-// Delete a memory
-await client.memories.delete(memory.id);
 ```
 
 ### Relationships
@@ -133,25 +162,23 @@ const relationship = await client.relationships.create(
   {
     relationshipType: 'supports',
     weight: 0.9,
-    metadata: { context: 'research' }
+    metadata: { context: 'research' },
   }
 );
 
-// Relationships are addressed by their (sourceId, targetId, type) key:
+// Relationships are addressed by their (sourceId, targetId, type) key
 const { sourceId, targetId, relationshipType } = relationship;
 
-// Get incoming / outgoing relationships for a memory
+// Incoming / outgoing
 const incoming = await client.relationships.getIncoming(memoryId);
 const outgoing = await client.relationships.getOutgoing(memoryId);
 
-// Update a relationship
-const updated = await client.relationships.update(sourceId, targetId, relationshipType, {
-  weight: 0.95
+// Update / reinforce / delete
+const reweighted = await client.relationships.update(sourceId, targetId, relationshipType, {
+  weight: 0.95,
 });
-
-// Reinforce (increase weight) / delete
 const reinforced = await client.relationships.reinforce(sourceId, targetId, relationshipType, {
-  boost: 0.1
+  boost: 0.1,
 });
 await client.relationships.delete(sourceId, targetId, relationshipType);
 ```
@@ -159,51 +186,30 @@ await client.relationships.delete(sourceId, targetId, relationshipType);
 ### Clusters
 
 ```typescript
-// Create a cluster
 const cluster = await client.clusters.create({
   name: 'Project Alpha',
   description: 'All memories related to Project Alpha',
-  memoryIds: ['mem_1', 'mem_2']
+  memoryIds: ['mem_1', 'mem_2'],
 });
 
-// List clusters
-const clusters = await client.clusters.list({
-  limit: 20,
-  sortBy: 'name'
-});
+const clusters = await client.clusters.list({ limit: 20, sortBy: 'name' });
 
-// Add a memory to a cluster
 await client.clusters.addMemory(cluster.id, memoryId, 0.9);
-
-// Expand a cluster (find similar memories)
-const expansion = await client.clusters.expand(cluster.id, {
-  limit: 10,
-  threshold: 0.7
-});
-
-// Remove a memory from a cluster
+const expansion = await client.clusters.expand(cluster.id, { limit: 10, threshold: 0.7 });
 await client.clusters.removeMemory(cluster.id, memoryId);
 ```
 
 ### Spaces
 
 ```typescript
-// Create a space
 const space = await client.spaces.create({
   name: 'Personal',
   description: 'My personal knowledge base',
-  metadata: { owner: 'user@example.com' }
+  metadata: { owner: 'user@example.com' },
 });
 
-// List all spaces
 const spaces = await client.spaces.list();
-
-// Update a space
-const updated = await client.spaces.update(space.id, {
-  name: 'Personal Knowledge'
-});
-
-// Delete a space
+const updated = await client.spaces.update(space.id, { name: 'Personal Knowledge' });
 await client.spaces.delete(space.id);
 ```
 
@@ -216,23 +222,18 @@ const graph = await client.graph.traverse({
   maxDepth: 3,
   relationshipTypes: ['related_to', 'supports'],
   direction: 'both',
-  limit: 100
+  limit: 100,
 });
 
-// Get context for a memory
+// Context around a memory
 const context = await client.graph.getContext({
   memoryId: 'mem_123',
   depth: 2,
-  includeMetadata: true
+  includeMetadata: true,
 });
 
-// Find shortest path between memories
-const path = await client.graph.shortestPath(
-  sourceMemoryId,
-  targetMemoryId,
-  { maxDepth: 5 }
-);
-
+// Shortest path between two memories
+const path = await client.graph.shortestPath(sourceMemoryId, targetMemoryId, { maxDepth: 5 });
 if (path.found) {
   console.log(`Path distance: ${path.distance}`);
 }
@@ -245,54 +246,37 @@ if (path.found) {
 const similar = await client.search.similar('mem_123', {
   limit: 20,
   threshold: 0.75,
-  includeEmbedding: false
+  includeEmbedding: false,
 });
-
 similar.results.forEach(({ memory, similarity }) => {
   console.log(`${memory.content} (${similarity.toFixed(2)})`);
 });
 
-// Generate embeddings for specific memories
+// Generate embeddings
 const embeddings = await client.search.embed(['mem_1', 'mem_2', 'mem_3']);
-
-// Generate embeddings for all memories
 const embedAll = await client.search.embedAll(100);
 
-// Get search configuration
+// Search configuration
 const config = await client.search.getConfig();
 console.log(`Embedding model: ${config.embeddingModel}`);
 ```
 
-### Webhooks
+### Bots
 
 ```typescript
-// Create a webhook
-const webhook = await client.webhooks.create({
-  url: 'https://api.example.com/webhook',
-  events: ['memory.created', 'memory.updated', 'memory.deleted'],
-  secret: 'your_webhook_secret',
-  active: true
+const bot = await client.bots.create({
+  name: 'Summarizer',
+  system_prompt: 'You summarize meetings and extract action items.',
 });
 
-// Test a webhook
-const testResult = await client.webhooks.test(webhook.id, 'memory.created');
+// Run and get the final result
+const run = await client.bots.run(bot.id, { message: "Summarize today's standup" });
 
-if (testResult.success) {
-  console.log('Webhook test successful!');
-}
-
-// Get webhook deliveries
-const deliveries = await client.webhooks.getDeliveries(webhook.id, {
-  status: 'failed',
-  limit: 20
-});
-
-// Retry a failed delivery
-await client.webhooks.retryDelivery(webhook.id, deliveryId);
-
-// Delete a webhook
-await client.webhooks.delete(webhook.id);
+// Or run and poll until it finishes
+const finished = await client.bots.runAndWait(bot.id, { message: 'Summarize' });
 ```
+
+See [Streaming](#streaming) for token-by-token bot runs.
 
 ### Agent Sessions
 
@@ -300,66 +284,54 @@ await client.webhooks.delete(webhook.id);
 // Create a session
 const session = await client.agent.createSession({
   name: 'Customer Support - Ticket #123',
-  metadata: { ticketId: '123', agent: 'bot' }
+  metadata: { ticketId: '123', agent: 'bot' },
 });
 
-// Add memories to a session
+// Add memories to the session
 const sessionMemory = await client.agent.addSessionMemory(session.id, {
   content: 'User asked about pricing',
-  tags: ['question', 'pricing']
+  tags: ['question', 'pricing'],
 });
 
-// Get session history
+// Session history
 const history = await client.agent.getSession(session.id, {
   includeMemories: true,
-  limit: 50
+  limit: 50,
 });
 
-// Get agent context
+// Retrieve agent context
 const context = await client.agent.getContext({
   sessionId: session.id,
   query: 'What did we discuss about pricing?',
   limit: 10,
-  includeRelated: true
+  includeRelated: true,
 });
 
-// End a session with consolidation
-const ended = await client.agent.endSession(session.id, {
-  consolidate: true
-});
-
-// Consolidate memories
-const consolidation = await client.agent.consolidate({
-  threshold: 0.8,
-  maxClusters: 100,
-  priority: 'high'
-});
+// End the session
+const ended = await client.agent.endSession(session.id);
 ```
 
 ### Feedback
 
 ```typescript
-// Submit detailed feedback
+// Detailed feedback
 const feedback = await client.feedback.submit({
   memoryId: 'mem_123',
   type: 'positive',
   comment: 'This memory was very useful',
-  metadata: { source: 'user_rating' }
+  metadata: { source: 'user_rating' },
 });
 
-// Submit quick feedback
-await client.feedback.quick({
-  memoryId: 'mem_123',
-  type: 'thumbs_up'
-});
+// Quick feedback
+await client.feedback.quick({ memoryId: 'mem_123', type: 'thumbs_up' });
 
-// Submit batch feedback
+// Batch feedback
 const batchResult = await client.feedback.batch({
   feedback: [
     { memoryId: 'mem_1', type: 'positive', comment: 'Great!' },
     { memoryId: 'mem_2', type: 'neutral' },
-    { memoryId: 'mem_3', type: 'negative', comment: 'Not relevant' }
-  ]
+    { memoryId: 'mem_3', type: 'negative', comment: 'Not relevant' },
+  ],
 });
 ```
 
@@ -372,195 +344,250 @@ const highlight = await client.highlights.create('mem_123', {
   startOffset: 100,
   endOffset: 128,
   color: 'yellow',
-  note: 'Remember this for later'
+  note: 'Remember this for later',
 });
 
 // List highlights for a memory
-const highlights = await client.highlights.list('mem_123', {
-  limit: 20
-});
+const highlights = await client.highlights.list('mem_123', { limit: 20 });
 
 // Extract important highlights using AI
 const extracted = await client.highlights.extract('mem_123', {
   method: 'ai',
   limit: 5,
-  minLength: 20
-});
-
-extracted.highlights.forEach(({ text, score }) => {
-  console.log(`${text} (score: ${score})`);
+  minLength: 20,
 });
 
 // Delete a highlight
 await client.highlights.delete(highlight.id);
 ```
 
-### Jobs
+### Facts
+
+The facts surface is read-mostly: list account facts, read the facts attached to a
+memory, and attach new (subject–predicate–object) facts to a memory.
 
 ```typescript
-// Get job statistics
-const stats = await client.jobs.getStats();
+// List facts across the account (paginated)
+const { data: facts } = await client.facts.list({ limit: 20 });
 
-stats.queues.forEach(queue => {
-  console.log(`Queue: ${queue.name}`);
-  console.log(`  Active: ${queue.active}`);
-  console.log(`  Failed: ${queue.failed}`);
-});
+// Read the facts attached to a specific memory
+const memoryFacts = await client.facts.listForMemory('mem_123');
+console.log(`${memoryFacts.total} facts on this memory`);
 
-// Get a specific job
-const job = await client.jobs.get('transcription', 'job_123');
-
-// List jobs
-const jobs = await client.jobs.list({
-  queue: 'transcription',
-  status: 'failed',
-  limit: 20
-});
-
-// Retry a failed job
-await client.jobs.retry('transcription', 'job_123');
-
-// Clean up old jobs
-const cleanResult = await client.jobs.clean('transcription', {
-  status: 'completed',
-  grace: 86400000, // 24 hours in ms
-  limit: 100
-});
-```
-
-### Facts (Knowledge Graph Triples)
-
-```typescript
-// Create a fact (Subject-Predicate-Object triple)
-const fact = await client.facts.create({
+// Attach a new fact (subject–predicate–object triple) to a memory
+const fact = await client.facts.createForMemory('mem_123', {
   subject: 'Albert Einstein',
   predicate: 'was_born_in',
   object: 'Ulm, Germany',
   confidence: 0.95,
-  source: { method: 'extracted', memoryId: 'mem_123' }
 });
-
-// Query facts using natural language
-const results = await client.facts.query('Where was Einstein born?', {
-  limit: 5,
-  minConfidence: 0.8
-});
-
-// List facts with filters
-const facts = await client.facts.list({
-  subject: 'Einstein',
-  minConfidence: 0.9
-});
-
-// Find facts by subject/predicate/object
-const bySubject = await client.facts.findBySubject('Einstein');
-const byPredicate = await client.facts.findByPredicate('discovered');
-const byObject = await client.facts.findByObject('Theory of Relativity');
-
-// Extract facts from a memory
-const extracted = await client.facts.extract('mem_123', { save: true });
-
-// Verify a fact against the knowledge base
-const verification = await client.facts.verify('fact_123');
-if (verification.verified) {
-  console.log(`Supported by ${verification.supportingMemories.length} memories`);
-}
-
-// Bulk create facts
-const bulk = await client.facts.bulkCreate([
-  { subject: 'A', predicate: 'is', object: 'B', confidence: 1.0 },
-  { subject: 'C', predicate: 'has', object: 'D', confidence: 0.9 }
-]);
-
-// Delete a fact
-await client.facts.delete('fact_123');
 ```
 
-### Entities (Named Entity Management)
+### Entities
+
+Named entities in the knowledge graph are read-mostly, plus a merge for
+deduplication.
 
 ```typescript
-// Create an entity
-const entity = await client.entities.create({
-  name: 'Albert Einstein',
-  type: 'person',
-  aliases: ['Einstein', 'A. Einstein', 'Prof. Einstein'],
-  description: 'Theoretical physicist',
-  properties: { birthYear: 1879, field: 'physics' }
-});
+// List entities (paginated), optionally filtered by type
+const { data: entities } = await client.entities.list({ type: 'person', limit: 20 });
 
-// Search entities
-const results = await client.entities.search('Einstein', {
-  type: 'person',
-  limit: 10
-});
+// Get one entity
+const entity = await client.entities.get('ent_123');
 
-// List entities by type
+// Filter by type
 const people = await client.entities.findByType('person');
 
-// Resolve text to an entity
-const resolution = await client.entities.resolve('Einstein', {
-  context: 'Nobel Prize in Physics'
-});
-if (resolution.entity) {
-  console.log(`Resolved to ${resolution.entity.name} (${resolution.confidence})`);
-}
+// Facts where the entity is the subject or object
+const { facts } = await client.entities.getFacts('ent_123');
 
-// Extract entities from a memory
-const extracted = await client.entities.extract('mem_123', {
-  save: true,
-  link: true
-});
-
-// Link/unlink entity to memory
-await client.entities.linkToMemory('ent_123', 'mem_456');
-await client.entities.unlinkFromMemory('ent_123', 'mem_456');
-
-// Find entities in a memory
-const memoryEntities = await client.entities.findByMemory('mem_123');
-
-// Merge duplicate entities
-const merged = await client.entities.merge('ent_target', 'ent_source');
-
-// Get facts about an entity
-const entityFacts = await client.entities.getFacts('ent_123');
-
-// Get all entity types
-const types = await client.entities.getTypes();
-types.types.forEach(t => console.log(`${t.name}: ${t.count} entities`));
-
-// Bulk operations
-const bulk = await client.entities.bulkCreate([
-  { name: 'Einstein', type: 'person' },
-  { name: 'Berlin', type: 'location' }
-]);
-
-// Delete an entity
-await client.entities.delete('ent_123');
+// Merge a duplicate into a canonical entity (the source is merged in and deleted)
+const merged = await client.entities.merge('ent_canonical', 'ent_duplicate');
 ```
 
 ## Pagination
 
-The SDK provides two ways to handle pagination:
+Every list endpoint supports manual paging and an auto-paginating async iterator.
 
-### 1. Manual Pagination
+### Manual
 
 ```typescript
 const page1 = await client.memories.list({ page: 1, limit: 100 });
 const page2 = await client.memories.list({ page: 2, limit: 100 });
 ```
 
-### 2. Async Iteration (Recommended)
+### Async iteration (recommended)
 
 ```typescript
-// Automatically fetches all pages
+// Automatically fetches every page
 for await (const memory of client.memories.listAll({ limit: 100 })) {
   console.log(memory.content);
 }
 ```
 
+`listAll` is also available on other paginated resources (e.g. `clusters.listAll`,
+`highlights.listAll`, `webhooks.listAll`).
+
+## Streaming
+
+Stream a bot run over Server-Sent Events with `bots.runStream`. It returns an async
+generator that yields typed `BotRunStep` events as the run progresses.
+
+```typescript
+import { Trix } from '@trixdb/client';
+
+const client = new Trix({ apiKey: process.env.TRIX_API_KEY! });
+
+const bot = await client.bots.create({
+  name: 'Summarizer',
+  system_prompt: 'You summarize meetings and extract action items.',
+});
+
+for await (const step of client.bots.runStream(bot.id, { message: "Summarize today's standup" })) {
+  console.log(step.type, step.data); // 'thinking' | 'tool_call' | 'message' | 'done' | ...
+  if (step.type === 'done') break;
+}
+```
+
+## File Uploads
+
+Upload files via multipart form data and fetch signed download URLs.
+
+```typescript
+import { readFile } from 'node:fs/promises';
+
+const bytes = await readFile('./diagram.png');
+
+const file = await client.files.upload({
+  file: new Blob([bytes]),
+  filename: 'diagram.png',
+  conversationId: 'conv_123',
+});
+
+// Signed, time-limited download URL
+const download = await client.files.getDownloadUrl(file.id);
+console.log(download.url);
+
+// Storage quota for the account
+const quota = await client.files.getQuota();
+```
+
+`file` accepts a `Blob` or `Buffer`. Uploads are validated client-side against
+`MAX_FILE_SIZE`; oversized files throw a `FileSizeError` before any request is sent.
+`validateFileSize` is exported if you want to check ahead of time.
+
+## Idempotency
+
+Every mutating request (`POST`, `PUT`, `PATCH`, `DELETE`) automatically carries an
+`Idempotency-Key` header — a fresh UUID v4 generated **once per logical request,
+before any retry**. If a network error hides an already-successful write, the
+built-in retry reuses the same key, so the server de-duplicates it instead of
+applying it twice.
+
+You never have to manage this. If you set your own `Idempotency-Key` (for example
+via a request interceptor), the SDK detects it and leaves it untouched.
+
+## Webhooks
+
+### Managing webhooks
+
+```typescript
+// Create a webhook
+const webhook = await client.webhooks.create({
+  url: 'https://api.example.com/webhook',
+  events: ['memory.created', 'memory.updated', 'memory.deleted'],
+  secret: 'your_webhook_secret',
+  active: true,
+});
+
+// List, test, inspect deliveries, retry, delete
+const list = await client.webhooks.list({ active: true });
+const testResult = await client.webhooks.test(webhook.id, 'memory.created');
+const deliveries = await client.webhooks.getDeliveries(webhook.id, { status: 'failed', limit: 20 });
+await client.webhooks.retryDelivery(webhook.id, 'del_456');
+await client.webhooks.delete(webhook.id);
+```
+
+`getEvents`, `getEventTypes`, `getStats`, `bulkCreate`, and `bulkDelete` are also
+available.
+
+### Verifying inbound webhooks
+
+Trix signs every delivery with an `X-Webhook-Signature: t=<unix>,v1=<hex>` header —
+an **HMAC-SHA256** of `` `${t}.${rawBody}` `` keyed by the endpoint's signing secret.
+`client.webhooks.verifySignature` recomputes it, compares in **constant time**, and
+enforces a **replay window** (default **300 seconds**, `DEFAULT_WEBHOOK_TOLERANCE_SECONDS`).
+It **fails closed**: it returns `false` — never throws — for a bad signature, a wrong
+secret, an expired timestamp, or a malformed header.
+
+Always verify the **raw request bytes**. Re-serializing the JSON reorders keys and
+breaks the HMAC.
+
+```typescript
+import express from 'express';
+import { Trix } from '@trixdb/client';
+
+const client = new Trix({ apiKey: process.env.TRIX_API_KEY! });
+const app = express();
+
+// Capture the raw body so the exact signed bytes are verified
+app.post('/webhooks/trix', express.raw({ type: 'application/json' }), async (req, res) => {
+  const rawBody = req.body.toString('utf8');
+  const signature = req.header('X-Webhook-Signature') ?? '';
+  const secret = process.env.TRIX_WEBHOOK_SECRET!;
+
+  const ok = await client.webhooks.verifySignature(rawBody, signature, secret, {
+    toleranceSeconds: 300, // optional; this is the default
+  });
+  if (!ok) return res.status(400).send('invalid signature');
+
+  const event = JSON.parse(rawBody);
+  // ...handle the verified event
+  res.sendStatus(204);
+});
+```
+
+Prefer `unwrap<T>` to verify and parse in one step. It throws a
+`WebhookVerificationError` when verification fails, so a valid return value is proof
+the payload is authentic:
+
+```typescript
+import { WebhookVerificationError } from '@trixdb/client';
+
+try {
+  const event = await client.webhooks.unwrap<{ type: string; data: unknown }>(
+    rawBody,
+    signature,
+    secret
+  );
+  // event is verified AND parsed
+} catch (err) {
+  if (err instanceof WebhookVerificationError) {
+    // reject the delivery
+  }
+}
+```
+
+The verification helpers are also exported standalone, so you can verify without
+constructing a client (handy in edge functions and workers):
+
+```typescript
+import {
+  verifyWebhookSignature,
+  unwrapWebhookPayload,
+  DEFAULT_WEBHOOK_TOLERANCE_SECONDS, // 300
+} from '@trixdb/client';
+
+const ok = await verifyWebhookSignature(rawBody, signature, secret);
+const event = await unwrapWebhookPayload<{ type: string }>(rawBody, signature, secret);
+```
+
+Built on Web Crypto, so it runs unchanged on Node.js 20+, Deno, Bun, Cloudflare
+Workers, and the browser.
+
 ## Error Handling
 
-The SDK provides specific error classes for different scenarios:
+The SDK throws a typed hierarchy — every error extends `TrixError`.
 
 ```typescript
 import {
@@ -571,7 +598,7 @@ import {
   RateLimitError,
   NetworkError,
   TimeoutError,
-  APIError
+  APIError,
 } from '@trixdb/client';
 
 try {
@@ -584,7 +611,7 @@ try {
   } else if (error instanceof ValidationError) {
     console.error('Validation failed:', error.errors);
   } else if (error instanceof RateLimitError) {
-    console.error('Rate limit exceeded, retry after:', error.retryAfter);
+    console.error('Rate limited, retry after:', error.retryAfter);
   } else if (error instanceof NetworkError) {
     console.error('Network error occurred');
   } else if (error instanceof TimeoutError) {
@@ -595,26 +622,55 @@ try {
 }
 ```
 
-## Automatic Retry
+`PermissionError`, `ConflictError`, `ServerError`, `FileSizeError`,
+`WebhookVerificationError`, and `APIVersionMismatchError` are exported as well.
 
-The SDK automatically retries failed requests with exponential backoff for:
-- Rate limit errors (429)
+## Automatic Retries
+
+Failed requests are retried automatically with exponential backoff and jitter for:
+
+- Rate-limit responses (429) — honoring the `Retry-After` header
 - Network errors
-- Timeout errors
-
-Configuration:
+- Timeouts
+- Server errors (5xx)
 
 ```typescript
 const client = new Trix({
   apiKey: 'your_api_key',
-  maxRetries: 3, // Maximum number of retry attempts (default: 3)
-  timeout: 30000 // Request timeout in milliseconds (default: 30000)
+  maxRetries: 3, // default: 3
+  timeout: 30000, // ms, default: 30000
 });
 ```
 
+Retries reuse the same `Idempotency-Key` (see [Idempotency](#idempotency)), so a retried
+write is de-duplicated rather than re-applied.
+
+## Testing
+
+The package ships a mock client at `@trixdb/client/testing` so you can unit-test code
+that uses the SDK without any network calls.
+
+```typescript
+import { MockTrix, createMockMemory } from '@trixdb/client/testing';
+
+const client = new MockTrix();
+
+// Queue a response and record calls
+client.memories.mockCreate(createMockMemory({ content: 'Hello' }));
+
+const memory = await client.memories.create({ content: 'Hello' });
+
+expect(memory.content).toBe('Hello');
+expect(client.memories.createCalls).toHaveLength(1);
+```
+
+Factory helpers (`createMockMemory`, `createMockCluster`, `createMockEntity`,
+`createMockFact`, `createMockRelationship`, `createMockPaginatedResponse`,
+`createMockBulkResult`) build well-formed fixtures.
+
 ## TypeScript Support
 
-The SDK is written in TypeScript and provides complete type definitions:
+The SDK is written in TypeScript and ships complete type definitions.
 
 ```typescript
 import type {
@@ -623,12 +679,12 @@ import type {
   Relationship,
   CreateMemoryParams,
   ListMemoriesParams,
-  PaginatedResponse
+  PaginatedResponse,
 } from '@trixdb/client';
 
 const params: CreateMemoryParams = {
   content: 'Typed memory creation',
-  tags: ['typescript']
+  tags: ['typescript'],
 };
 
 const memory: Memory = await client.memories.create(params);
@@ -636,19 +692,16 @@ const memory: Memory = await client.memories.create(params);
 
 ## Browser Usage
 
-The SDK works in modern browsers that support the Fetch API:
+The SDK works in modern browsers with the Fetch API and Web Crypto:
 
 ```typescript
 import { Trix } from '@trixdb/client';
 
-const client = new Trix({
-  apiKey: 'your_api_key'
-});
+const client = new Trix({ apiKey: 'your_api_key' });
 
-// All methods work the same in browsers
 const memory = await client.memories.create({
   content: 'Browser memory',
-  tags: ['browser']
+  tags: ['browser'],
 });
 ```
 
@@ -656,7 +709,7 @@ const memory = await client.memories.create({
 
 ### Custom Fetch Implementation
 
-You can provide a custom fetch implementation for testing or specific environments:
+Provide a custom `fetch` for testing or non-standard environments:
 
 ```typescript
 import { Trix } from '@trixdb/client';
@@ -664,7 +717,7 @@ import fetch from 'node-fetch';
 
 const client = new Trix({
   apiKey: 'your_api_key',
-  fetch: fetch as any
+  fetch: fetch as unknown as typeof globalThis.fetch,
 });
 ```
 
@@ -675,31 +728,36 @@ const client = new Trix({
 const audioMemory = await client.memories.create({
   content: 'Audio recording',
   type: 'audio',
-  audioFile: audioBlob // Blob or Buffer
+  audioFile: audioBlob, // Blob or Buffer
 });
 
 // Request transcription
-const job = await client.memories.transcribe(audioMemory.id, {
-  language: 'en',
-  priority: 'high'
-});
+const job = await client.memories.transcribe(audioMemory.id, { language: 'en' });
 
-// Check transcription status
-const transcriptionJob = await client.jobs.get('transcription', job.id);
+// Fetch the transcript once processing completes
+const transcript = await client.memories.getTranscript(audioMemory.id);
+console.log(transcript.text);
 
-// Get transcript when ready
-if (transcriptionJob.status === 'completed') {
-  const transcript = await client.memories.getTranscript(audioMemory.id);
-  console.log(transcript.text);
-}
-
-// Stream audio
+// Or stream the raw audio bytes
 const stream = await client.memories.streamAudio(audioMemory.id);
 ```
 
+## Requirements
+
+- **Node.js 20+** (for native `fetch` and Web Crypto), or any runtime with the Fetch
+  and Web Crypto APIs (Deno, Bun, Cloudflare Workers, modern browsers).
+
+## Related SDKs
+
+Trix ships official SDKs for several languages — pick the one that fits your stack:
+
+- **Python** — [`trixdb/trix-sdk-python`](https://github.com/trixdb/trix-sdk-python) (`pip install trixdb`)
+- **Go** — [`trixdb/trix-sdk-go`](https://github.com/trixdb/trix-sdk-go) — the streaming-focused client
+- **C# / .NET** — [`trixdb/trix-sdk-csharp`](https://github.com/trixdb/trix-sdk-csharp) (NuGet)
+
 ## License
 
-Copyright 2026 TrixDB
+Copyright 2026 TrixDB.
 
 Licensed under the [Apache License, Version 2.0](LICENSE).
 
@@ -707,16 +765,5 @@ Licensed under the [Apache License, Version 2.0](LICENSE).
 
 - Website: [https://trixdb.com](https://trixdb.com)
 - Documentation: [https://docs.trixdb.com](https://docs.trixdb.com)
-- Support: [https://trixdb.com/support](https://trixdb.com/support)
+- Changelog: [CHANGELOG.md](CHANGELOG.md)
 - Email: support@trixdb.com
-
-## Changelog
-
-### 0.1.0 (2025-12-30)
-
-- Initial public release
-- Full API coverage for Trix
-- TypeScript support
-- Automatic retry with exponential backoff
-- Pagination helpers
-- ESM and CJS builds
