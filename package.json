@@ -40,7 +40,7 @@
     "sdk"
   ],
   "author": "Trix",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://trixdb.com/support",
     "email": "support@trixdb.com"
