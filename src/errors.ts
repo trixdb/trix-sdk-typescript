@@ -182,3 +182,15 @@ export class FileSizeError extends TrixError {
     Object.setPrototypeOf(this, FileSizeError.prototype);
   }
 }
+
+/**
+ * Error thrown when an inbound webhook signature fails verification
+ * (invalid signature, wrong secret, expired timestamp, or malformed header).
+ */
+export class WebhookVerificationError extends TrixError {
+  constructor(message = 'Webhook signature verification failed') {
+    super(message);
+    this.name = 'WebhookVerificationError';
+    Object.setPrototypeOf(this, WebhookVerificationError.prototype);
+  }
+}

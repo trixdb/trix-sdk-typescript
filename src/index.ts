@@ -69,6 +69,14 @@ export {
   maskCredential,
 } from './utils/security.js';
 
+// Export inbound webhook signature verification utilities
+export {
+  verifyWebhookSignature,
+  unwrapWebhookPayload,
+  DEFAULT_WEBHOOK_TOLERANCE_SECONDS,
+} from './utils/webhook-signature.js';
+export type { VerifyWebhookOptions } from './utils/webhook-signature.js';
+
 // Export resources for type declarations
 export type {
   Memories,
