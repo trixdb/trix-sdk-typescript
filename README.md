@@ -3,6 +3,7 @@
 Official TypeScript SDK for Trix - A memory and knowledge management API.
 
 [![npm version](https://img.shields.io/npm/v/@trixdb/client.svg)](https://www.npmjs.com/package/@trixdb/client)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
 ## Features
 
@@ -698,9 +699,9 @@ const stream = await client.memories.streamAudio(audioMemory.id);
 
 ## License
 
-Copyright © 2025 Trix. All rights reserved.
+Copyright 2026 TrixDB
 
-This software is proprietary and confidential. Unauthorized copying, distribution, or use is strictly prohibited.
+Licensed under the [Apache License, Version 2.0](LICENSE).
 
 ## Support
 
