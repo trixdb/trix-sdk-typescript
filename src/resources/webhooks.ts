@@ -20,6 +20,11 @@ import type {
 } from '../types.js';
 import { paginateIterator } from '../utils/pagination.js';
 import { validateId, validateWebhookUrl } from '../utils/security.js';
+import {
+  verifyWebhookSignature,
+  unwrapWebhookPayload,
+  type VerifyWebhookOptions,
+} from '../utils/webhook-signature.js';
 
 /**
  * Webhooks resource for managing webhook subscriptions
@@ -312,5 +317,70 @@ export class Webhooks {
       path: '/webhooks/bulk/delete',
       body: { ids },
     });
+  }
+
+  /**
+   * Verify the signature of an inbound webhook delivery.
+   *
+   * Trix signs every delivery with `X-Webhook-Signature: t=<ts>,v1=<hmac>`,
+   * an HMAC-SHA256 of `` `${ts}.${rawBody}` `` keyed by the endpoint's signing
+   * secret. This recomputes it, compares in constant time, and enforces a
+   * replay window so an old captured delivery cannot be re-sent.
+   *
+   * @param payload - The exact raw request body string as received. Verify the
+   *   raw bytes, never a re-serialized object.
+   * @param signatureHeader - The `X-Webhook-Signature` header value.
+   * @param secret - The endpoint's signing secret.
+   * @param options - Optional overrides (e.g. `toleranceSeconds`, default 300).
+   * @returns `true` iff authentic and fresh; `false` on tampering, a wrong
+   *   secret, an expired timestamp or a malformed header (fails closed, never
+   *   throws).
+   *
+   * @example
+   * ```typescript
+   * const ok = await client.webhooks.verifySignature(
+   *   rawBody,
+   *   request.headers['x-webhook-signature'] as string,
+   *   process.env.TRIX_WEBHOOK_SECRET!
+   * );
+   * if (!ok) throw new Error('Untrusted webhook');
+   * ```
+   */
+  verifySignature(
+    payload: string,
+    signatureHeader: string,
+    secret: string,
+    options?: VerifyWebhookOptions
+  ): Promise<boolean> {
+    return verifyWebhookSignature(payload, signatureHeader, secret, options);
+  }
+
+  /**
+   * Verify an inbound webhook and return its parsed JSON body in one step.
+   *
+   * @typeParam T - Expected shape of the decoded payload.
+   * @param payload - The exact raw request body string as received.
+   * @param signatureHeader - The `X-Webhook-Signature` header value.
+   * @param secret - The endpoint's signing secret.
+   * @param options - Optional overrides (e.g. `toleranceSeconds`, default 300).
+   * @returns The parsed payload.
+   * @throws {WebhookVerificationError} If verification fails.
+   *
+   * @example
+   * ```typescript
+   * const event = await client.webhooks.unwrap<{ type: string }>(
+   *   rawBody,
+   *   request.headers['x-webhook-signature'] as string,
+   *   process.env.TRIX_WEBHOOK_SECRET!
+   * );
+   * ```
+   */
+  unwrap<T = unknown>(
+    payload: string,
+    signatureHeader: string,
+    secret: string,
+    options?: VerifyWebhookOptions
+  ): Promise<T> {
+    return unwrapWebhookPayload<T>(payload, signatureHeader, secret, options);
   }
 }
