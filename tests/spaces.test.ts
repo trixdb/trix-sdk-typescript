@@ -87,6 +87,43 @@ describe('Spaces Resource', () => {
     });
   });
 
+  describe('tags field', () => {
+    const taggedSpace: Space = { ...mockSpace, tags: ['work', 'engineering'] };
+
+    it('should surface tags from a read response', async () => {
+      const mockFetch = createMockFetch({ status: 200, body: taggedSpace });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
+
+      const space = await client.spaces.get('space_123');
+
+      expect(space.tags).toEqual(['work', 'engineering']);
+    });
+
+    it('should send tags on create', async () => {
+      const mockFetch = createMockFetch({ status: 200, body: taggedSpace });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
+
+      const params: CreateSpaceParams = { name: 'Test Space', tags: ['work', 'engineering'] };
+      await client.spaces.create(params);
+
+      const [, options] = mockFetch.mock.calls[0];
+      const body = JSON.parse(options.body);
+      expect(body.tags).toEqual(['work', 'engineering']);
+    });
+
+    it('should send tags on update', async () => {
+      const mockFetch = createMockFetch({ status: 200, body: taggedSpace });
+      const client = new Trix({ apiKey: 'test_key', fetch: mockFetch });
+
+      const params: UpdateSpaceParams = { tags: ['archived'] };
+      await client.spaces.update('space_123', params);
+
+      const [, options] = mockFetch.mock.calls[0];
+      const body = JSON.parse(options.body);
+      expect(body.tags).toEqual(['archived']);
+    });
+  });
+
   describe('getBySlug', () => {
     it('should get space by slug', async () => {
       const mockFetch = createMockFetch({ status: 200, body: mockSpace });

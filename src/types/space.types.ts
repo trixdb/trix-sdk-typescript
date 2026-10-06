@@ -15,6 +15,7 @@ export interface Space extends BaseEntityWithMetadata {
   name: string;
   slug: string;
   description?: string;
+  tags?: string[];
 }
 
 // ============================================================================
@@ -28,6 +29,7 @@ export interface CreateSpaceParams {
   name: string;
   slug?: string;
   description?: string;
+  tags?: string[];
   metadata?: Record<string, unknown>;
 }
 
@@ -38,5 +40,6 @@ export interface UpdateSpaceParams {
   name?: string;
   slug?: string;
   description?: string;
+  tags?: string[];
   metadata?: Record<string, unknown>;
 }
