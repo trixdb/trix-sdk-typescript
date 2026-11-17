@@ -176,6 +176,26 @@ describe('handleResponse case conversion', () => {
     expect(result.metadata).toEqual({ snake_stays: true });
   });
 
+  it('keeps MQL aggregate bucket keys verbatim so they match `metrics`', async () => {
+    // A `group by type count avg quality` response: bucket keys are the metric
+    // aliases the server lists in `metrics`, so they must not be camelCased.
+    const result = await handleResponse<{
+      aggregate: Array<Record<string, unknown>>;
+      groupBy: string | null;
+      metrics: string[];
+    }>(
+      jsonResponse({
+        aggregate: [{ group: 'fact', count: 3, avg_quality_score: 0.8 }],
+        group_by: 'type',
+        metrics: ['count', 'avg_quality_score'],
+      })
+    );
+    expect(result.groupBy).toBe('type');
+    for (const metric of result.metrics) {
+      expect(result.aggregate[0]).toHaveProperty(metric);
+    }
+  });
+
   it('returns undefined for a 204 without touching the body', async () => {
     const res = {
       ok: true,

@@ -12,7 +12,8 @@ export type {
 export type {
   MemoryType, OriginType, SourceType, ResourceRelationshipType, ProtectionLevel,
   MemoryOriginContext, MemoryProtectionFields, Memory, CreateMemoryParams,
-  UpdateMemoryParams, ListMemoriesParams, MemoryConfig, MemoryStatsParams, MemoryStats,
+  UpdateMemoryParams, ListMemoriesParams, QueryMemoriesParams, MqlAggregateResult,
+  MemoryConfig, MemoryStatsParams, MemoryStats,
 } from './memory.types.js';
 
 export type {

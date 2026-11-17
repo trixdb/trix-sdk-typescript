@@ -112,6 +112,29 @@ export interface UpdateMemoryParams extends Partial<MemoryOriginContext>, Memory
   embedding?: number[];
 }
 
+/** Parameters for {@link Memories.query} — an MQL query. */
+export interface QueryMemoriesParams {
+  /** The MQL query string, compiled to SQL server-side. */
+  mql: string;
+  /** Maximum rows to return (ignored for aggregations). */
+  limit?: number;
+  /** Rows to skip (pagination). */
+  offset?: number;
+}
+
+/**
+ * Response shape when an MQL `group by … count avg …` query aggregates.
+ *
+ * Each bucket holds `group` (when grouped) plus one key per entry in
+ * `metrics`; bucket keys are kept verbatim (e.g. `avg_quality_score`) so
+ * `bucket[metric]` works. `groupBy` is the wire `group_by`, camelCased.
+ */
+export interface MqlAggregateResult {
+  aggregate: Array<Record<string, string | number | null>>;
+  groupBy: string | null;
+  metrics: string[];
+}
+
 /**
  * Parameters for listing memories.
  */

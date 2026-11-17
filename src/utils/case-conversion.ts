@@ -83,6 +83,9 @@ const OPAQUE_KEYS = new Set<string>([
   // Aggregation / permission maps (arbitrary string keys → scalars)
   'permissions', 'facets', 'factors', 'stages',
   'by_type', 'by_tag', 'by_event', 'by_space',
+  // MQL `group by` buckets: keys are the metric aliases listed in `metrics`
+  // (e.g. `avg_quality_score`), so they must stay verbatim to stay indexable.
+  'aggregate',
 ]);
 
 /**

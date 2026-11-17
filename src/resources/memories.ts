@@ -8,6 +8,8 @@ import type {
   CreateMemoryParams,
   UpdateMemoryParams,
   ListMemoriesParams,
+  QueryMemoriesParams,
+  MqlAggregateResult,
   PaginatedResponse,
   BulkResult,
   MemoryConfig,
@@ -161,6 +163,32 @@ export class Memories extends BaseResource {
       method: 'GET',
       path: '/memories',
       params: buildParams(params || {}),
+    });
+  }
+
+  /**
+   * Query memories with MQL (Memory Query Language) — one expressive string
+   * (boolean logic, ranges, `in`/`between`, wildcards, `content:`, `entity:`/
+   * `related:`, `near:`/`bbox:`, `order by`, and `group by … count avg …`)
+   * compiled to parameterised SQL server-side.
+   *
+   * Returns a paginated list for a normal query, or an {@link MqlAggregateResult}
+   * for an aggregation. Narrow with an `'aggregate' in result` check.
+   *
+   * @example
+   * ```typescript
+   * const page = await client.memories.query({ mql: 'type:fact quality>0.8 order by quality desc limit 10' });
+   * const agg = await client.memories.query({ mql: 'group by type count avg quality' });
+   * if ('aggregate' in agg) console.log(agg.aggregate);
+   * ```
+   */
+  async query(
+    params: QueryMemoriesParams
+  ): Promise<PaginatedResponse<Memory> | MqlAggregateResult> {
+    return this.request<PaginatedResponse<Memory> | MqlAggregateResult>({
+      method: 'GET',
+      path: '/memories',
+      params: buildParams(params),
     });
   }
 
