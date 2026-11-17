@@ -156,7 +156,7 @@ describe('Memories', () => {
     it('returns the aggregate shape for a group by query', async () => {
       const agg = {
         aggregate: [{ group: 'fact', count: 3 }],
-        group_by: 'type',
+        groupBy: 'type',
         metrics: ['count'],
       };
       mockClient.request.mockResolvedValue(agg);
@@ -165,7 +165,7 @@ describe('Memories', () => {
 
       expect('aggregate' in result).toBe(true);
       if ('aggregate' in result) {
-        expect(result.group_by).toBe('type');
+        expect(result.groupBy).toBe('type');
         expect(result.aggregate).toHaveLength(1);
       }
     });
